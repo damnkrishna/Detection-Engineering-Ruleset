@@ -1,0 +1,38 @@
+title: Persistent Miner Service Registration (AN1489-A)
+id: 282eee2b-a13a-4f64-b5c7-25328d9f75e7
+status: experimental
+description: Detects registry entries creating system services pointing to known cryptomining processes.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry:
+        TargetObject|contains:
+            - 'SYSTEM\CurrentControlSet\Services\'
+    selection_details:
+        Details|contains:
+            - '\xmrig'
+            - '\minerd'
+            - '\cgminer'
+            - '--stratum'
+            - '--pool'
+    filter_installer:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_registry and selection_details and not filter_installer
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Standard enterprise software deploying components that share parameters with mining tools (extremely rare).
+level: critical
+tags:
+    - attack.impact
+    - attack.t1496.001
+    - analytic.an1489
+    - detection.det0540

@@ -1,0 +1,23 @@
+{
+  "rule_id": "cfc94563-1de9-4172-8b75-12200e24147a",
+  "rule_name": "SCM Event Log Service Crash Loop (AN0850-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,50 @@
+title: Collection - Search Loop for Sensitive Local Files (AN1070)
+id: ab321f4f-0b00-497f-ac15-1a6852c62b4e
+status: experimental
+description: Detects command-line interpreters or scripting hosts executing recursive search commands (like dir /s or Get-ChildItem) targeting sensitive file extensions (e.g. .docx, .xlsx, .pdf, .pst, .db, .key), suggesting data harvesting.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_process:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_search_commands:
+        CommandLine|contains:
+            - 'dir /s'
+            - 'Get-ChildItem'
+            - 'findstr'
+    selection_extensions:
+        CommandLine|contains:
+            - '.docx'
+            - '.xlsx'
+            - '.pdf'
+            - '.pst'
+            - '.ost'
+            - '.key'
+            - '.wallet'
+            - '.pgp'
+    condition: selection_process and selection_search_commands and selection_extensions
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - search scripts or user-initiated manual command-line lookups for lost local files.
+    - Local desktop search indexers or backup scripts running search queries.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1005
+    - analytic.an1070
+    - detection.det0380

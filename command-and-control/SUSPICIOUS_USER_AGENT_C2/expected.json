@@ -1,0 +1,23 @@
+{
+  "rule_id": "SUSPICIOUS_USER_AGENT_C2",
+  "rule_name": "Known malware/C2 framework or scanner user agent detected (Splunk: Suspicious User Agents story)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-nids",
+  "event_source": "suricata",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

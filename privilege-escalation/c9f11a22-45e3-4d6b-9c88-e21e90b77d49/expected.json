@@ -1,0 +1,23 @@
+{
+  "rule_id": "c9f11a22-45e3-4d6b-9c88-e21e90b77d49",
+  "rule_name": "SID-History Injection (AN0383)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,42 @@
+title: MFA Administrative Tampering via PowerShell (AN0543-B)
+id: c10c6c11-0f72-4025-82ea-6e121ba1ffed
+status: experimental
+description: Detects PowerShell script blocks clearing or weakening user MFA configurations in AD or Azure AD.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: windows
+    category: ps_script
+detection:
+    selection_cmdlets:
+        ScriptBlockText|contains:
+            - 'Set-MsolUser'
+            - 'Update-MgUser'
+            - 'Set-AzureADUser'
+    selection_mfa_params:
+        ScriptBlockText|contains:
+            - 'StrongAuthenticationRequirements'
+            - 'StrongAuthenticationMethods'
+            - 'StrongAuthenticationPhoneAppDetails'
+    selection_disable_keywords:
+        ScriptBlockText|contains:
+            - 'StrongAuthenticationRequirements = $null'
+            - 'StrongAuthenticationRequirements = @()'
+            - 'StrongAuthenticationRequirements.Clear()'
+            - 'StrongAuthenticationRequirements = clear'
+            - 'StrongAuthenticationRequirements = Remove'
+            - 'StrongAuthenticationMethods = $null'
+            - 'StrongAuthenticationMethods = @()'
+            - 'StrongAuthenticationMethods.Clear()'
+    condition: selection_cmdlets and selection_mfa_params and selection_disable_keywords
+fields:
+    - ScriptBlockText
+    - User
+falsepositives:
+    - Legitimate administration scripts resetting user MFA methods upon request.
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1556.006
+    - analytic.an0543
+    - detection.det0190

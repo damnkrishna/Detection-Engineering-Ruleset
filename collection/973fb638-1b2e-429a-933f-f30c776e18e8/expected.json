@@ -1,0 +1,23 @@
+{
+  "rule_id": "973fb638-1b2e-429a-933f-f30c776e18e8",
+  "rule_name": "ARP Spoofing Tool Execution (AN1091-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

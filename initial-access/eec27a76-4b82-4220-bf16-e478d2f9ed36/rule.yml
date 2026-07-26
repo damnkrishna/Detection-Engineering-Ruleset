@@ -1,0 +1,69 @@
+title: Exploit Public-Facing Application - Suspicious Child Process of Web Server (AN0219-A)
+id: f6564559-a33a-42d0-a66f-7c885a952a0d
+status: experimental
+description: Detects command-line interpreters or administrative utilities spawned by web server processes (e.g., IIS, Tomcat, Apache, Java web services), suggesting successful exploitation or web shell deployment.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\w3wp.exe'
+            - '\httpd.exe'
+            - '\nginx.exe'
+            - '\tomcat.exe'
+            - '\tomcat7.exe'
+            - '\tomcat8.exe'
+            - '\tomcat9.exe'
+            - '\tomcat10.exe'
+            - '\httpd.exe'
+            - '\java.exe'
+            - '\javaw.exe'
+    selection_child:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\sh.exe'
+            - '\bash.exe'
+            - '\whoami.exe'
+            - '\net.exe'
+            - '\nltest.exe'
+            - '\systeminfo.exe'
+            - '\ipconfig.exe'
+            - '\arp.exe'
+            - '\curl.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'whoami.exe'
+            - 'net.exe'
+            - 'nltest.exe'
+            - 'systeminfo.exe'
+            - 'ipconfig.exe'
+            - 'arp.exe'
+            - 'curl.exe'
+    condition: selection_parent and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative scripts triggered by web application dashboards (e.g., automated server backup scripts triggered from an admin panel).
+level: critical
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - analytic.an0219
+    - detection.det0080

@@ -1,0 +1,23 @@
+{
+  "rule_id": "65a5e5c3-7e09-4c9b-87d2-7966bf46cc74",
+  "rule_name": "Exploit Framework Induced Denial of Service Execution (AN0850-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

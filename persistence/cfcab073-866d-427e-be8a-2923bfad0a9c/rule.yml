@@ -1,0 +1,31 @@
+title: File Association Registry Modification (AN0170-B)
+id: 88c535dd-2666-4c1a-bf66-18443cfe6a35
+status: experimental
+description: Detects registry value writes altering default application associations for file classes under Software\Classes or HKCR paths.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry_path:
+        TargetObject|contains:
+            - '\Software\Classes\'
+            - 'HKCR\'
+    selection_registry_value:
+        TargetObject|endswith: '\shell\open\command'
+    condition: selection_registry_path and selection_registry_value
+fields:
+    - TargetObject
+    - Image
+    - User
+    - Details
+falsepositives:
+    - Installation of approved applications modifying file associations.
+level: medium
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1546.001
+    - analytic.an0170
+    - detection.det0061

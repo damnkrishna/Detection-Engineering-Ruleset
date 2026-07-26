@@ -1,0 +1,31 @@
+title: Group Policy Modification via Script Block (AN0854-B)
+id: 7cce6522-2df9-4973-ad2c-f11bd5b4d4ef
+status: experimental
+description: Detects executing PowerShell script blocks containing cmdlets that create or modify Group Policy Objects.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection:
+        ScriptBlockText|contains:
+            - 'New-GPO'
+            - 'Set-GPO'
+            - 'Set-GPRegistryValue'
+            - 'New-GPLink'
+            - 'Import-GPO'
+            - 'New-GPOImmediateTask'
+    condition: selection
+fields:
+    - ScriptBlockText
+    - User
+falsepositives:
+    - Centralized IT administration scripts automating domain config changes.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.privilege-escalation
+    - attack.t1484.001
+    - analytic.an0854
+    - detection.det0305

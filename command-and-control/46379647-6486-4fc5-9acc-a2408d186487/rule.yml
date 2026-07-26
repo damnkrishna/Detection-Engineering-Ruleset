@@ -1,0 +1,43 @@
+title: Multi-Stage C2 Process Spawning (AN0637-B)
+id: cc4cd7e5-b8ad-4725-8619-a196f4fe5447
+status: experimental
+description: Detects process creation patterns typical of multi-stage C2 channels, where a scripting host (stage 1) spawns an unexpected child process (stage 2).
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\hh.exe'
+    selection_child:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\schtasks.exe'
+            - '\certutil.exe'
+            - '\installutil.exe'
+            - '\cvtres.exe'
+    condition: selection_parent and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Legitimate administrative software deployment or diagnostic scripting.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1104
+    - analytic.an0637
+    - detection.det0228

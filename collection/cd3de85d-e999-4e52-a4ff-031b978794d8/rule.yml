@@ -1,0 +1,34 @@
+title: Keyboard Layout Registry Tampering (AN0243-B)
+id: fccbc1da-535e-47ab-8735-8b93885af6d4
+status: experimental
+description: Detects registry modifications to Scancode Map or Keyboard Layout Order.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry:
+        TargetObject|contains:
+            - 'SYSTEM\CurrentControlSet\Control\Keyboard Layout'
+        TargetObject|endswith:
+            - '\Scancode Map'
+            - '\Layout Display Name'
+    filter_system:
+        Image|endswith:
+            - '\ctfmon.exe'
+            - '\explorer.exe'
+            - '\svchost.exe'
+    condition: selection_registry and not filter_system
+fields:
+    - TargetObject
+    - Details
+    - User
+falsepositives:
+    - Legitimate user customizations or language pack installations remapping specific keys.
+level: high
+tags:
+    - attack.collection
+    - attack.t1056.001
+    - analytic.an0243
+    - detection.det0089

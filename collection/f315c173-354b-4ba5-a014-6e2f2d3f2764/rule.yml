@@ -1,0 +1,50 @@
+title: Suspicious Module Load in Interactive User Processes (AN0282-B)
+id: 222416de-b7ce-4c6a-96f0-c88117c25a01
+status: experimental
+description: Detects loading of DLLs from user-writable directories into interactive user shells and web browsers, excluding known signed updater and native-host binaries.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection_target:
+        Image|endswith:
+            - '\explorer.exe'
+            - '\chrome.exe'
+            - '\firefox.exe'
+            - '\msedge.exe'
+            - '\mstsc.exe'
+    selection_load:
+        ImageLoaded|contains:
+            - '\Temp\'
+            - '\Users\Public\'
+            - '\AppData\'
+            - '\ProgramData\'
+    filter_signed_updaters:
+        # Known signed auto-updater and installer binaries that write legitimately to AppData/Temp
+        ImageLoaded|contains:
+            - '\GoogleUpdate\'
+            - '\MicrosoftEdgeUpdate\'
+            - '\BraveUpdate\'
+            - '\Mozilla\updates\'
+            - '\Firefox\updates\'
+            - '\Update\\'
+    filter_native_hosts:
+        # Browser native messaging hosts that load helper DLLs from AppData by design
+        ImageLoaded|contains:
+            - '\NativeMessagingHosts\'
+            - '\native-messaging-hosts\'
+    condition: selection_target and selection_load and not (filter_signed_updaters or filter_native_hosts)
+fields:
+    - Image
+    - ImageLoaded
+    - User
+falsepositives:
+    - Browser updates running inside AppData or legitimate web browser extensions that utilize local native host helper executables.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1056
+    - analytic.an0282
+    - detection.det0102

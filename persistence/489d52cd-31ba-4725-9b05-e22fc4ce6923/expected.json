@@ -1,0 +1,23 @@
+{
+  "rule_id": "489d52cd-31ba-4725-9b05-e22fc4ce6923",
+  "rule_name": "Accessibility Features Registry Debugger Configuration (AN0094-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

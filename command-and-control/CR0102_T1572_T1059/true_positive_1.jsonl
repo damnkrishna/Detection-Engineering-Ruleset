@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"Zeek::Notice Scan::Address_Scan SSH connection","hostname":"OPS-WKS-203","agent_ip":"10.42.94.197","severity_id":3,"event_uid":"golden|CR0102_T1572_T1059|0|312800","proto":"tcp","src_port":"50412","dst_port":"443","src_ip":"10.42.94.197","dst_ip":"198.51.100.113"}

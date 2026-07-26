@@ -1,0 +1,37 @@
+title: Developer Utility Project File Creation (AN0550-B)
+id: f9883cae-05fe-45a5-976b-5f8ec4b134ed
+status: experimental
+description: Detects the creation of ClickOnce deployment or MSBuild project files in temporary or user-writable folders, indicating potential execution staging.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.application'
+            - '.manifest'
+            - '.csproj'
+            - '.vbproj'
+            - '.targets'
+            - '.props'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Developers writing code or local compilations.
+level: medium
+tags:
+    - attack.execution
+    - attack.defense-evasion
+    - attack.t1127.002
+    - analytic.an0550
+    - detection.det0191

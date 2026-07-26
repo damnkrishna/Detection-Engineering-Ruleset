@@ -1,0 +1,40 @@
+title: PowerShell Error Suppression Command-Line Option (AN0182-B)
+id: 4e0035aa-a241-46a8-9f34-9470a022b76e
+status: experimental
+description: Detects powershell.exe execution where the command-line parameters specify silencing or ignoring error actions, which is common in adversarial scripting trying to avoid user alerts.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_flags:
+        CommandLine|contains:
+            - '-ErrorAction SilentlyContinue'
+            - '-EA SilentlyContinue'
+            - '-ErrorAction Ignore'
+            - '-EA Ignore'
+    condition: selection_powershell and selection_flags
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - User
+falsepositives:
+    - Administrative automation tasks running PowerShell commands with error ignoring options.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1564.011
+    - analytic.an0182
+    - detection.det0067

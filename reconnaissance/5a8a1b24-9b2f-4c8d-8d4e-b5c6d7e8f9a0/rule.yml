@@ -1,0 +1,49 @@
+title: Suspicious System Information Gathering (AN2067)
+id: a337ef4a-6a48-40d6-99ab-850d4e0d3545
+status: experimental
+description: Detects the execution of utilities like systeminfo, dxdiag, and gpresult to discover system specifications, filtering out benign local interactive admin executions unless suspicious remote query parameters are used.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_utilities:
+        Image|endswith:
+            - '\systeminfo.exe'
+            - '\dxdiag.exe'
+            - '\gpresult.exe'
+        OriginalFileName:
+            - 'systeminfo.exe'
+            - 'dxdiag.exe'
+            - 'gpres.exe'
+    selection_suspicious_cli:
+        CommandLine|contains:
+            - '/S'  # Remote system query — suspicious
+            - '/U'  # Remote credentials — suspicious
+    filter_admin:
+        ParentImage|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\explorer.exe'
+            - '\mmc.exe'
+    filter_approved_scripts:
+        ParentCommandLine|contains:
+            - 'C:\Program Files\Diagnostic Tools\'
+            - 'C:\Windows\System32\drivers\etc\'
+    condition: ((selection_utilities and selection_suspicious_cli) or (selection_utilities and not filter_admin)) and not filter_approved_scripts
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Administrative diagnostics or inventory software updates.
+    - Approved diagnostic scripts running from whitelisted paths (e.g. C:\Program Files\Diagnostic Tools\).
+level: medium
+tags:
+    - attack.reconnaissance
+    - attack.t1592
+    - analytic.an2067
+    - detection.det0924

@@ -1,0 +1,79 @@
+{
+  "id": "STAGED_CLOUD_UPLOAD",
+  "description": "File collection on endpoint (HIDS) followed by cloud sync client making large outbound upload (Zeek) \u2014 T1567.002 exfil over cloud storage API evading DLP; cross-sensor confirmation",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.5,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "HIDS",
+    "ZEEK"
+  ],
+  "stages": [
+    {
+      "label": "collection_or_archive",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0009"
+          ]
+        },
+        {
+          "field": "sensor",
+          "op": "IN",
+          "values": [
+            "HIDS"
+          ]
+        }
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "7z",
+        "zip",
+        "tar",
+        "compress",
+        "archive",
+        "robocopy",
+        "xcopy",
+        "Compress-Archive",
+        "bulk copy",
+        "file collection"
+      ]
+    },
+    {
+      "label": "cloud_exfil_upload",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0010"
+          ]
+        },
+        {
+          "field": "sensor",
+          "op": "IN",
+          "values": [
+            "ZEEK"
+          ]
+        }
+      ],
+      "optional": false,
+      "maxGapSeconds": 1800,
+      "signatureEquals": [
+        "onedrive",
+        "sharepoint",
+        "dropbox",
+        "googledrive",
+        "box.com",
+        "mega.nz",
+        "cloud upload",
+        "large upload",
+        "high bytes out",
+        "cloud storage",
+        "upload spike"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+title: 'AN1436 - Office Application Startup: Office Template Macros'
+id: a6b2cffc-b286-465b-9bc1-efaab91f6694
+status: experimental
+description: 'Detects the creation or modification of global Office templates (like Normal.dotm) by suspicious processes, indicating potential macro-based persistence.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: file_event
+detection:
+  selection_file:
+    TargetFilename|endswith:
+      - '\Microsoft\Templates\Normal.dotm'
+      - '\Microsoft\Excel\XLSTART\*.xlam'
+  selection_event:
+    EventType: 'CreateFile'
+  filter_office:
+    Image|endswith:
+      - '\winword.exe'
+      - '\excel.exe'
+  condition: selection_file and selection_event and not filter_office
+fields:
+  - EventID
+  - TargetFilename
+  - Image
+  - Details
+level: high
+tags:
+  - attack.persistence
+  - attack.t1137.001
+  - analytic.an1436

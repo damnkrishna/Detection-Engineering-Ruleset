@@ -1,0 +1,23 @@
+{
+  "rule_id": "ZEEK_DGA_HIDS_LOLBIN",
+  "rule_name": "Cross-sensor: Zeek detects DGA/NXDOMAIN burst (behavior-driven) + HIDS detects LOLBin execution on same host — confirms active implant communicating out, not scanning noise (T1568.002 + T1218)",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-zeek",
+  "event_source": "zeek",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 11
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 11
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 11
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 11
+  }
+}

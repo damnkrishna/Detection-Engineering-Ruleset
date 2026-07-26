@@ -1,0 +1,32 @@
+title: Hybrid Identity Service Registry Tampering (AN0814-A)
+id: de4b26bd-4032-45df-a83f-209de5c18e99
+status: experimental
+description: Detects registry modifications targeting Azure AD Connect or AD FS service configurations.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry:
+        TargetObject|contains:
+            - 'SOFTWARE\Microsoft\Microsoft Azure AD Connection Tool\'
+            - 'SOFTWARE\Microsoft\ADFS\'
+            - 'SYSTEM\CurrentControlSet\Services\AdFederationSvc\'
+    filter_legitimate:
+        Image|endswith:
+            - '\AzureADConnect.exe'
+            - '\miiserver.exe'
+    condition: selection_registry and not filter_legitimate
+fields:
+    - TargetObject
+    - Details
+    - User
+falsepositives:
+    - Standard administrator updates or reconfiguration of Azure AD Connect Sync Service.
+level: medium
+tags:
+    - attack.defense-impairment
+    - attack.t1556.007
+    - analytic.an0814
+    - detection.det0293

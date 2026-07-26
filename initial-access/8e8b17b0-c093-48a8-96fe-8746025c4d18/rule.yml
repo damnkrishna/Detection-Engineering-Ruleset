@@ -1,0 +1,37 @@
+title: Supply Chain Compromise - Installer Spawned Script Block (AN1480-B)
+id: 68c51aa2-61e6-4e91-b541-73781e41fa1d
+status: experimental
+description: Detects PowerShell script block logs executing commands associated with software installations, pointing to potentially tampered installers.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_installer:
+        ScriptBlockText|contains:
+            - '\Temp\'
+            - '\AppData\Local\'
+            - 'msiexec'
+            - 'setup'
+            - 'install'
+    selection_cmd:
+        ScriptBlockText|contains:
+            - 'Invoke-Expression'
+            - 'iex'
+            - 'Invoke-WebRequest'
+            - 'iwr'
+            - 'Net.WebClient'
+            - 'DownloadFile'
+            - 'DownloadString'
+    condition: selection_installer and selection_cmd
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate software updates using scripts for post-install configurations.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1195
+    - analytic.an1480
+    - detection.det0537

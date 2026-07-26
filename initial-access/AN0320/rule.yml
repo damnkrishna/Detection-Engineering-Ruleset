@@ -1,0 +1,68 @@
+title: Spearphishing via Service - Suspicious Child Process Spawned by Browser or Chat Application (AN0320-A)
+id: 44ce0c9a-2cb3-4646-80b7-1cb2ed5361c6
+status: experimental
+description: Detects suspicious child processes (like cmd.exe, powershell.exe, wscript.exe, rundll32.exe) spawned by web browsers or collaboration/chat applications (Discord, Slack, Telegram, Teams), which indicates browser-initiated exploit execution or user execution of phishing attachments.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\firefox.exe'
+            - '\brave.exe'
+            - '\opera.exe'
+            - '\discord.exe'
+            - '\slack.exe'
+            - '\teams.exe'
+            - '\Telegram.exe'
+            - '\WhatsApp.exe'
+            - '\zoom.exe'
+    selection_child:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\certutil.exe'
+            - '\bitsadmin.exe'
+            - '\curl.exe'
+            - '\scrcons.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'mshta.exe'
+            - 'rundll32.exe'
+            - 'regsvr32.exe'
+            - 'certutil.exe'
+            - 'bitsadmin.exe'
+            - 'curl.exe'
+    condition: selection_parent and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate user actions such as developer utilities running via local browser-based IDEs (e.g., Jupyter Notebooks or VS Code Web).
+    - Auto-update mechanisms for messaging applications that spawn command-line execution or self-update scripts.
+level: high
+tags:
+    - attack.initial-access
+    - attack.t1566.003
+    - analytic.an0320
+    - detection.det0115

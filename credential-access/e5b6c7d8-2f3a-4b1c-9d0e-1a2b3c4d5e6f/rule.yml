@@ -1,0 +1,48 @@
+title: Suspicious SPN Enumeration and Kerberoasting Activity via CLI (AN0444-A)
+id: 0b2e72d7-67c1-4724-8f0e-cae4fe0633e0
+status: experimental
+description: Detects command-line parameters associated with Service Principal Name (SPN) enumeration via setspn.exe or direct Kerberoasting attacks using Rubeus.
+author: Krishna Gupta
+date: 2026-06-12
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_setspn:
+        - Image|endswith: '\setspn.exe'
+        - OriginalFileName: 'setspn.exe'
+    selection_setspn_args:
+        CommandLine|contains:
+            - '-q'
+            - '-Q'
+            - '/q'
+            - '/Q'
+    selection_setspn_query:
+        CommandLine|contains:
+            - '*/*'
+    selection_rubeus:
+        CommandLine|contains:
+            - 'kerberoast'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (((selection_setspn_image or selection_setspn_original) and selection_setspn_args and selection_setspn_query) or selection_rubeus) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Active Directory administrators running legitimate SPN checks or audits.
+    - Automated identity management platforms checking service account configurations.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1558.003
+    - analytic.an0444
+    - detection.det0157

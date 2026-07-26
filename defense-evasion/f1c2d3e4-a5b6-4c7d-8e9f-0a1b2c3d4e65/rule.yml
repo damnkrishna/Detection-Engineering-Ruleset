@@ -1,0 +1,47 @@
+title: Steganography or Data Obfuscation Utility Execution (AN2108)
+id: 702ad6bb-6445-4cb2-8309-1108838876e6
+status: experimental
+description: "Detects the execution of known command-line steganography tools (e.g., steghide, openstego, outguess) commonly used by threat actors to embed or extract hidden payloads inside images or audio files to bypass network monitoring."
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_steg_images:
+        Image|endswith:
+            - '\steghide.exe'
+            - '\openstego.exe'
+            - '\outguess.exe'
+    selection_steg_ofn:
+        OriginalFileName:
+            - 'steghide.exe'
+            - 'openstego.exe'
+            - 'outguess.exe'
+    selection_steg_cli:
+        CommandLine|contains:
+            - 'embed'
+            - 'extract'
+            - '-ef'
+            - '-cf'
+            - '-sf'
+            - '-xf'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_steg_images or selection_steg_ofn) and selection_steg_cli and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Developer or security audit environments where steganography tools are tested or used in training exercises.
+level: medium
+tags:
+    - attack.defense_evasion
+    - attack.t1001
+    - analytic.an2108
+    - detection.det0965

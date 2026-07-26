@@ -1,0 +1,26 @@
+title: Scheduled Task Staging File Creation (AN1118-B)
+id: 4ed6a4dc-4168-4e5e-82fa-94ed6c1acaa9
+status: experimental
+description: Detects the creation of scheduled task configuration files under System32\Tasks, which may contain scheduled staging or exfiltration commands.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\System32\Tasks\'
+    condition: selection_paths
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Standard software installations registering system maintenance tasks.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1029
+    - analytic.an1118
+    - detection.det0399

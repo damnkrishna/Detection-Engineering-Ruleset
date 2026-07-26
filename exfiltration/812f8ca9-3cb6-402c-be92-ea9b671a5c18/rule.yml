@@ -1,0 +1,39 @@
+title: Outbound Encrypted File Upload (AN1389-B)
+id: db8c3816-697c-4c6c-8e54-d843d3b34740
+status: experimental
+description: Detects CLI tools or scripting engines initiating network connections over port 443 with command-line parameters specifying encoding or encryption keywords, suggesting potential exfiltration.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\curl.exe'
+    selection_ports:
+        DestinationPort: 443
+    selection_obfuscation:
+        CommandLine|contains:
+            - '-enc'
+            - 'enc'
+            - 'base64'
+            - 'secure'
+    condition: selection_process and selection_ports and selection_obfuscation
+fields:
+    - Image
+    - CommandLine
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Administrative scripts or software updates performing secure communication.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1048.001
+    - analytic.an1389
+    - detection.det0503

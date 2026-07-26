@@ -1,0 +1,23 @@
+{
+  "rule_id": "DATA_STAGING_LARGE_FILE",
+  "rule_name": "Bulk file archiving or compression (T1074.001) followed by large outbound transfer — pre-exfil staging behavior",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-hids",
+  "event_source": "wazuh",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 3
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 3
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 3
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 3
+  }
+}

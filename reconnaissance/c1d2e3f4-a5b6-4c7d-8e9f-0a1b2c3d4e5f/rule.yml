@@ -1,0 +1,37 @@
+title: External Port Scanning Detection (AN2070)
+id: 6fefda07-8b5f-4d5f-89b7-6d87c0206913
+status: experimental
+description: Detects connection sweeps and port scans against external assets originating from single or multiple IP sources, handling distributed and low-and-slow scanning profiles while whitelisting common public search engines.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: zeek
+    service: conn
+detection:
+    selection:
+        proto:
+            - 'tcp'
+            - 'udp'
+    
+    filter_legitimate_cidr:
+        src_ip|cidr:
+            - '1.2.3.0/24'      # Censys
+            - '4.5.6.0/24'      # Shodan
+
+    filter_internal:
+        orig_h|cidr: '10.0.0.0/8'  # Internal scans OK
+        
+    condition: selection and not filter_legitimate_cidr and not filter_internal
+fields:
+    - orig_h
+    - resp_h
+    - resp_p
+    - proto
+falsepositives:
+    - Authorized internal diagnostic vulnerability scanners.
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1595
+    - analytic.an2070
+    - detection.det0927

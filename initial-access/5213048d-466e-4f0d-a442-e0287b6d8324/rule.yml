@@ -1,0 +1,48 @@
+title: Content Injection - Unauthorized Process Writing Web Content (AN0992-A)
+id: 55e1a431-82f6-44dc-af85-d7a6e9a603c5
+status: experimental
+description: Detects command-line interpreters or scripting hosts modifying or creating files within local web server roots (e.g., C:\inetpub\wwwroot, C:\xampp\htdocs), indicating potential content injection or defacement.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_path:
+        TargetFilename|contains:
+            - '\inetpub\wwwroot\'
+            - '\xampp\htdocs\'
+            - '\apache\htdocs\'
+            - '\nginx\html\'
+    selection_extension:
+        TargetFilename|endswith:
+            - '.html'
+            - '.htm'
+            - '.js'
+            - '.aspx'
+            - '.asp'
+            - '.php'
+            - '.jsp'
+    selection_process:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\curl.exe'
+    condition: selection_path and selection_extension and selection_process
+fields:
+    - Image
+    - TargetFilename
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative deployments or manual updates of web assets by admins using command shell scripts.
+level: high
+tags:
+    - attack.initial-access
+    - attack.t1659
+    - analytic.an0992
+    - detection.det0349

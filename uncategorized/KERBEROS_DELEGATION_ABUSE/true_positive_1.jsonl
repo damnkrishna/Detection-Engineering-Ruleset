@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"Windows audit failure event unconstrained delegation","hostname":"FIN-WKS-310","agent_ip":"10.42.1.30","severity_id":3,"event_uid":"golden|KERBEROS_DELEGATION_ABUSE|0|621100","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:05:00.000Z","signature_name":"C:\\Windows\\System32 Rubeus ptt","hostname":"FIN-WKS-310","agent_ip":"10.42.1.30","severity_id":3,"event_uid":"golden|KERBEROS_DELEGATION_ABUSE|1|621101","proto":"tcp","src_port":"50412","dst_port":"443"}

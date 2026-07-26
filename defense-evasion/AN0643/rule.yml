@@ -1,0 +1,28 @@
+title: Detect Suspicious or Malicious Code Signing Abuse (AN0643)
+id: 1841a3f6-8f90-4d61-bb4b-995145379e1f
+status: experimental
+description: Detects registry modifications under system certificate store paths that register disallowed or untrusted code signing certificates.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains:
+            - '\SOFTWARE\Microsoft\SystemCertificates\Disallowed\Certificates\'
+            - '\SOFTWARE\Microsoft\SystemCertificates\Untrusted\'
+    condition: selection
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Legitimate administrative certificate revocation distributions.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1553.002
+    - analytic.an0643
+    - detection.det0230

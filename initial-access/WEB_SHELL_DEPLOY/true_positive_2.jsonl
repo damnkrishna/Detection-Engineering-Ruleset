@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","signature_name":"C:\\Windows\\System32 file upload","hostname":"ENG-WKS-347","agent_ip":"10.42.138.159","severity_id":3,"event_uid":"golden|WEB_SHELL_DEPLOY|0|8600","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T10:05:00.000Z","signature_name":"C:\\Users\\j.mercer\\AppData\\Local\\Temp bash","hostname":"ENG-WKS-347","agent_ip":"10.42.138.159","severity_id":3,"event_uid":"golden|WEB_SHELL_DEPLOY|1|8601","proto":"tcp","src_port":"50412","dst_port":"443"}

@@ -1,0 +1,47 @@
+title: User Account Access Removal via CLI (AN0334-A)
+id: d6e171b1-87c5-4e22-904e-c672523ce153
+status: experimental
+description: Detects command-line execution of net.exe or net1.exe used to delete, disable, or deactivate user accounts, which can be abused to lock out administrators.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_net:
+        - Image|endswith:
+            - '\net.exe'
+            - '\net1.exe'
+        - OriginalFileName:
+            - 'net.exe'
+            - 'net1.exe'
+    selection_net_user:
+        CommandLine|contains:
+            - 'user'
+    selection_net_action:
+        CommandLine|contains:
+            - '/delete'
+            - 'active:no'
+            - '/active:no'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_net and selection_net_user and selection_net_action and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative account management tasks or automated user lifecycle provisioning scripts disabling inactive accounts.
+level: high
+tags:
+    - attack.impact
+    - attack.t1531
+    - analytic.an0334
+    - detection.det0334

@@ -1,0 +1,23 @@
+{
+  "rule_id": "a93fdf91-cb32-4e9b-8fbf-40df22336a18",
+  "rule_name": "Alternate Data Stream (ADS) File Creation (AN0091-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

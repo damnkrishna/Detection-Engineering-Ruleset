@@ -1,0 +1,27 @@
+title: Windows Firewall Registry Modification (AN0406-B)
+id: cd4307e1-1c59-42f4-8d4e-770ffb8cbb3d
+status: experimental
+description: Detects registry modifications under Windows Firewall settings, indicating programmatic disabling or altering of local firewall policies.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains:
+            - '\System\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\'
+    condition: selection
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Centralized configuration via Active Directory Group Policies or local system modifications by administrative tools.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1686
+    - analytic.an0406
+    - detection.det0145

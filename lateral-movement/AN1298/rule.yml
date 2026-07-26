@@ -1,0 +1,38 @@
+title: Tainted Content Dropped on Shared Storage (AN1298)
+id: 6b43dfea-20ce-4fbd-b049-76fb595a14e5
+status: experimental
+description: Detects file creation events dropping executable, scripting, or shortcut extensions (e.g., .exe, .vbs, .lnk) onto administrative network shared directory paths.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_shares:
+        TargetFilename|contains:
+            - '\C$\'
+            - '\Admin$\'
+            - '\IPC$\'
+            - '\\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.exe'
+            - '.vbs'
+            - '.lnk'
+            - '.bat'
+            - '.ps1'
+            - '.scr'
+            - '.cmd'
+    condition: selection_shares and selection_extensions
+fields:
+    - Image
+    - TargetFilename
+    - User
+falsepositives:
+    - Administrative software distribution or patch management tools that deploy updates via admin shares.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1080
+    - analytic.an1298
+    - detection.det0471

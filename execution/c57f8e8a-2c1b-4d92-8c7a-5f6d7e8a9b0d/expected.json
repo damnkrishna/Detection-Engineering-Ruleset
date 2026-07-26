@@ -1,0 +1,23 @@
+{
+  "rule_id": "c57f8e8a-2c1b-4d92-8c7a-5f6d7e8a9b0d",
+  "rule_name": "Elevated Execution from Weak Permissions Installer Directory (AN0108)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

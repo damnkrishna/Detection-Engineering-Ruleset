@@ -1,0 +1,29 @@
+title: Disk Wiping and Partition Destruction Utilities via PowerShell Script Block (AN0384-B)
+id: 334e6756-cd97-4a8e-a6cb-170ecd3d5869
+status: experimental
+description: Detects PowerShell script block logs containing storage management cmdlets used to format, delete, or initialize disks and partitions.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Clear-Disk'
+            - 'Remove-Partition'
+            - 'Format-Volume'
+            - 'Initialize-Disk'
+            - 'Remove-Volume'
+            - 'diskpart'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administration scripts configuring system storage configurations.
+level: high
+tags:
+    - attack.impact
+    - attack.t1561
+    - analytic.an0384
+    - detection.det0384

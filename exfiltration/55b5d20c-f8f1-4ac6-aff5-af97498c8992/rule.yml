@@ -1,0 +1,48 @@
+title: Exfiltration - Outbound Network Connection from Suspicious Path (AN0988)
+id: 79d73fb7-4b24-4af1-9ce9-02371947ce78
+status: experimental
+description: Detects processes executing from temp, user appdata, or public directories initiating outbound TCP/UDP connections to external networks, which could indicate data exfiltration over a C2 channel.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_path:
+        Image|contains:
+            - '\AppData\Local\Temp\'
+            - '\Windows\Temp\'
+            - '\Users\Public\'
+            - '\PerfLogs\'
+    filter_internal:
+        DestinationIp|startswith:
+            - '10.'
+            - '192.168.'
+            - '172.16.'
+            - '172.17.'
+            - '172.18.'
+            - '172.19.'
+            - '172.2'
+            - '172.3'
+            - '127.'
+            - '169.254.'
+    condition: selection_path and not filter_internal
+fields:
+    - Image
+    - CommandLine
+    - User
+    - LogonId
+    - Initiated
+    - SourceIp
+    - DestinationIp
+    - DestinationPort
+falsepositives:
+    - Legitimate software auto-updaters (running out of AppData\Local\Temp) downloading application updates.
+    - User-run portable applications initiating connections for sync or updates.
+level: high
+tags:
+    - attack.exfiltration
+    - attack.t1041
+    - analytic.an0988
+    - detection.det0348

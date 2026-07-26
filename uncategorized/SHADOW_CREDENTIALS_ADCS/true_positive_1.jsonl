@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"Windows audit failure event certutil","hostname":"OPS-WKS-328","agent_ip":"10.42.119.99","severity_id":3,"event_uid":"golden|SHADOW_CREDENTIALS_ADCS|0|659300","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:05:00.000Z","signature_name":"C:\\Windows\\System32 certificate logon","hostname":"OPS-WKS-328","agent_ip":"10.42.119.99","severity_id":3,"event_uid":"golden|SHADOW_CREDENTIALS_ADCS|1|659301","proto":"tcp","src_port":"50412","dst_port":"443"}

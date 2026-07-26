@@ -1,0 +1,50 @@
+title: Collection - Archiving and Encryption of Data via Utility (AN1458)
+id: 9a1da34f-f6f5-4a27-9cc6-aeae94281461
+status: experimental
+description: Detects compression utilities or native tools executing with specific command-line parameters used to create archives or encrypt files (like password switches), suggesting staging before exfiltration.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_makecab:
+        - Image|endswith: '\makecab.exe'
+        - OriginalFileName: 'makecab.exe'
+    selection_utilities:
+        - Image|endswith:
+            - '\7z.exe'
+            - '\rar.exe'
+            - '\tar.exe'
+            - '\zip.exe'
+        - OriginalFileName:
+            - '7z.exe'
+            - 'rar.exe'
+            - 'tar.exe'
+            - 'zip.exe'
+    selection_switches:
+        CommandLine|contains:
+            - ' a '       # Add to archive (7z, rar)
+            - ' -p'       # Password protection/encryption (7z, rar)
+            - ' -cf'      # Create file (tar)
+            - ' -cz'      # Compress gzip (tar)
+            - 'Compress-Archive'
+    condition: selection_makecab or (selection_utilities and selection_switches)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - backup scripts, installer deployment tasks, or manual developer archiving.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1560
+    - analytic.an1458
+    - detection.det0526

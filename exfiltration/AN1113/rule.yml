@@ -1,0 +1,51 @@
+title: Automated Archiving and Staging via CLI (AN1113)
+id: 2fed4da3-f637-490e-bc92-597275266030
+status: experimental
+description: Detects command-line archiving utilities being spawned by command shells or task schedulers, which may indicate automated data harvesting and staging for exfiltration.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\taskeng.exe'
+            - '\svchost.exe'
+    selection_archive_image:
+        Image|endswith:
+            - '\7z.exe'
+            - '\7za.exe'
+            - '\rar.exe'
+            - '\zip.exe'
+            - '\tar.exe'
+            - '\makecab.exe'
+    selection_archive_original:
+        OriginalFileName:
+            - '7z.exe'
+            - '7za.exe'
+            - 'rar.exe'
+            - 'zip.exe'
+            - 'tar.exe'
+            - 'makecab.exe'
+    condition: selection_parent and (selection_archive_image or selection_archive_original)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative backup scripts, database backups, or software build tools performing automated file archiving.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1020
+    - analytic.an1113
+    - detection.det0397

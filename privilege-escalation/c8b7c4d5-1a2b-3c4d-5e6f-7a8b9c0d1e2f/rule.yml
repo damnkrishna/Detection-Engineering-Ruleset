@@ -1,0 +1,32 @@
+title: Known Vulnerable Driver Loaded (BYOVD) (AN1419)
+id: c4e14a1b-5411-477c-9ce5-8fb07a40e514
+status: experimental
+description: Detects exploitation attempts targeting vulnerable kernel drivers by monitoring for the loading of known vulnerable drivers (e.g., capcom.sys, gdrv.sys).
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: driver_load
+    product: windows
+    # Relies on Sysmon Event ID 6
+detection:
+    selection_driver:
+        ImageLoaded|endswith:
+            - '\capcom.sys'
+            - '\gdrv.sys'      # Gigabyte
+            - '\RTCore64.sys'  # MSI Afterburner
+            - '\iqvw64e.sys'   # Intel
+            - '\cpuz141_x64.sys'
+            - '\dbutil_2_3.sys' # Dell
+    condition: selection_driver
+fields:
+    - ImageLoaded
+    - Signature
+    - Hashes
+falsepositives:
+    - Users legitimately running older hardware monitoring tools (like CPU-Z or MSI Afterburner) that utilize these drivers.
+level: high
+tags:
+    - attack.privilege-escalation
+    - attack.t1068
+    - analytic.an1419
+    - detection.det0514

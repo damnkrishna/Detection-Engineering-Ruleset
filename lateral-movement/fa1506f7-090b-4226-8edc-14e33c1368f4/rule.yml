@@ -1,0 +1,28 @@
+title: Runas with Netonly Flag (AN0954-B)
+id: 347ffbe7-7a87-4505-bed5-5d7ac848f71c
+status: experimental
+description: Detects the execution of runas.exe with the /netonly argument, which is commonly used by adversaries for outbound authentication using alternate credentials (e.g. Pass-the-Hash or Pass-the-Ticket).
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith: '\runas.exe'
+        - OriginalFileName: 'runas.exe'
+    selection_args:
+        CommandLine|contains: '/netonly'
+    condition: selection_img and selection_args
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Legitimate administrative troubleshooting or resource access under alternate credentials.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1550
+    - analytic.an0954
+    - detection.det0338

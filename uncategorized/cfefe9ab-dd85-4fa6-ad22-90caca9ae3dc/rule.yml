@@ -1,0 +1,32 @@
+title: Active Directory Trust Object Modification (AN1259-B)
+id: 272a1d35-b750-48e0-9cca-48d5b5632bf5
+status: experimental
+description: Detects modifications to Active Directory trustedDomain objects, which represent domain trust relationships.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_4662:
+        EventID: 4662
+        ObjectType|contains: '19195a5b-6da0-11d0-afd3-00c04fd930c9'
+        ObjectDN|contains: 'CN=System'
+    selection_5136:
+        EventID: 5136
+        ObjectClass|contains: 'trustedDomain'
+        ObjectDN|contains: 'CN=System'
+    condition: selection_4662 or selection_5136
+fields:
+    - EventID
+    - ObjectDN
+    - SubjectUserName
+    - ObjectType
+falsepositives:
+    - Official domain consolidation or active directory trusts established by administrators.
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1484.002
+    - analytic.an1259
+    - detection.det0458

@@ -1,0 +1,44 @@
+title: LLMNR/NBT-NS Spoofing Tool Execution (AN1274-A)
+id: bdcf2683-23f0-40f2-b204-71816cdacc32
+status: experimental
+description: Detects command-line execution of Responder, Inveigh, or impacket-ntlmrelayx.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\Responder.exe'
+            - '\Inveigh.exe'
+            - '\ntlmrelayx.exe'
+        OriginalFileName:
+            - 'Responder.exe'
+            - 'Inveigh.exe'
+            - 'ntlmrelayx.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'responder'
+            - 'inveigh'
+            - 'ntlmrelayx'
+            - ' -smbrelay'
+            - ' -llmnr'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_cli) and not filter_installers
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Internal penetration testing exercises or authorized network auditing.
+level: high
+tags:
+    - attack.collection
+    - attack.t1557.001
+    - analytic.an1274
+    - detection.det0462

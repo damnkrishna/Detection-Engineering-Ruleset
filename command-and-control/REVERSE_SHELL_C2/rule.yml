@@ -1,0 +1,58 @@
+{
+  "id": "REVERSE_SHELL_C2",
+  "description": "Reverse shell established then C2 activity \u2014 active attacker on system",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.5,
+  "windowMinutes": 20,
+  "sensorFilter": [
+    "NIDS",
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "rev_shell",
+      "techniques": [
+        "T1059"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "reverse shell",
+        "bash -i",
+        "/bin/sh",
+        "nc -e",
+        "ncat",
+        "socat",
+        "python -c",
+        "mkfifo",
+        "powershell -nop",
+        "iex",
+        "invoke-expression",
+        "meterpreter",
+        "metasploit",
+        "4688",
+        "shell spawn"
+      ]
+    },
+    {
+      "label": "c2_comms",
+      "tactics": [
+        "TA0011"
+      ],
+      "optional": false,
+      "maxGapSeconds": 600,
+      "signatureEquals": [
+        "beacon",
+        "c2",
+        "c&c",
+        "connect",
+        "callback",
+        "check-in",
+        "dns beacon",
+        "http beacon",
+        "cobalt",
+        "metasploit",
+        "empire"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+title: Local DNS Server Zone File Modification (AN1622-B)
+id: 4a8670e1-72bc-436b-8edb-8c750eb241dc
+status: experimental
+description: Detects unauthorized edits to active DNS server zone files by non-DNS system processes.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\system32\dns\'
+    selection_exts:
+        TargetFilename|endswith:
+            - '.dns'
+    filter_dns:
+        Image|endswith:
+            - '\system32\dns.exe'
+    condition: selection_paths and selection_exts and not filter_dns
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - DNS administrators updating zone profiles via standard admin scripts (rare outside of controlled migration windows).
+level: high
+tags:
+    - attack.impact
+    - attack.t1491.002
+    - analytic.an1622
+    - detection.det0590

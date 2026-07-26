@@ -1,0 +1,28 @@
+title: Process Discovery via PowerShell Script Block (AN0095-B)
+id: b7b82e7d-55ae-43d9-90cf-f54b5a359b4f
+status: experimental
+description: Detects PowerShell script blocks querying active processes using Win32 API or WMI cmdlets.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Get-Process'
+            - 'Win32_Process'
+            - 'System.Diagnostics.Process'
+            - 'Get-WmiObject -Class Win32_Process'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Authorized administrative or developer script tasks running process diagnostics.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1057
+    - analytic.an0095
+    - detection.det0034

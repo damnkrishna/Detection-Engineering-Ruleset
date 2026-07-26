@@ -1,0 +1,54 @@
+{
+  "id": "KERBEROS_DELEGATION_ABUSE",
+  "description": "Kerberos unconstrained delegation exploitation: delegation-capable host enumeration or forced TGT capture (SpoolSample/PetitPotam) followed by pass-the-ticket lateral movement (T1558.003, T1550.003)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 4.0,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "delegation_enum_or_capture",
+      "techniques": [
+        "T1558.003"
+      ],
+      "signatureContains": [
+        "unconstrained delegation",
+        "TrustedForDelegation",
+        "TGT capture",
+        "SpoolSample",
+        "PrinterBug",
+        "PetitPotam",
+        "Rubeus monitor",
+        "Rubeus dump",
+        "msDS-AllowedToDelegateTo",
+        "SeEnableDelegationPrivilege",
+        "delegation enumeration",
+        "find delegation"
+      ],
+      "optional": false
+    },
+    {
+      "label": "ticket_import_lateral",
+      "techniques": [
+        "T1550.003"
+      ],
+      "signatureContains": [
+        "pass-the-ticket",
+        "Rubeus ptt",
+        "kirbi",
+        "ticket import",
+        "kerberos::ptt",
+        "ticket::import",
+        "klist purge",
+        "TGT inject",
+        "forwarded TGT",
+        "delegation ticket use",
+        "4769 forwarded"
+      ],
+      "optional": false,
+      "maxGapSeconds": 3600
+    }
+  ]
+}

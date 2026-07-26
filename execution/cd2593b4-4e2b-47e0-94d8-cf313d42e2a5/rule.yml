@@ -1,0 +1,46 @@
+title: Component Object Model (COM) Execution (AN0628)
+id: d1cdd521-ef4b-45b9-8f6e-27fa464efaab
+status: experimental
+description: Detects anomalous use of COM objects for execution, such as dllhost.exe or wmiprvse.exe spawning script engines or command shells.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\dllhost.exe'
+            - '\wmiprvse.exe'
+            - '\svchost.exe'
+    selection_parent_args:
+        ParentCommandLine|contains:
+            - 'DcomLaunch'
+            - '/Processid'
+    selection_child:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\regsvr32.exe'
+    condition: selection_parent and selection_parent_args and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Systems management tools invoking WMI/DCOM for legitimate remote administration.
+level: high
+tags:
+    - attack.execution
+    - attack.t1559.001
+    - analytic.an0628
+    - detection.det0224

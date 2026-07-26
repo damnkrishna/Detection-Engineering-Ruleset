@@ -1,0 +1,39 @@
+title: Denial of Service Script Engine Execution (AN1434-A)
+id: 7cd540bc-6a52-489a-a1fb-ad71b1db052e
+status: experimental
+description: Detects command-line execution of Python, PowerShell, or Perl interpreters targeting network flooding or DoS attacks.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\python.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\perl.exe'
+            - '\go.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'slowloris'
+            - 'goldeneye'
+            - 'hulk.py'
+            - 'rudy.py'
+            - 'syn-flood'
+            - 'udp-flood'
+            - 'ping-of-death'
+    condition: selection_images and selection_cli
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Internal network security team running approved stress tests or load capability checks.
+level: high
+tags:
+    - attack.impact
+    - attack.t1498
+    - analytic.an1434
+    - detection.det0518

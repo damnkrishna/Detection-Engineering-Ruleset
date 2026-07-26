@@ -1,0 +1,40 @@
+title: Suspicious Script Execution CommandLine (AN1428-A)
+id: 3470719a-f697-4c6f-bf58-694d8999363b
+status: experimental
+description: Detects command-line execution of wscript.exe or cscript.exe with parameters executing vbscript or jscript.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\wscript.exe'
+            - '\cscript.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'wscript.exe'
+            - 'cscript.exe'
+    selection_cli:
+        CommandLine|contains:
+            - ' //e:vbscript'
+            - ' //e:jscript'
+            - ' .vbs'
+            - ' .js'
+            - ' .sct'
+            - ' //b'
+            - ' //nologo'
+    condition: (selection_images or selection_orig) and selection_cli
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - IT administration scripts deploying legacy packages.
+level: medium
+tags:
+    - attack.execution
+    - attack.t1059
+    - analytic.an1428
+    - detection.det0516

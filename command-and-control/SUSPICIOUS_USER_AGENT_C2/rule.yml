@@ -1,0 +1,55 @@
+{
+  "id": "SUSPICIOUS_USER_AGENT_C2",
+  "description": "Known malware/C2 framework or scanner user agent detected (Splunk: Suspicious User Agents story)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.5,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "NIDS"
+  ],
+  "stages": [
+    {
+      "label": "suspicious_ua",
+      "tactics": [
+        "TA0011",
+        "TA0001"
+      ],
+      "techniques": [
+        "T1071.001"
+      ],
+      "signatureContains": [
+        "r00ts3c",
+        "libredtail",
+        "python-requests",
+        "go-http-client",
+        "masscan",
+        "zgrab",
+        "nikto",
+        "sqlmap",
+        "nmap",
+        "dirbuster",
+        "gobuster",
+        "nuclei",
+        "httpx",
+        "ffuf",
+        "cobalt strike",
+        "metasploit",
+        "meterpreter",
+        "empire",
+        "havoc",
+        "brute ratel",
+        "sliver",
+        "curl/",
+        "wget/",
+        "libwww-perl",
+        "python/2",
+        "python/3",
+        "suspicious user agent",
+        "User Agent Anomaly",
+        "known scanner",
+        "automated tool"
+      ],
+      "optional": false
+    }
+  ]
+}

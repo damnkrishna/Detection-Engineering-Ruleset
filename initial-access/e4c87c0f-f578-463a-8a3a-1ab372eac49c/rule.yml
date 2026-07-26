@@ -1,0 +1,62 @@
+title: Removable Media - Execution of Script or Command from Removable Drive (AN0841-A)
+id: c823489c-7f3e-4eb2-ac0e-da815f74678e
+status: experimental
+description: Detects command-line interpreters, script hosts, or remote utilities executing directly from non-system drive letters (e.g., D:\, E:\, F:\, G:\, H:\), which may indicate replication from removable USB devices.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_drives:
+        - Image|startswith:
+            - 'D:\'
+            - 'E:\'
+            - 'F:\'
+            - 'G:\'
+            - 'H:\'
+            - 'I:\'
+        - CommandLine|contains:
+            - 'D:\'
+            - 'E:\'
+            - 'F:\'
+            - 'G:\'
+            - 'H:\'
+            - 'I:\'
+    selection_executables:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\curl.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'mshta.exe'
+            - 'rundll32.exe'
+            - 'regsvr32.exe'
+    condition: selection_drives and selection_executables
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Users running legitimate backup scripts, developers testing code from secondary local SSD drives (mapped as D:\ or E:\), or software installs from CD/DVD optical drives.
+level: high
+tags:
+    - attack.initial-access
+    - attack.t1091
+    - analytic.an0841
+    - detection.det0301

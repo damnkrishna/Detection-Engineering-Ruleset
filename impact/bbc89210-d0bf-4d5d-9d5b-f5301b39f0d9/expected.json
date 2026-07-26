@@ -1,0 +1,23 @@
+{
+  "rule_id": "bbc89210-d0bf-4d5d-9d5b-f5301b39f0d9",
+  "rule_name": "Stopping or Disabling Critical System Services via PowerShell Script Block (AN0061-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

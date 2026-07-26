@@ -1,0 +1,33 @@
+title: AV Exclusion Registry Modification (AN0139-B)
+id: b2c55986-57a1-4a50-a617-4be8bf8a3ac3
+status: experimental
+description: Detects registry value additions under Windows Defender exclusions registry keys, indicating direct AV evasion attempts bypassing standard PowerShell commands.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 13
+detection:
+    selection_path:
+        TargetObject|contains:
+            - 'HKLM\SOFTWARE\Microsoft\Windows Defender\Exclusions\'
+            - '\Exclusions\Paths\'
+            - '\Exclusions\Extensions\'
+            - '\Exclusions\Processes\'
+    filter_legitimate:
+        Image|endswith: '\MsMpEng.exe'
+    condition: selection_path and not filter_legitimate
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - System administration tools or configuration scripts adding Defender exclusions legitimately.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1564.012
+    - analytic.an0139
+    - detection.det0051

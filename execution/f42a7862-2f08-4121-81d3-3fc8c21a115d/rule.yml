@@ -1,0 +1,47 @@
+title: Suspicious JavaScript Execution via WSH (AN0733)
+id: 906c9539-8bcb-4c16-8173-c82caa7119de
+status: experimental
+description: Detects JavaScript execution through wscript.exe, cscript.exe, or mshta.exe, particularly when spawned from Office macros or abnormal user paths.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_wsh:
+        Image|endswith:
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+    selection_js:
+        CommandLine|contains:
+            - '.js'
+            - '.jse'
+    selection_suspicious:
+        - ParentImage|endswith:
+            - '\winword.exe'
+            - '\excel.exe'
+            - '\outlook.exe'
+        - CommandLine|contains:
+            - '\AppData\Local\Temp\'
+            - '\Downloads\'
+            - '\ProgramData\'
+    condition: selection_wsh and selection_js and selection_suspicious
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legacy enterprise applications relying on local JavaScript automation.
+level: high
+tags:
+    - attack.execution
+    - attack.t1059.007
+    - analytic.an0733
+    - detection.det0264

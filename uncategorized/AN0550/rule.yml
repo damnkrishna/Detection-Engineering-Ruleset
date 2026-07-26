@@ -1,0 +1,90 @@
+title: ClickOnce Proxy Execution Abuse (AN0550)
+id: b78d6541-f516-47cf-9e7c-e244512bd7e2
+status: experimental
+description: Detects ClickOnce utility abuse, including rundll32.exe loading dfshim.dll to execute applications or dfsvc.exe spawning unexpected child shells.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_rundll:
+        - Image|endswith: '\rundll32.exe'
+        - OriginalFileName: 'RUNDLL32.EXE'
+    selection_dfshim_args:
+        CommandLine|contains|all:
+            - 'dfshim.dll'
+        CommandLine|contains:
+            - 'ShOpenVerbApplication'
+            - 'ShOpenVerbShortcut'
+    selection_dfsvc:
+        ParentImage|endswith: '\dfsvc.exe'
+    selection_suspicious_children:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\regsvr32.exe'
+            - '\rundll32.exe'
+            - '\mshta.exe'
+            - '\csc.exe'
+            - '\msbuild.exe'
+    condition: (selection_rundll and selection_dfshim_args) or (selection_dfsvc and selection_suspicious_children)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate corporate ClickOnce application deployments launching administrative scripts.
+level: high
+tags:
+    - attack.execution
+    - attack.defense-evasion
+    - attack.t1127.002
+    - analytic.an0550
+    - detection.det0191
+---
+title: Developer Utility Project File Creation (AN0550-B)
+id: f9883cae-05fe-45a5-976b-5f8ec4b134ed
+status: experimental
+description: Detects the creation of ClickOnce deployment or MSBuild project files in temporary or user-writable folders, indicating potential execution staging.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.application'
+            - '.manifest'
+            - '.csproj'
+            - '.vbproj'
+            - '.targets'
+            - '.props'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Developers writing code or local compilations.
+level: medium
+tags:
+    - attack.execution
+    - attack.defense-evasion
+    - attack.t1127.002
+    - analytic.an0550
+    - detection.det0191

@@ -1,0 +1,56 @@
+{
+  "id": "NETWORK_TUNNEL_COVERT",
+  "description": "Covert channel: protocol tunneling (DNS/ICMP/HTTP) or port forwarding tool \u2014 C2 traffic hiding inside legitimate protocols (T1572, T1090)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.5,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "NIDS",
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "tunnel_tool_setup",
+      "techniques": [
+        "T1572",
+        "T1095",
+        "T1090"
+      ],
+      "signatureContains": [
+        "plink.exe",
+        "chisel",
+        "ngrok",
+        "frp",
+        "netsh portproxy",
+        "ssh -R ",
+        "ssh -L ",
+        "socat",
+        "iodine",
+        "dns2tcp",
+        "dnscat2",
+        "icmptunnel",
+        "ptunnel",
+        "stunnel",
+        "protocol tunnel",
+        "port forward"
+      ],
+      "optional": false
+    },
+    {
+      "label": "sustained_covert_traffic",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0011",
+            "TA0010"
+          ]
+        }
+      ],
+      "optional": false,
+      "minOccurrences": 2,
+      "maxGapSeconds": 3600
+    }
+  ]
+}

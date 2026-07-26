@@ -1,0 +1,23 @@
+{
+  "rule_id": "e7cb71a0-3ef2-4d2c-bc7d-a5df8c2ba310",
+  "rule_name": "Exclusive Control Service State Change (AN0045-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

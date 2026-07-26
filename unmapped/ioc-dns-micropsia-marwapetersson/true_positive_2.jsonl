@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","dns_query":"C:\\Windows\\System32 marwapetersson.info","hostname":"SEC-WKS-529","agent_ip":"10.42.20.22","severity_id":3,"event_uid":"golden|ioc-dns-micropsia-marwapetersson|0|750600","proto":"tcp","src_port":"50412","dst_port":"443"}

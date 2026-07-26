@@ -1,0 +1,35 @@
+title: Spearphishing via Service - Suspicious Script Block executing Browser-Downloaded Content (AN0320-B)
+id: ead3ce3b-3722-473a-85f1-6a80e570b32e
+status: experimental
+description: Detects PowerShell script block logs executing commands associated with downloads or temporary folders, indicating browser-initiated script execution.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_cmd:
+        ScriptBlockText|contains:
+            - 'Invoke-Expression'
+            - 'iex'
+            - 'Invoke-WebRequest'
+            - 'iwr'
+            - 'Net.WebClient'
+            - 'DownloadFile'
+            - 'DownloadString'
+    selection_paths:
+        ScriptBlockText|contains:
+            - '\Downloads\'
+            - '\Temp\'
+            - 'AppData\Local\'
+    condition: selection_cmd and selection_paths
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Administrative scripts or legitimate developer automation packages.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1566.003
+    - analytic.an0320
+    - detection.det0115

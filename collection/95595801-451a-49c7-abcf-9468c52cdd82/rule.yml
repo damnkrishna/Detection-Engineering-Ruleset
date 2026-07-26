@@ -1,0 +1,51 @@
+title: Collection - Copy of Data from Remote UNC Share (AN1145)
+id: 7b0e7c89-5281-406d-8b10-63b15611895f
+status: experimental
+description: Detects command-line utilities (robocopy, xcopy, copy) or compression tools targeting remote network shares (UNC paths) to copy files locally, suggesting data harvesting.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_utilities:
+        - Image|endswith:
+            - '\robocopy.exe'
+            - '\xcopy.exe'
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\7z.exe'
+            - '\tar.exe'
+        - OriginalFileName:
+            - 'robocopy.exe'
+            - 'xcopy.exe'
+            - '7z.exe'
+            - 'tar.exe'
+    selection_unc:
+        CommandLine|contains:
+            - ' \\' # Space followed by UNC double backslash (denotes target)
+    selection_copy_commands:
+        CommandLine|contains:
+            - 'copy '
+            - ' cp '
+            - ' -cf '
+            - ' a '
+    condition: selection_utilities and selection_unc and selection_copy_commands
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - administrators running standard network backup sync jobs or deploying software updates from server shares.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1039
+    - analytic.an1145
+    - detection.det0410

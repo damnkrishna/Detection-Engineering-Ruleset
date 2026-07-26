@@ -1,0 +1,23 @@
+{
+  "rule_id": "aca5ffc0-565e-4e02-a9ce-0b8794671e68",
+  "rule_name": "Phishing - Suspicious File Attachment Written by Mail Client (AN0188-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

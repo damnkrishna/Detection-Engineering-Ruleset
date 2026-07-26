@@ -1,0 +1,38 @@
+title: Cryptographic DLL Loaded by Scripting Host (AN1389)
+id: 7a56f75b-ba0c-46d3-8d5d-e1273422cd8c
+status: experimental
+description: Detects command-line interpreters or scripting hosts loading Windows cryptographic libraries (e.g., bcryptprimitives.dll, cryptsp.dll), which may indicate symmetric encryption of data prior to exfiltration.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\cmd.exe'
+    selection_dll:
+        ImageLoaded|endswith:
+            - '\bcrypt.dll'
+            - '\bcryptprimitives.dll'
+            - '\cryptsp.dll'
+            - '\ncrypt.dll'
+    condition: selection_process and selection_dll
+fields:
+    - Image
+    - ImageLoaded
+    - Signed
+    - SignatureStatus
+falsepositives:
+    - Administrative scripts executing complex hashing routines (e.g. comparing file hashes using Get-FileHash) or managing secure password fields.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1048.001
+    - analytic.an1389
+    - detection.det0503

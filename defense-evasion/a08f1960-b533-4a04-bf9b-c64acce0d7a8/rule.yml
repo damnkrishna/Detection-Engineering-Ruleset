@@ -1,0 +1,27 @@
+title: Windows Event Logging Service Registry Modification (AN0535-B)
+id: ca95c7f9-a9a6-49d1-803e-bde7431dbc1c
+status: experimental
+description: Detects registry modifications under Windows EventLog configurations, indicating attempts to disable or redirect logging.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains:
+            - '\System\CurrentControlSet\Services\EventLog\'
+    condition: selection
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Administrative configuration of custom event log paths or settings.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1685.001
+    - analytic.an0535
+    - detection.det0187

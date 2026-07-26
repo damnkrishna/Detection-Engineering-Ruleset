@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","signature_name":"C:\\Windows\\System32 Anomalous outbound HTTP payload","hostname":"ENG-WKS-762","agent_ip":"10.42.53.40","severity_id":3,"event_uid":"golden|CR0105_T1071_T1560|0|907300","proto":"tcp","src_port":"50412","dst_port":"443","src_ip":"10.42.53.40","dst_ip":"198.51.100.72"}

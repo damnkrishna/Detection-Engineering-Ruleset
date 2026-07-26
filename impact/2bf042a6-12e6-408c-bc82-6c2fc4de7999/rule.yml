@@ -1,0 +1,28 @@
+title: Recovery Environment Disabling via PowerShell (AN0933-B)
+id: 769038d4-2a64-46b7-8d5e-7748635bb1ea
+status: experimental
+description: Detects PowerShell script blocks containing commands to delete shadow copies or disable system restore mechanisms.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_cmdlets:
+        ScriptBlockText|contains:
+            - 'Disable-ComputerRestore'
+            - 'Win32_ShadowCopy'
+            - 'delete shadows'
+            - 'delete catalog'
+    condition: selection_cmdlets
+fields:
+    - ScriptBlockText
+    - User
+falsepositives:
+    - Administrative configuration scripts managing disk allocation space on enterprise workstations.
+level: high
+tags:
+    - attack.impact
+    - attack.t1490
+    - analytic.an0933
+    - detection.det0329

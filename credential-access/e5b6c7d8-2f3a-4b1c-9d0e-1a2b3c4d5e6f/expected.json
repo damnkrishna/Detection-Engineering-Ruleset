@@ -1,0 +1,23 @@
+{
+  "rule_id": "e5b6c7d8-2f3a-4b1c-9d0e-1a2b3c4d5e6f",
+  "rule_name": "Suspicious SPN Enumeration and Kerberoasting Activity via CLI (AN0444-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

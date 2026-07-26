@@ -1,0 +1,39 @@
+title: Database or Log File Modification by Non-Database Process via CLI (AN0162-B)
+id: 909471cf-ea56-4c51-ba81-546fb57a78b0
+status: experimental
+description: Detects command-line commands attempting to manipulate databases or clear Windows event logs using utilities like wevtutil or database engines.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_tools:
+        - Image|endswith:
+            - '\wevtutil.exe'
+            - '\sqlite3.exe'
+        - OriginalFileName:
+            - 'wevtutil.exe'
+            - 'sqlite3.exe'
+    selection_commands:
+        CommandLine|contains:
+            - ' cl '
+            - 'clear-eventlog'
+            - 'clear-log'
+            - 'update '
+            - 'delete '
+    condition: selection_tools or selection_commands
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Legitimate event log rotations or database maintenance scripts.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1565
+    - analytic.an0162
+    - detection.det0162

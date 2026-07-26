@@ -1,0 +1,23 @@
+{
+  "rule_id": "MULTI_STAGE_EXFIL",
+  "rule_name": "Credential access → collection → staging (optional) → exfiltration (Splunk: Cloud/Multi-stage Exfil story)",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-nids",
+  "event_source": "suricata",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 5
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 5
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 5
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 5
+  }
+}

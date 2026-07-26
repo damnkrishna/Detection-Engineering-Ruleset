@@ -1,0 +1,64 @@
+{
+  "id": "DATA_STAGING_LARGE_FILE",
+  "description": "Bulk file archiving or compression (T1074.001) followed by large outbound transfer \u2014 pre-exfil staging behavior",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.5,
+  "windowMinutes": 120,
+  "sensorFilter": [
+    "HIDS",
+    "NIDS"
+  ],
+  "stages": [
+    {
+      "label": "archive_or_compress",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0009"
+          ]
+        }
+      ],
+      "signatureContains": [
+        "7z",
+        "7zip",
+        "WinRAR",
+        "zip -r",
+        "tar -c",
+        "compress",
+        "robocopy",
+        "xcopy /s",
+        "data archive",
+        "Compress-Archive",
+        "ZipFile"
+      ],
+      "optional": false,
+      "minOccurrences": 2
+    },
+    {
+      "label": "large_outbound",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0010"
+          ]
+        }
+      ],
+      "signatureContains": [
+        "large transfer",
+        "high bytes out",
+        "anomalous outbound",
+        "ftp upload",
+        "sftp",
+        "scp",
+        "rsync",
+        "data out"
+      ],
+      "optional": false,
+      "maxGapSeconds": 1800
+    }
+  ]
+}

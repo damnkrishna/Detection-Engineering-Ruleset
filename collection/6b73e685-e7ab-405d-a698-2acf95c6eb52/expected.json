@@ -1,0 +1,23 @@
+{
+  "rule_id": "6b73e685-e7ab-405d-a698-2acf95c6eb52",
+  "rule_name": "Collection - Archiving and Encryption of Data via Utility (AN1458)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

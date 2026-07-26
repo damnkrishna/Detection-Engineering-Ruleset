@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"Windows audit failure event schtasks","hostname":"OPS-WKS-218","agent_ip":"10.42.109.136","severity_id":3,"event_uid":"golden|SCHEDULED_TASK_PERSISTENCE|0|542300","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:05:00.000Z","tactic":"TA0002","hostname":"OPS-WKS-218","agent_ip":"10.42.109.136","severity_id":3,"event_uid":"golden|SCHEDULED_TASK_PERSISTENCE|1|542301","proto":"tcp","src_port":"50412","dst_port":"443"}

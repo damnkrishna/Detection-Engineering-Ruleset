@@ -1,0 +1,103 @@
+title: Automated File Collection via Recursive Enumeration (AN0531)
+id: 1b7fa1db-06ad-4336-a524-17eb69d90b5a
+status: experimental
+description: Detects automated collection behavior — recursive directory searches targeting sensitive file extensions (documents, credentials, archives) via cmd.exe or PowerShell — indicative of scripted bulk data collection.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_cmd_recursive:
+        - Image|endswith: '\cmd.exe'
+        - OriginalFileName: 'Cmd.Exe'
+    selection_cmd_args:
+        CommandLine|contains:
+            - ' /s '
+            - ' /S '
+    selection_cmd_extensions:
+        CommandLine|contains:
+            - '*.docx'
+            - '*.xlsx'
+            - '*.pdf'
+            - '*.pst'
+            - '*.kdbx'
+            - '*.txt'
+            - '*.csv'
+            - '*.conf'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_ps_recursive:
+        CommandLine|contains:
+            - '-Recurse'
+            - 'Get-ChildItem'
+            - 'gci '
+            - 'ls -r'
+    selection_ps_extensions:
+        CommandLine|contains:
+            - '*.docx'
+            - '*.pdf'
+            - '*.pst'
+            - '*.kdbx'
+            - '*.xlsx'
+            - '*.csv'
+    condition: (selection_cmd_recursive and selection_cmd_args and selection_cmd_extensions) or (selection_powershell and selection_ps_recursive and selection_ps_extensions)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Administrators running inventory scripts to locate and report on document types for compliance or data governance purposes.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1119
+    - analytic.an0531
+    - detection.det0186
+---
+title: Automated Collection Staged File Creation (AN0531-B)
+id: 202bcf4a-0c3a-48f7-bd67-233b0deecaf3
+status: experimental
+description: Detects creation or drop of sensitive documents in user temp or staging directories, suggesting automated script collection.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\ProgramData\'
+            - 'C:\Temp\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.docx'
+            - '.xlsx'
+            - '.pdf'
+            - '.pst'
+            - '.kdbx'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Standard software installers unpacking dynamic assets or user applications saving document cache files.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1119
+    - analytic.an0531
+    - detection.det0186

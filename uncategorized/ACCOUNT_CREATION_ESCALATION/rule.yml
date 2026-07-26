@@ -1,0 +1,56 @@
+{
+  "id": "ACCOUNT_CREATION_ESCALATION",
+  "description": "New local account created then added to privileged group (Splunk: Account Manipulation story)",
+  "correlationKey": "username",
+  "scoreMultiplier": 3.0,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "account_create",
+      "techniques": [
+        "T1136"
+      ],
+      "optional": false,
+      "excludeSignatureContains": [
+        "CVE-",
+        "affects ",
+        "vulnerability",
+        "patch"
+      ],
+      "signatureEquals": [
+        "4720",
+        "net user /add",
+        "useradd",
+        "new user created",
+        "account created",
+        "user account created"
+      ]
+    },
+    {
+      "label": "group_add",
+      "techniques": [
+        "T1078"
+      ],
+      "optional": false,
+      "excludeSignatureContains": [
+        "CVE-",
+        "affects ",
+        "vulnerability",
+        "patch"
+      ],
+      "signatureEquals": [
+        "4728",
+        "4732",
+        "4756",
+        "net localgroup administrators",
+        "added to group",
+        "administrator added",
+        "privileged group",
+        "Domain Admins"
+      ]
+    }
+  ]
+}

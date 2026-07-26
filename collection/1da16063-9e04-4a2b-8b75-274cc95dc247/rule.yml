@@ -1,0 +1,31 @@
+title: Logon UI Suspicious DLL Load (AN0389-B)
+id: 82cf7077-3d7d-4bfb-8b6e-f65e84a7559e
+status: experimental
+description: Detects DLLs loaded into logonui.exe from non-standard locations (such as Temp or AppData).
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection_target:
+        Image|endswith: '\logonui.exe'
+    filter_standard_paths:
+        ImageLoaded|startswith:
+            - 'C:\Windows\System32\'
+            - 'C:\Windows\SysWOW64\'
+            - 'C:\Program Files\'
+            - 'C:\Program Files (x86)\'
+    condition: selection_target and not filter_standard_paths
+fields:
+    - Image
+    - ImageLoaded
+    - User
+falsepositives:
+    - Third-party credential providers or customized smart-card reader software installed in non-standard enterprise configurations.
+level: high
+tags:
+    - attack.collection
+    - attack.t1056.004
+    - analytic.an0389
+    - detection.det0139

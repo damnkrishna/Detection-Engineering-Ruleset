@@ -1,0 +1,42 @@
+title: Security Software Registry Key Modifications (AN0048-C)
+id: e48a8ada-0488-41e8-ae23-1e72943f2d49
+status: experimental
+description: Detects registry value modifications or additions targeting known antivirus or Defender registry paths.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 13
+detection:
+    selection_path:
+        TargetObject|contains:
+            - 'HKLM\SOFTWARE\Microsoft\Windows Defender'
+            - 'HKLM\SOFTWARE\Microsoft\Windows Advanced Threat Protection'
+            - 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender'
+            - 'HKLM\SOFTWARE\McAfee\'
+            - 'HKLM\SOFTWARE\Symantec\'
+            - 'HKLM\SOFTWARE\TrendMicro\'
+            - 'HKLM\SOFTWARE\CrowdStrike\'
+    filter_legitimate:
+        Image|endswith:
+            - '\MsMpEng.exe'
+            - '\NisSrv.exe'
+            - '\SenseIR.exe'
+            - '\SenseCncProxy.exe'
+            - '\wininit.exe'
+            - '\services.exe'
+    condition: selection_path and not filter_legitimate
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - Authorized software installations or security agent updates.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1518.001
+    - analytic.an0048
+    - detection.det0016

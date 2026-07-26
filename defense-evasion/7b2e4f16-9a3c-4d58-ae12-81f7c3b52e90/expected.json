@@ -1,0 +1,23 @@
+{
+  "rule_id": "7b2e4f16-9a3c-4d58-ae12-81f7c3b52e90",
+  "rule_name": "File Decode or Deobfuscation via LOLBins (AN2099)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

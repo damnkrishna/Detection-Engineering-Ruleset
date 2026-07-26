@@ -1,0 +1,42 @@
+title: Suspicious Child Process of Service Control Manager (AN1185-A)
+id: 156af8bb-bc8d-4cf9-8765-e2e7d907ef4f
+status: experimental
+description: Detects non-standard binaries spawned directly by services.exe, suggesting malicious service executions.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith: '\services.exe'
+    filter_standard:
+        Image|endswith:
+            - '\system32\svchost.exe'
+            - '\system32\spoolsv.exe'
+            - '\system32\lsass.exe'
+            - '\system32\wininit.exe'
+            - '\system32\searchindexer.exe'
+            - '\system32\taskhostw.exe'
+            - '\system32\dllhost.exe'
+            - '\system32\sihost.exe'
+            - '\system32\mstsc.exe'
+            - '\system32\consent.exe'
+            - '\system32\smartscreen.exe'
+            - '\system32\runtimebroker.exe'
+            - '\system32\wbem\WmiPrvSE.exe'
+            - '\MsMpEng.exe'
+    condition: selection_parent and not filter_standard
+fields:
+    - Image
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Standard enterprise software installers registering and launching components during updates.
+level: high
+tags:
+    - attack.execution
+    - attack.t1569.002
+    - analytic.an1185
+    - detection.det0421

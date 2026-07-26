@@ -1,0 +1,42 @@
+title: Domain Administrator Logon on Workstation (AN0590)
+id: 00e90765-8211-4335-87db-03cc403fc684
+status: experimental
+description: Detects successful remote network or RDP logons by domain administrator accounts onto standard workstation or member server endpoints, which may indicate lateral movement.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_event:
+        EventID: 4624
+    selection_logon_type:
+        LogonType:
+            - 3 # Network
+            - 10 # Remote Interactive
+    selection_domain_admin:
+        TargetUserName|contains:
+            - 'da_'
+            - 'domainadmin'
+            - 'domadmin'
+    selection_domain:
+        TargetDomainName|contains:
+            - 'NT AUTHORITY'
+            - 'NT Service'
+            - 'Window Manager'
+    condition: selection_event and selection_logon_type and selection_domain_admin and not selection_domain
+fields:
+    - EventID
+    - LogonType
+    - TargetDomainName
+    - TargetUserName
+falsepositives:
+    - Authorized troubleshooting by domain administrators directly on user workstations.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1078.002
+    - analytic.an0590
+    - detection.det0210

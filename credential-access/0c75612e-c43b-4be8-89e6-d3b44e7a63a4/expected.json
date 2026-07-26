@@ -1,0 +1,23 @@
+{
+  "rule_id": "0c75612e-c43b-4be8-89e6-d3b44e7a63a4",
+  "rule_name": "Suspicious Browser Credential Store Access via File Event (AN0105-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

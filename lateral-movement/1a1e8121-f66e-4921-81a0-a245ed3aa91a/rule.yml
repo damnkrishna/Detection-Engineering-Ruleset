@@ -1,0 +1,34 @@
+title: DCOM Configuration Modification (AN0791-B)
+id: a5c1150b-decd-4eed-80b3-19d94293d409
+status: experimental
+description: Detects registry modifications targeting DCOM system configurations or AppID registrations, which may indicate lateral movement preparation or COM object hijacking.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_keys:
+        TargetObject|contains:
+            - 'HKLM\SOFTWARE\Classes\AppID\'
+            - 'HKLM\SOFTWARE\Microsoft\Ole\'
+    selection_values:
+        TargetObject|endswith:
+            - 'EnableDCOM'
+            - 'LocalService'
+            - 'LaunchPermission'
+            - 'AccessPermission'
+    condition: selection_keys or selection_values
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - Legitimate administrative software updates or configuration changes via MMC or GPO.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1021.003
+    - analytic.an0791
+    - detection.det0285

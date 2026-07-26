@@ -1,0 +1,37 @@
+title: Verclsid Custom CLSID Registry Modification (AN0118-C)
+id: 3e4e29d9-b1b9-4b10-85c9-b471b780875d
+status: experimental
+description: Detects registry value writes under the user-writable Class ID registry paths (HKCU\SOFTWARE\Classes\CLSID\), which is a common persistence and defense evasion method used to proxy code execution.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 12/13
+detection:
+    selection_path:
+        TargetObject|contains:
+            - 'HKCU\SOFTWARE\Classes\CLSID\'
+            - '\Software\Classes\CLSID\'
+    selection_cmd:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+    condition: selection_path and selection_cmd
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - Legitimate software installers creating user-level COM registrations during setup.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1218.012
+    - analytic.an0118
+    - detection.det0042

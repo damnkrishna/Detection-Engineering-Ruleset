@@ -1,0 +1,35 @@
+title: DLL Side-Loading File Drop (AN0577-B)
+id: 88dba5a9-d4af-4626-9594-018894157d89
+status: experimental
+description: Detects the creation of dynamic link library (.dll) files inside user-writable temp folders, indicating staging for DLL side-loading.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+            - '\AppData\Roaming\'
+            - '\ProgramData\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.dll'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Software installer routines unpacking libraries.
+level: medium
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1574.001
+    - analytic.an0577
+    - detection.det0201

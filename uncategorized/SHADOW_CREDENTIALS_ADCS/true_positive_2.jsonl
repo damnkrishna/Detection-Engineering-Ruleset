@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","signature_name":"C:\\Windows\\System32 certreq","hostname":"ENG-WKS-327","agent_ip":"10.42.118.99","severity_id":3,"event_uid":"golden|SHADOW_CREDENTIALS_ADCS|0|659400","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T10:05:00.000Z","signature_name":"C:\\Users\\j.mercer\\AppData\\Local\\Temp SmartCard authentication","hostname":"ENG-WKS-327","agent_ip":"10.42.118.99","severity_id":3,"event_uid":"golden|SHADOW_CREDENTIALS_ADCS|1|659401","proto":"tcp","src_port":"50412","dst_port":"443"}

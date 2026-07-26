@@ -1,0 +1,23 @@
+title: Access to Deprecated or Historical Endpoint Patterns (AN2069-Historical-Paths)
+id: bd92255c-8ef5-400c-9590-f20a57e099f2
+status: experimental
+description: Detects access attempts to deprecated API versions or backup files often found via Wayback Machine.
+author: Krishna Gupta
+date: 2026-07-02
+logsource:
+    category: webserver
+    product: windows
+detection:
+    selection:
+        http_request_path|re:
+            - '.*\/v[0-9]+\/.*'          # Old API versions
+            - '.*\/api\/v[0-9]+\/.*'
+            - '.*\.(old|bak|backup|orig|copy|tmp|swp)$'
+            - '.*~$'                      # Vim backup files
+            - '.*\/archive\/.*'
+            - '.*\/deprecated\/.*'
+    condition: selection
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1594

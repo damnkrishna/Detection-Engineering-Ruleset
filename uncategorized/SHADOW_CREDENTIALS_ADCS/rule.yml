@@ -1,0 +1,58 @@
+{
+  "id": "SHADOW_CREDENTIALS_ADCS",
+  "description": "ADCS certificate-based attack \u2014 enumeration or ESC exploitation, cert request, certificate-based auth for lateral movement or persistence (T1649)",
+  "correlationKey": "username",
+  "scoreMultiplier": 4.0,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "adcs_enum_or_abuse",
+      "techniques": [
+        "T1649",
+        "T1558"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "certutil",
+        "certreq",
+        "4886",
+        "4887",
+        "ESC1",
+        "ESC2",
+        "ESC3",
+        "ESC4",
+        "ESC6",
+        "ESC8",
+        "Certipy",
+        "Certify.exe",
+        "ADCSPwn",
+        "shadow credentials",
+        "msDS-KeyCredentialLink",
+        "ADCS",
+        "certificate template",
+        "enrollment"
+      ]
+    },
+    {
+      "label": "cert_auth_or_lateral",
+      "techniques": [
+        "T1649"
+      ],
+      "optional": false,
+      "maxGapSeconds": 3600,
+      "signatureEquals": [
+        "PKINIT",
+        "certificate logon",
+        "SmartCard authentication",
+        "5059",
+        "certificate issued",
+        "TGT via certificate",
+        "4768 certificate",
+        "certificate-based auth"
+      ]
+    }
+  ]
+}

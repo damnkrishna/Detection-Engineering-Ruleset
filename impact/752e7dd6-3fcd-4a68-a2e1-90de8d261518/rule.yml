@@ -1,0 +1,27 @@
+title: Boot Configuration Tampering via PowerShell Script Block (AN0474-B)
+id: 2c460dad-d47c-4c3c-b473-021f744a37c1
+status: experimental
+description: Detects PowerShell script block logs containing commands attempting to modify Windows Boot Configuration Data (BCD).
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'bcdedit'
+            - 'recoveryenabled'
+            - 'bootstatuspolicy'
+            - 'ignoreallfailures'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative scripts or maintenance tools configuring boot settings.
+level: high
+tags:
+    - attack.impact
+    - attack.t1495
+    - analytic.an0474
+    - detection.det0167

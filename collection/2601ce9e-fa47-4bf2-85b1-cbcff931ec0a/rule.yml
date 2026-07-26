@@ -1,0 +1,50 @@
+title: Unofficial DHCP Server Port Binding (AN1290-B)
+id: 27c94cac-dc26-4cbd-a2b2-91c2c7463ca7
+status: experimental
+description: Detects scripting interpreter or tool processes (python, powershell, cmd) binding to the DHCP server port (UDP 67). The real Windows DHCP Server role runs under svchost.exe hosted by services.exe and is explicitly filtered — any scripting interpreter on port 67 is anomalous.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_processes:
+        # Scripting interpreters and generic tools that should never host a DHCP server
+        Image|endswith:
+            - '\python.exe'
+            - '\python3.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    selection_ports:
+        SourcePort:
+            - 67  # DHCPv4 Server
+    filter_system_services:
+        # The genuine Windows DHCP Server service always runs under svchost.exe
+        # spawned by services.exe — never under any interpreter above.
+        # This filter is a safety net; the selection_processes block already
+        # excludes svchost.exe by not listing it.
+        Image|endswith:
+            - '\svchost.exe'
+    filter_virt:
+        # Virtualization DHCP services
+        Image|endswith:
+            - '\vmnat.exe'
+            - '\vmware-natd.exe'
+            - '\vboxsvc.exe'
+    condition: selection_processes and selection_ports and not (filter_system_services or filter_virt)
+fields:
+    - Image
+    - SourcePort
+    - DestinationIp
+    - User
+falsepositives:
+    - Authorized developer scripts hosting virtual local DHCP services for sandbox or lab environments.
+level: high
+tags:
+    - attack.collection
+    - attack.t1557.003
+    - analytic.an1290
+    - detection.det0468

@@ -1,0 +1,48 @@
+title: Cmd Error Stream Suppression (AN0182-C)
+id: c47ea961-9e65-4ac0-b84c-9ebf11e99442
+status: experimental
+description: Detects command prompt (cmd.exe) processes redirecting stderr to null (2>nul or >nul 2>&1) combined with network download or scripting commands, which indicates attempts to execute tools silently.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_cmd:
+        - Image|endswith: '\cmd.exe'
+        - OriginalFileName: 'Cmd.Exe'
+    selection_redirection:
+        CommandLine|contains:
+            - '2>nul'
+            - '>nul 2>&1'
+            - '2>&1 >nul'
+    selection_execution:
+        CommandLine|contains:
+            - 'powershell'
+            - 'pwsh'
+            - 'curl'
+            - 'wget'
+            - 'certutil'
+            - 'bitsadmin'
+            - 'reg '
+            - 'sc '
+            - 'wscript'
+            - 'cscript'
+            - 'mshta'
+            - 'rundll32'
+    condition: selection_cmd and selection_redirection and selection_execution
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Automated system backup or installation scripts using standard error output redirection.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1564.011
+    - analytic.an0182
+    - detection.det0067

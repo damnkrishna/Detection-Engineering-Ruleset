@@ -1,0 +1,32 @@
+title: Visual Basic Script File Drop in Temp Directories (AN0209-B)
+id: acfd3837-537c-4211-ac91-ac6d7cbecc06
+status: experimental
+description: Detects the creation of Visual Basic script files (.vbs, .vbe) inside user-writable temp folders, indicating staging for execution.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.vbs'
+            - '.vbe'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Software installer routines unpacking helper scripts.
+level: medium
+tags:
+    - attack.execution
+    - attack.t1059.005
+    - analytic.an0209
+    - detection.det0076

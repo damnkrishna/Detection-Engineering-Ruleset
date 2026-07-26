@@ -1,0 +1,23 @@
+{
+  "rule_id": "e93fdf25-dd43-4eab-89cd-bd3f5a7fa84d",
+  "rule_name": "Scheduled Task Deletion via Security Logs (AN0113-C)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

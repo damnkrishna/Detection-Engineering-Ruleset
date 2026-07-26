@@ -1,0 +1,73 @@
+title: Registry Modification for System Logon Defacement via Registry Set (AN0229-A)
+id: 819905f3-302c-4bc8-8ce5-181a4805370f
+status: experimental
+description: Detects registry modifications targeting Windows logon legal notice banners or wallpaper registry values, which can indicate system defacement.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_target:
+        TargetObject|contains:
+            - '\Policies\System\legalnoticecaption'
+            - '\Policies\System\legalnoticetext'
+            - '\Control Panel\Desktop\wallpaper'
+    condition: selection_target
+fields:
+    - TargetObject
+    - Image
+    - User
+falsepositives:
+    - IT administration deploying corporate warning banners or setting default company wallpapers.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1491.001
+    - analytic.an0229
+    - detection.det0082
+---
+title: Registry Modification for System Logon Defacement via CLI (AN0229-B)
+id: f6c898e2-b5f6-44f5-a112-018314d01318
+status: experimental
+description: Detects command-line registry modifications targeting Windows logon legal notice banners or wallpaper registry values, which can indicate system defacement.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_registry_path:
+        CommandLine|contains:
+            - 'Policies\System'
+            - 'Control Panel\Desktop'
+    selection_registry_value:
+        CommandLine|contains:
+            - 'legalnoticecaption'
+            - 'legalnoticetext'
+            - 'wallpaper'
+    selection_registry_command:
+        CommandLine|contains:
+            - 'reg'
+            - 'add'
+            - 'Set-ItemProperty'
+            - 'New-ItemProperty'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_registry_path and selection_registry_value and selection_registry_command and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - IT administration deploying corporate warning banners or setting default company wallpapers.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1491.001
+    - analytic.an0229
+    - detection.det0082

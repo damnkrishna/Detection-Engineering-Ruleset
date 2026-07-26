@@ -1,0 +1,57 @@
+title: Lateral Movement - Script Host Initiating Outbound SMTP Connection (AN0147)
+id: 77a17922-9a08-4179-a315-da26b9f7e77a
+status: experimental
+description: Detects command-line interpreters, scripting hosts, or proxy executables initiating direct outbound TCP connections to mail gateway ports (25, 465, 587), suggesting automated internal spearphishing or mail worm propagation.
+author: Krishna Gupta
+date: 2026-06-12
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\msbuild.exe'
+            - '\wsmprovhost.exe'
+    selection_ports:
+        DestinationPort:
+            - 25  # SMTP
+            - 465 # SMTPS
+            - 587 # SMTP submission
+    selection_initiated:
+        Initiated: 'true'
+    filter_loopback:
+        DestinationIp:
+            - '127.0.0.1'
+            - '::1'
+    filter_system_accounts:
+        User|contains:
+            - 'NT AUTHORITY\SYSTEM'
+            - 'NT AUTHORITY\NETWORK SERVICE'
+            - 'NT AUTHORITY\LOCAL SERVICE'
+            - 'SYSTEM'
+    condition: selection_process and selection_ports and selection_initiated and not filter_loopback and not filter_system_accounts
+fields:
+    - Image
+    - CommandLine
+    - User
+    - DestinationHostname
+    - DestinationIp
+    - DestinationPort
+    - Initiated
+    - SourceIp
+    - SourcePort
+falsepositives:
+    - Legitimate administrative scripts or scheduled tasks configured to email log files or reports to the IT team.
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1534
+    - attack.t1566.002
+    - analytic.an0147
+    - detection.det0054

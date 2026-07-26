@@ -1,0 +1,48 @@
+{
+  "id": "BEACONING_FIXED_INTERVAL",
+  "description": "Single host making 5+ outbound C2-tactic connections in 60 minutes \u2014 frequency-based beacon detection with no signature dependency; catches custom implants, encrypted C2, novel frameworks (T1071, T1095, T1573)",
+  "correlationKey": "entity_key",
+  "scoreMultiplier": 3.0,
+  "windowMinutes": 60,
+  "minTimeSpanSec": 120,
+  "sensorFilter": [
+    "ZEEK",
+    "NIDS"
+  ],
+  "stages": [
+    {
+      "label": "interval_beacon",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0011"
+          ]
+        },
+        {
+          "field": "entity_key_direction",
+          "op": "eq",
+          "value": "ACTOR"
+        }
+      ],
+      "optional": false,
+      "minOccurrences": 5,
+      "excludeSignatureContains": [
+        "bittorrent",
+        "vuze",
+        "dht",
+        "torrent",
+        "USER_AGENTS",
+        "suspicious user agent",
+        "suspicious UA",
+        "User-Agent"
+      ]
+    }
+  ],
+  "maxDistinctCount": 2,
+  "maxDistinctField": "dstIp",
+  "suppression": {
+    "durationSeconds": 3600
+  }
+}

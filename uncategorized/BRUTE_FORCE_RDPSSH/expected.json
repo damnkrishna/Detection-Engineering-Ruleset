@@ -1,0 +1,23 @@
+{
+  "rule_id": "BRUTE_FORCE_RDPSSH",
+  "rule_name": "Brute force against RDP/SSH/VPN followed by successful authentication",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-nids",
+  "event_source": "suricata",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 4
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 4
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 4
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 4
+  }
+}

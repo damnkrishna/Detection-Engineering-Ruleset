@@ -1,0 +1,23 @@
+{
+  "rule_id": "b471ca9d-e4fb-43ee-87a2-b5df7c8ba3c9",
+  "rule_name": "Domain Account Creation Event ID 4720 (AN0006-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

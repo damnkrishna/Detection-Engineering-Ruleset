@@ -1,0 +1,35 @@
+title: Subvert Trust Controls - Malicious Root Cert Install (AN1246)
+id: 5b5976b7-46b4-4b3f-bbc8-3e72700ba043
+status: experimental
+description: Detects abnormal installation of root or code-signing certificates using certutil.exe.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_img:
+        Image|endswith: '\certutil.exe'
+    selection_cmd:
+        CommandLine|contains|all:
+            - '-addstore'
+            - 'Root'
+    condition: selection_img and selection_cmd
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administration scripts deploying corporate PKI root certificates.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1553
+    - analytic.an1246
+    - detection.det0452

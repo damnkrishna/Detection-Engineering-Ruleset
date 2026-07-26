@@ -1,0 +1,44 @@
+{
+  "id": "BITS_JOB_ABUSE",
+  "description": "BITS job created for stealthy payload download + persistence \u2014 evades AV via signed Windows service (T1197)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.0,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "bits_create",
+      "techniques": [
+        "T1197"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "bitsadmin /transfer",
+        "bitsadmin /create",
+        "bitsadmin /addfile",
+        "Start-BitsTransfer",
+        "7680",
+        "BitsJob",
+        "Background Intelligent Transfer",
+        "BITS transfer"
+      ]
+    },
+    {
+      "label": "payload_exec_or_persist",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0002",
+            "TA0003"
+          ]
+        }
+      ],
+      "optional": false,
+      "maxGapSeconds": 3600
+    }
+  ]
+}

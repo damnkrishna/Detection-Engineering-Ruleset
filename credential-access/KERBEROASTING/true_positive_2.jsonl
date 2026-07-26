@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","signature_name":"C:\\Windows\\System32 TGS-REQ","hostname":"OPS-WKS-788","agent_ip":"10.42.179.75","severity_id":3,"event_uid":"golden|KERBEROASTING|0|788700","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T10:05:00.000Z","signature_name":"C:\\Users\\j.mercer\\AppData\\Local\\Temp GetUserSPNs","hostname":"OPS-WKS-788","agent_ip":"10.42.179.75","severity_id":3,"event_uid":"golden|KERBEROASTING|1|788701","proto":"tcp","src_port":"50412","dst_port":"443"}

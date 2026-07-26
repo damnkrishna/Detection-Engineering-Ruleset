@@ -1,0 +1,47 @@
+title: Scheduled File Transfer via CLI (AN1118)
+id: 27c27225-5682-4a8c-9254-732d0b3d564c
+status: experimental
+description: Detects command-line execution of file transfer commands or scripting hosts spawned by task schedulers, which may indicate scheduled exfiltration attempts.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\taskeng.exe'
+    selection_cmd:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\curl.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'curl'
+            - 'wget'
+            - 'UploadFile'
+            - 'ftp'
+            - 'sftp'
+            - 'scp'
+            - 'Invoke-WebRequest'
+            - 'Invoke-RestMethod'
+    condition: selection_parent and selection_cmd and selection_args
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate enterprise synchronization scripts, monitoring tools, or software update check-ins.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1029
+    - analytic.an1118
+    - detection.det0399

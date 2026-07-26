@@ -1,0 +1,80 @@
+{
+  "id": "RARE_PROC_NET_OUTBOUND",
+  "description": "Non-browser signed-binary process makes first-ever outbound connection on non-standard port \u2014 implant or LOLBin C2 first-time activation (T1071, T1095)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.0,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "HIDS",
+    "ZEEK"
+  ],
+  "stages": [
+    {
+      "label": "unusual_proc_start",
+      "tactics": [
+        "TA0002"
+      ],
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0002"
+          ]
+        },
+        {
+          "field": "sensor",
+          "op": "IN",
+          "values": [
+            "HIDS"
+          ]
+        }
+      ],
+      "signatureContains": [
+        "mshta.exe",
+        "wscript.exe",
+        "cscript.exe",
+        "regsvr32.exe",
+        "rundll32.exe",
+        "forfiles.exe",
+        "pcalua.exe",
+        "odbcconf.exe",
+        "msdt.exe",
+        "first seen process",
+        "unusual process"
+      ],
+      "optional": false
+    },
+    {
+      "label": "outbound_uncommon_port",
+      "tactics": [
+        "TA0011"
+      ],
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0011"
+          ]
+        },
+        {
+          "field": "sensor",
+          "op": "IN",
+          "values": [
+            "ZEEK"
+          ]
+        }
+      ],
+      "signatureContains": [
+        "unusual port",
+        "non-standard port",
+        "outbound connection",
+        "uncommon destination",
+        "new connection"
+      ],
+      "optional": false,
+      "maxGapSeconds": 300
+    }
+  ]
+}

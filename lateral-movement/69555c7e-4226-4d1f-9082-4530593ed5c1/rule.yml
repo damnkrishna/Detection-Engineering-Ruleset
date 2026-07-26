@@ -1,0 +1,55 @@
+title: Lateral Movement - DCOM Server Spawning Suspicious Shell (AN0791)
+id: ff94b34b-de7c-485f-bd00-ba079a31c492
+status: experimental
+description: Detects command-line interpreters (cmd.exe, powershell.exe) spawned by DCOM server hosts (mmc.exe, explorer.exe, dllhost.exe) that are launched under the system DCOM service, indicating DCOM-based remote code execution.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\mmc.exe'
+            - '\explorer.exe'
+            - '\dllhost.exe'
+    selection_child:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'mshta.exe'
+    filter_user:
+        ParentCommandLine|contains:
+            - ' /factory' # COM server flag
+            - '-embedding'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_parent and selection_child and filter_user and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administration scripts triggered via COM objects by automated software (e.g., local backup agent launching command triggers).
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1021.003
+    - analytic.an0791
+    - detection.det0285

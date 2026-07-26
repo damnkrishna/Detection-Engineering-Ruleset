@@ -1,0 +1,41 @@
+title: Raw Physical Drive Access Command Line (AN0827-A)
+id: 3b407c63-b341-47a9-a86d-cbc4a0bca1de
+status: experimental
+description: Detects command-line parameters containing physical drive paths or volume namespaces used for raw disk writing or wiping.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_paths:
+        CommandLine|contains:
+            - '\\.\PhysicalDrive'
+            - '\\.\Volume{'
+            - '\\.\CdRom'
+    filter_sys:
+        Image|endswith:
+            - '\system32\defrag.exe'
+            - '\system32\chkdsk.exe'
+            - '\system32\wbem\WmiPrvSE.exe'
+    filter_disk_tools:
+        Image|endswith:
+            - '\diskpart.exe'
+            - '\fdisk.exe'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\svchost.exe'
+    condition: selection_paths and not (filter_sys or filter_disk_tools or filter_installers)
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Disk formatting utilities, diagnostic tasks run by administrators, or virtualization managers checking partition parameters.
+level: high
+tags:
+    - attack.impact
+    - attack.t1561.002
+    - analytic.an0827
+    - detection.det0297

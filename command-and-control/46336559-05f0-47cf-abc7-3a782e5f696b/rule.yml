@@ -1,0 +1,53 @@
+title: Outbound Connection via Non-Standard Port via CLI (AN0633-B)
+id: 734e0bbd-b846-458a-957c-742bdd0e319d
+status: experimental
+description: Detects command-line process parameters referencing typical non-standard C2 port values in connection configurations.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_process:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\nc.exe'
+            - '\ncat.exe'
+            - '\socat.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'nc.exe'
+            - 'ncat.exe'
+    selection_args:
+        CommandLine|contains:
+            - '4444'
+            - '4445'
+            - '5555'
+            - '8000'
+            - '8080'
+            - '8443'
+            - '8888'
+            - '9001'
+            - '9999'
+    condition: selection_process and selection_args
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Legitimate administration scripts testing network listener ports.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1571
+    - analytic.an0633
+    - detection.det0227

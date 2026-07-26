@@ -1,0 +1,44 @@
+title: Suspicious Browser Credential Store Access via File Event (AN0105-B)
+id: fccb5ec4-efc4-4cc7-a4a0-30da2663a4fc
+status: experimental
+description: Detects non-browser processes writing, accessing, or creating web browser credential and cookie databases, indicating potential credential theft.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\Google\Chrome\User Data\'
+            - '\Microsoft\Edge\User Data\'
+            - '\Mozilla\Firefox\Profiles\'
+            - '\Opera Software\Opera Stable\'
+            - '\BraveSoftware\Brave-Browser\User Data\'
+    selection_files:
+        TargetFilename|endswith:
+            - '\Login Data'
+            - '\Cookies'
+            - '\Web Data'
+            - 'places.sqlite'
+            - 'key4.db'
+            - 'logins.json'
+    filter_browsers:
+        Image|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\firefox.exe'
+            - '\brave.exe'
+            - '\opera.exe'
+    condition: (selection_paths or selection_files) and not filter_browsers
+fields:
+    - Image
+    - TargetFilename
+falsepositives:
+    - Backup software or legitimate password managers accessing browser databases.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1555.003
+    - analytic.an0105
+    - detection.det0037

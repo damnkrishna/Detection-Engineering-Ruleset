@@ -1,0 +1,138 @@
+{
+  "ruleId": "CR0108_T1071_T1218",
+  "ruleName": "Cobalt Strike Malleable Profile HTTP Request Match",
+  "ruleFormat": "IR_v1",
+  "ruleType": "THRESHOLD",
+  "ruleOrigin": "custom",
+  "description": "Detects Cobalt Strike HTTP request traffic followed by rundll32.exe executing with empty arguments on the host within 15 minutes.",
+  "enabled": true,
+  "version": 1,
+  "correlationKey": "entity_key",
+  "eventSources": [
+    "suricata",
+    "windows_sysmon"
+  ],
+  "window": {
+    "type": "sliding",
+    "minSpanSeconds": 0,
+    "durationSeconds": 900
+  },
+  "output": {
+    "tags": [
+      "atomic-red-team",
+      "bzar"
+    ],
+    "message": "Cobalt Strike malleable C2 traffic and suspicious rundll32.exe execution detected",
+    "severity": "HIGH",
+    "entityField": "host.name",
+    "mitreTactics": [
+      "TA0011",
+      "TA0005"
+    ],
+    "includeFields": [],
+    "riskScoreDelta": 4,
+    "mitreTechniques": [
+      "T1071.001",
+      "T1218.011"
+    ]
+  },
+  "stages": [
+    {
+      "stageIndex": 0,
+      "match": {
+        "groups": [
+          {
+            "groups": [],
+            "operator": "OR",
+            "conditions": [
+              {
+                "field": "signature_name",
+                "value": "Cobalt Strike HTTP request",
+                "values": [],
+                "operator": "contains"
+              },
+              {
+                "field": "signature_name",
+                "value": "Cobalt Strike C2 traffic",
+                "values": [],
+                "operator": "contains"
+              }
+            ]
+          }
+        ],
+        "operator": "AND",
+        "conditions": []
+      },
+      "minGapMs": 0,
+      "aggregate": {
+        "field": null,
+        "groupBy": [],
+        "function": "count",
+        "threshold": 1,
+        "distinctField": null
+      },
+      "eventSources": [
+        "suricata"
+      ],
+      "withinSeconds": 0,
+      "minOccurrences": 0,
+      "correlation_key": "host.name",
+      "minDistinctCount": 0,
+      "requireDistinctField": null,
+      "excludeSignatureContains": []
+    },
+    {
+      "stageIndex": 1,
+      "match": {
+        "groups": [
+          {
+            "groups": [],
+            "operator": "AND",
+            "conditions": [
+              {
+                "field": "process_name",
+                "value": "rundll32.exe",
+                "values": [],
+                "operator": "equals"
+              },
+              {
+                "field": "command_line",
+                "value": "\"rundll32.exe\"",
+                "values": [],
+                "operator": "equals"
+              }
+            ]
+          }
+        ],
+        "operator": "AND",
+        "conditions": []
+      },
+      "minGapMs": 0,
+      "aggregate": {
+        "field": null,
+        "groupBy": [],
+        "function": "count",
+        "threshold": 1,
+        "distinctField": null
+      },
+      "eventSources": [
+        "windows_sysmon"
+      ],
+      "withinSeconds": 900,
+      "minOccurrences": 0,
+      "correlation_key": "host.name",
+      "minDistinctCount": 0,
+      "requireDistinctField": null,
+      "excludeSignatureContains": []
+    }
+  ],
+  "suppression": {
+    "groupBy": [
+      "host.name"
+    ],
+    "durationSeconds": 300
+  },
+  "maxGapSeconds": 0,
+  "behavioralConstraints": null,
+  "maxConcurrentInstances": 0
+}

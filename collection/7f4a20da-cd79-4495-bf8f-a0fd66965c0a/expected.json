@@ -1,0 +1,23 @@
+{
+  "rule_id": "7f4a20da-cd79-4495-bf8f-a0fd66965c0a",
+  "rule_name": "Collection - Remote Email Collection via Exchange API Query (AN0131)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

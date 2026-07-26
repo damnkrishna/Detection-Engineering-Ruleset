@@ -1,0 +1,60 @@
+title: Registry Modification via CLI (AN0781)
+id: c8a70eec-018c-410e-9869-90c2822476d9
+status: experimental
+description: Detects command-line registry modifications using reg.exe, powershell.exe, cmd.exe, or wmic.exe targeting critical keys for persistence, privilege escalation, or defense evasion (e.g., Winlogon Notify, Userinit, Run/RunOnce, SafeDllSearchMode).
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_images:
+        - Image|endswith:
+            - '\reg.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wmic.exe'
+        - OriginalFileName:
+            - 'reg.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'cmd.exe'
+            - 'wmic.exe'
+    selection_keys:
+        CommandLine|contains:
+            - 'CurrentVersion\Winlogon\Notify'
+            - 'CurrentVersion\Winlogon'
+            - 'CurrentVersion\Run'
+            - 'CurrentVersion\RunOnce'
+            - 'Session Manager\SafeDllSearchMode'
+            - 'SafeDllSearchMode'
+    selection_actions:
+        CommandLine|contains:
+            - 'add'
+            - 'import'
+            - 'delete'
+            - 'Set-ItemProperty'
+            - 'New-ItemProperty'
+            - 'Remove-ItemProperty'
+    condition: selection_images and selection_keys and selection_actions
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Administrative scripts or software installations updating registry keys.
+    - System updates or security agent configurations.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.persistence
+    - attack.t1112
+    - analytic.an0781
+    - detection.det0280

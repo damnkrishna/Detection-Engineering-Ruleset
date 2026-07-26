@@ -1,0 +1,39 @@
+title: Suspicious Process Access indicating EWM Injection (AN0608)
+id: eaa09313-c5d1-46d6-bfc0-81e60b6daf3c
+status: experimental
+description: Detects adversary manipulation of Extra Window Memory (EWM) by monitoring for suspicious ProcessAccess requests targeting GUI processes like explorer.exe.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_access
+    product: windows
+    # Relies on Sysmon Event ID 10
+detection:
+    selection_target:
+        TargetImage|endswith:
+            - '\explorer.exe'
+            - '\dwm.exe'
+    selection_access:
+ # Access rights often needed to manipulate window structures
+        GrantedAccess:
+            - '0x1F0FFF' # All Access
+            - '0x143A'   # VM Write + VM Operation + VM Read
+    filter_known:
+        SourceImage|endswith:
+            - '\taskmgr.exe'
+            - '\MsMpEng.exe'
+    condition: selection_target and selection_access and not filter_known
+fields:
+    - SourceImage
+    - TargetImage
+    - GrantedAccess
+falsepositives:
+    - Legitimate screen sharing or UI automation tools.
+    - Software debuggers.
+level: high
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1055.011
+    - analytic.an0608
+    - detection.det0217

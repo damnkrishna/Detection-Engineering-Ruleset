@@ -1,0 +1,60 @@
+title: Suspicious Database Client Execution for Data Collection (AN0677)
+id: 1b8e0b47-186f-4763-92c8-2a74ebca6c66
+status: experimental
+description: Detects database client tools (sqlcmd, bcp, osql, mysql) launched by unexpected parent processes or with output directed to temp/user directories, indicating adversarial database collection.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_db_clients:
+        - Image|endswith:
+            - '\sqlcmd.exe'
+            - '\bcp.exe'
+            - '\osql.exe'
+            - '\isql.exe'
+            - '\mysql.exe'
+            - '\mysqldump.exe'
+        - OriginalFileName:
+            - 'sqlcmd.exe'
+            - 'bcp.exe'
+            - 'osql.exe'
+            - 'isql.exe'
+            - 'mysql.exe'
+            - 'mysqldump.exe'
+    selection_suspicious_parent:
+        ParentImage|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\explorer.exe'
+    selection_output_to_temp:
+        CommandLine|contains:
+            - '\Windows\Temp\'
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - ' -o '
+            - ' /o '
+            - ' > '
+    condition: selection_db_clients and (selection_suspicious_parent or selection_output_to_temp)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - DBA or developer scripts using sqlcmd.exe from PowerShell or cmd.exe for authorized database queries.
+level: high
+tags:
+    - attack.collection
+    - attack.t1213.006
+    - analytic.an0677
+    - detection.det0242

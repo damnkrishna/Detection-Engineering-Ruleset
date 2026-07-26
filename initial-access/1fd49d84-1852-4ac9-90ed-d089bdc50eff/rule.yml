@@ -1,0 +1,36 @@
+title: Supply Chain Tampering - Suspicious Process Spawned by Development Tool via PowerShell Script Block (AN0021-B)
+id: b12ff037-6c42-4994-a5ac-b3b37ea50411
+status: experimental
+description: Detects PowerShell script block logs containing commands associated with package installations running command shells or downloaders.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_dev:
+        ScriptBlockText|contains:
+            - 'npm '
+            - 'pip '
+            - 'nuget '
+            - 'msbuild '
+            - 'gradle '
+    selection_shells:
+        ScriptBlockText|contains:
+            - 'cmd.exe'
+            - 'powershell.exe'
+            - 'curl'
+            - 'wget'
+            - 'bitsadmin'
+            - 'certutil'
+    condition: selection_dev and selection_shells
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate developer environment scripts or compilation routines.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1195.001
+    - analytic.an0021
+    - detection.det0009

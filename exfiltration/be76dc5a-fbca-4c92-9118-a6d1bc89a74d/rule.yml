@@ -1,0 +1,46 @@
+title: Code Repository Exfiltration Command Execution (AN0895-B)
+id: ae6959f6-46a1-484c-bdf0-ecf7adf6b541
+status: experimental
+description: Detects CLI tools or scripting engines executing commands that target known public code repositories, suggesting potential scripted data exfiltration.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_process_image:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\curl.exe'
+    selection_process_original:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'cmd.exe'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'curl.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'github.com'
+            - 'gitlab.com'
+            - 'bitbucket.org'
+            - 'githubusercontent.com'
+    condition: (selection_process_image or selection_process_original) and selection_args
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Standard administrative tasks or developer workflows.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1567.001
+    - analytic.an0895
+    - detection.det0318

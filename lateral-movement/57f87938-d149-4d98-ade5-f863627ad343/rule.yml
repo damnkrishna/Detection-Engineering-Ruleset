@@ -1,0 +1,31 @@
+title: RDP Session Hijacking via Service Creation (AN1620-B)
+id: ee7425a2-8def-49fe-b2fd-25743d0de80e
+status: experimental
+description: Detects service installation pointing to tscon.exe for session hijacking by monitoring System Event ID 7045.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    service: system
+    product: windows
+detection:
+    selection_eid:
+        EventID: 7045
+    selection_cmd:
+        ImagePath|contains:
+            - 'tscon'
+            - '/dest:'
+    condition: selection_eid and selection_cmd
+fields:
+    - EventID
+    - ServiceName
+    - ImagePath
+    - ServiceType
+    - StartType
+falsepositives:
+    - None. IT administrators should not configure tscon as a system service.
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1563.002
+    - analytic.an1620
+    - detection.det0588

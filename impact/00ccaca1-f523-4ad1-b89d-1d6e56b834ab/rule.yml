@@ -1,0 +1,45 @@
+title: Local System Shutdown/Reboot Invocations (AN1538-A)
+id: 8787b980-9e6f-4f08-a694-d8e916707701
+status: experimental
+description: Detects command-line execution of shutdown.exe or scripting utilities to shut down or restart the local system.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\shutdown.exe'
+    selection_args:
+        CommandLine|contains:
+            - ' /s'
+            - ' /r'
+            - ' -s'
+            - ' -r'
+            - ' /p'
+            - ' /h'
+    selection_powershell:
+        CommandLine|contains:
+            - 'Stop-Computer'
+            - 'Restart-Computer'
+    filter_system_images:
+        ParentImage|endswith:
+            - '\tiworker.exe'
+            - '\svchost.exe'
+            - '\trustedinstaller.exe'
+    filter_system_user:
+        User: 'NT AUTHORITY\SYSTEM'
+    condition: ((selection_images and selection_args) or selection_powershell) and not (filter_system_images or filter_system_user)
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Legitimate system restarts triggered by administrators or patching engines (e.g. Windows Update).
+level: high
+tags:
+    - attack.impact
+    - attack.t1529
+    - analytic.an1538
+    - detection.det0559

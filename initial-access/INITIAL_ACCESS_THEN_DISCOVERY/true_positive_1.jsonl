@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"ET MALWARE Observed Suspicious Outbound Connection exploit","hostname":"SEC-WKS-119","agent_ip":"10.42.110.165","severity_id":3,"event_uid":"golden|INITIAL_ACCESS_THEN_DISCOVERY|0|908000","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:05:00.000Z","signature_name":"C:\\Windows\\System32 scan","hostname":"SEC-WKS-119","agent_ip":"10.42.110.165","severity_id":3,"event_uid":"golden|INITIAL_ACCESS_THEN_DISCOVERY|1|908001","proto":"tcp","src_port":"50412","dst_port":"443"}

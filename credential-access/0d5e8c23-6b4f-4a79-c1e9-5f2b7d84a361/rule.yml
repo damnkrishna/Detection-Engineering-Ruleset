@@ -1,0 +1,49 @@
+title: Browser Cookie Database Access by Non-Browser Process (AN2107)
+id: c8482297-b08f-4820-bb09-b9fee843ff68
+status: experimental
+description: Detects processes other than browsers reading SQLite cookie databases from Chrome, Edge, or Firefox profile directories. Used by attackers to steal authenticated session tokens without re-authenticating.
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_sqlite_tools:
+        Image|endswith:
+            - '\sqlite3.exe'
+            - '\python.exe'
+            - '\python3.exe'
+    selection_cookie_paths:
+        CommandLine|contains:
+            - 'AppData\Local\Google\Chrome\User Data'
+            - 'AppData\Local\Microsoft\Edge\User Data'
+            - 'AppData\Roaming\Mozilla\Firefox\Profiles'
+            - '\Cookies'
+            - '\Network\Cookies'
+    selection_ps_cookie:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_ps_cookie_ofn:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.exe'
+    selection_ps_cookie_cli:
+        CommandLine|contains:
+            - 'Chrome\User Data'
+            - 'Edge\User Data'
+            - 'Firefox\Profiles'
+            - 'Cookies'
+    condition: (selection_sqlite_tools and selection_cookie_paths) or ((selection_ps_cookie or selection_ps_cookie_ofn) and selection_ps_cookie_cli)
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Cookie management or synchronization tools operating on browser data for backup purposes.
+level: high
+tags:
+    - attack.credential_access
+    - attack.t1539
+    - analytic.an2107
+    - detection.det0964

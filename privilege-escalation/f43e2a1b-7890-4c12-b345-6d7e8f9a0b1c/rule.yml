@@ -1,0 +1,39 @@
+title: Suspicious Remote Thread Creation (PE Injection) (AN0297)
+id: 1deae8e5-7bc3-49fa-9f58-5de9026d5d08
+status: experimental
+description: Detects PE injection where a process initiates a new thread (CreateRemoteThread) in another live process, executing injected code.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: create_remote_thread
+    product: windows
+    # Relies on Sysmon Event ID 8
+detection:
+    selection_target:
+        TargetImage|endswith:
+            - '\explorer.exe'
+            - '\svchost.exe'
+            - '\lsass.exe'
+            - '\winlogon.exe'
+            - '\spoolsv.exe'
+            - '\services.exe'
+    filter_known_injectors:
+        SourceImage|endswith:
+            - '\MsMpEng.exe'
+            - '\csrss.exe'
+            - '\wbemprox.exe'
+    condition: selection_target and not filter_known_injectors
+fields:
+    - SourceImage
+    - TargetImage
+    - StartAddress
+falsepositives:
+    - Antivirus solutions inspecting processes.
+    - Legitimate Windows subsystems (csrss) creating threads.
+level: high
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1055.002
+    - analytic.an0297
+    - detection.det0106

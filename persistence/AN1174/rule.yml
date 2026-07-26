@@ -1,0 +1,31 @@
+title: 'AN1174 - Power Settings'
+id: 6ea85653-8ec3-4977-84e1-917479b28931
+status: experimental
+description: 'Detects the use of powercfg.exe to disable sleep or hibernation settings, a common tactic to maintain persistent network connections.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_image:
+    Image|endswith: '\powercfg.exe'
+    OriginalFileName: 'powercfg.exe'
+  selection_args:
+    CommandLine|contains:
+      - ' -x '
+      - ' /x '
+      - ' -hibernate '
+      - ' /hibernate '
+      - ' -standby-timeout '
+      - ' /standby-timeout '
+  condition: selection_image and selection_args
+fields:
+  - EventID
+  - Image
+  - CommandLine
+  - ParentImage
+level: medium
+tags:
+  - attack.persistence
+  - attack.t1653
+  - analytic.an1174

@@ -1,0 +1,37 @@
+title: Remote Logon Session Creation (AN0750-B)
+id: dd6e16f1-d9e7-4012-bc2c-8b5d6ea63f47
+status: experimental
+description: Detects successful remote network logons (Type 3) or remote interactive RDP logons (Type 10) by administrative or non-standard accounts, suggesting lateral movement.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    service: security
+    product: windows
+detection:
+    selection_eid:
+        EventID: 4624
+    selection_logon_type:
+        LogonType:
+            - 3
+            - 10
+    filter_machine:
+        TargetUserName|endswith: '$'
+    filter_system:
+        TargetUserName:
+            - 'ANONYMOUS LOGON'
+            - 'SYSTEM'
+    condition: selection_eid and selection_logon_type and not (filter_machine or filter_system)
+fields:
+    - EventID
+    - LogonType
+    - TargetUserName
+    - TargetDomainName
+    - IpAddress
+falsepositives:
+    - Legitimate administrative remote access and script automation.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1021
+    - analytic.an0750
+    - detection.det0269

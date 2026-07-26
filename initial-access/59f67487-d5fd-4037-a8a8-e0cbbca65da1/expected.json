@@ -1,0 +1,23 @@
+{
+  "rule_id": "59f67487-d5fd-4037-a8a8-e0cbbca65da1",
+  "rule_name": "Spearphishing Attachment - Execution of Process from Mail Attachment Cache (AN0655-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

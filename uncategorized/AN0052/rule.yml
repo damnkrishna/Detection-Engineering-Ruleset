@@ -1,0 +1,71 @@
+title: Loading of Suspicious DLL from User-Writable Directory (AN0052)
+id: ca57eb80-62df-46a3-952b-f13071633f66
+status: experimental
+description: Detects a process loading a shared module (DLL) located in user-writable directories (like AppData, Temp, or Public), which may indicate DLL side-loading or search order hijacking.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: image_load
+    product: windows
+    # Relies on Sysmon Event ID 7
+detection:
+    selection_paths:
+        ImageLoaded|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+            - '\AppData\Roaming\'
+    selection_processes:
+        Image|endswith:
+            - '\explorer.exe'
+            - '\svchost.exe'
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\mshta.exe'
+    selection_signature:
+        Signed: 'false'
+    condition: selection_paths and selection_processes and selection_signature
+fields:
+    - Image
+    - ImageLoaded
+    - Signed
+    - SignatureStatus
+falsepositives:
+    - Legitimate software installed in user directories (like local profile applications) loading local DLLs.
+level: high
+tags:
+    - attack.execution
+    - attack.t1129
+    - analytic.an0052
+    - detection.det0018
+---
+title: Loading Shared Modules via PowerShell (AN0052-B)
+id: 940d721f-0ac7-4048-a47e-aa8592887ff0
+status: experimental
+description: Detects PowerShell script blocks loading assemblies or DLLs dynamically.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection:
+        ScriptBlockText|contains:
+            - '[System.Reflection.Assembly]::Load'
+            - 'Add-Type'
+        ScriptBlockText|contains:
+            - '.dll'
+    condition: selection
+fields:
+    - ScriptBlockText
+    - User
+falsepositives:
+    - Administrative automation or development scripts.
+level: medium
+tags:
+    - attack.execution
+    - attack.t1129
+    - analytic.an0052
+    - detection.det0018

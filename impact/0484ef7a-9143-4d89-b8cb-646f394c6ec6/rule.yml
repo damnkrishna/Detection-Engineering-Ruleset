@@ -1,0 +1,40 @@
+title: Bulk Content Wiping Utilities Command Line (AN0882-A)
+id: e11ffaf8-51b1-40ed-86d3-873a8adb3739
+status: experimental
+description: Detects command-line parameters indicating bulk file wiping or secure data overwrite using cipher.exe or sdelete.exe.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_cipher:
+        Image|endswith:
+            - '\cipher.exe'
+        CommandLine|contains:
+            - ' /w:'
+            - ' -w:'
+    selection_sdelete:
+        Image|endswith:
+            - '\sdelete.exe'
+            - '\sdelete64.exe'
+        CommandLine|contains:
+            - ' -p '
+            - ' -z '
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_cipher or selection_sdelete) and not filter_installers
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - System administrators securely cleaning disks before repurposing systems or disposing of hardware.
+level: high
+tags:
+    - attack.impact
+    - attack.t1561.001
+    - analytic.an0882
+    - detection.det0316

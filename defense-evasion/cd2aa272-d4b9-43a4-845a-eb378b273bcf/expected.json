@@ -1,0 +1,23 @@
+{
+  "rule_id": "cd2aa272-d4b9-43a4-845a-eb378b273bcf",
+  "rule_name": "Prevent Command History Logging - Set-PSReadLineOption (AN1557)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

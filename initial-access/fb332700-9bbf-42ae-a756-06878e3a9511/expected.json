@@ -1,0 +1,23 @@
+{
+  "rule_id": "fb332700-9bbf-42ae-a756-06878e3a9511",
+  "rule_name": "Content Injection - Execution of Web Server Configuration Tool (AN0992-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

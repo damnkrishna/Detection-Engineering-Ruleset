@@ -1,0 +1,37 @@
+title: Hybrid Identity Agent DLL Modification (AN0814-B)
+id: 6de9f511-62ae-446d-a6db-93054c2c14bf
+status: experimental
+description: Detects file creation of DLLs or suspicious image loads within Azure AD Connect Sync folders.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - 'C:\Program Files\Microsoft Azure AD Connection Tool\'
+            - 'C:\Program Files\Microsoft Azure AD Connect Authentication Agent\'
+    selection_filetypes:
+        TargetFilename|endswith:
+            - '.dll'
+            - '.exe'
+    filter_installers:
+        Image|endswith:
+            - '\trustedinstaller.exe'
+            - '\msiexec.exe'
+            - '\tiworker.exe'
+            - '\AzureADConnect.exe'
+            - '\AzureADConnectUpdater.exe'
+    condition: selection_paths and selection_filetypes and not filter_installers
+fields:
+    - TargetFilename
+    - User
+falsepositives:
+    - Authorized software updates to Azure AD Connect or authentication agent versions.
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1556.007
+    - analytic.an0814
+    - detection.det0293

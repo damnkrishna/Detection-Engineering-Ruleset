@@ -1,0 +1,23 @@
+{
+  "rule_id": "f8041fd7-61e2-4cb0-ab40-24d5cc7a7938",
+  "rule_name": "High Connection Burst to Web Server Port (AN1165-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

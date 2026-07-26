@@ -1,0 +1,34 @@
+title: External Remote Services - Successful Remote Logon Event (AN1004-B)
+id: a4fbaadd-c39e-4c42-8d61-8bc25e05ddeb
+status: experimental
+description: Detects successful remote desktop logons (Logon Type 10) or network logons (Logon Type 3), which are paths for external remote service logins.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_logon:
+        EventID: 4624
+        LogonType:
+            - 3  # Network
+            - 10 # Remote Interactive
+    filter_common:
+        TargetUserName|endswith: '$'
+        TargetUserName:
+            - 'ANONYMOUS LOGON'
+            - 'SYSTEM'
+    condition: selection_logon and not filter_common
+fields:
+    - EventID
+    - IpAddress
+    - LogonType
+    - TargetUserName
+falsepositives:
+    - Legitimate administrative or user remote network logons.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1133
+    - analytic.an1004
+    - detection.det0354

@@ -1,0 +1,35 @@
+title: Execution of DLL with Suspicious or Revoked Code Signature (AN0643-B)
+id: 3080b555-5eb4-4d6d-b726-20c98752ac64
+status: experimental
+description: Detects the loading of images (DLLs/EXEs) from user-writable directories that possess an invalid, expired, or explicitly revoked digital signature.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection_paths:
+        ImageLoaded|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+            - '\AppData\Roaming\'
+    selection_signature_status:
+        SignatureStatus:
+            - 'invalid'
+            - 'revoked'
+            - 'expired'
+    condition: selection_paths and selection_signature_status
+fields:
+    - Image
+    - ImageLoaded
+    - Signed
+    - SignatureStatus
+falsepositives:
+    - Legacy corporate applications compiled internally with expired certificates executing from user directories.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1553.002
+    - analytic.an0643
+    - detection.det0230

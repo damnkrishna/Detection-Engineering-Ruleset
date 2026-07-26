@@ -1,0 +1,29 @@
+title: Domain Trust Discovery via PowerShell Script Block (AN0016-B)
+id: de42ba1e-2afc-4efd-915a-40de601a5a30
+status: experimental
+description: Detects PowerShell script blocks invoking Active Directory namespace classes to query domain trust relationships, indicating advanced reconnaissance.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'System.DirectoryServices.ActiveDirectory'
+            - 'GetAllTrustRelationships'
+            - 'Get-ADTrust'
+            - 'Get-NetDomainTrust'
+            - 'Get-DomainTrust'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Domain administrators running audit scripts or AD health check tools.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1482
+    - analytic.an0016
+    - detection.det0007

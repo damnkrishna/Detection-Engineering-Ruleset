@@ -1,0 +1,30 @@
+title: UAC Bypass Registry Key Modification (AN0975-B)
+id: 87878686-e292-4556-be3c-ca76390ea1b8
+status: experimental
+description: Detects registry modifications to command overrides under the User classes hive used in UAC bypass methods.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry:
+        TargetObject|contains:
+            - '\Software\Classes\ms-settings\shell\open\command'
+            - '\Software\Classes\mscfile\shell\open\command'
+            - '\Software\Classes\exefile\shell\runas\command'
+    condition: selection_registry
+fields:
+    - TargetObject
+    - Image
+    - User
+    - Details
+falsepositives:
+    - Legitimate installers registering shell commands under standard file associations.
+level: high
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1548
+    - analytic.an0975
+    - detection.det0345

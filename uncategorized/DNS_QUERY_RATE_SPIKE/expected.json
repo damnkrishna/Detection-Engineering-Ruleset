@@ -1,0 +1,23 @@
+{
+  "rule_id": "DNS_QUERY_RATE_SPIKE",
+  "rule_name": "Abnormal DNS query volume from single host in 5 minutes — DGA C2 characteristic or DNS tunneling (T1568, T1071.004). Behavior-driven, no signature required.",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-zeek",
+  "event_source": "zeek",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 20
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 20
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 19
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 20
+  }
+}

@@ -1,0 +1,29 @@
+title: Suspicious Windows Credential Manager Access via PowerShell Script Block (AN0378-B)
+id: 677acbf4-e0c6-4a49-a093-9cb4d6888bc7
+status: experimental
+description: Detects PowerShell script block logs containing keywords related to Windows Credential Manager or Vault querying.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'cmdkey'
+            - 'vaultcmd'
+            - 'Get-VaultCredential'
+            - 'CredEnumerate'
+            - 'CredentialManager'
+            - 'Get-CachedCredential'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative scripting for backup or credentials validation.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1555.004
+    - analytic.an0378
+    - detection.det0134

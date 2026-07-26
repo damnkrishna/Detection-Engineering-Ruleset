@@ -1,0 +1,38 @@
+title: Exploit Framework Induced Denial of Service Execution (AN0850-B)
+id: dc60e850-d355-4de3-bef6-fe59bdf3859f
+status: experimental
+description: Detects process creations of exploit scripts or utilities launched with parameters commonly associated with service crash exploits.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_args:
+        CommandLine|contains:
+            - 'exploit/windows/dos/'
+            - 'exploit/linux/dos/'
+            - 'bluekeep'
+            - 'etherleak'
+            - 'cve-2021-31166'
+            - 'cve-2022-21907'
+            - 'cve-2020-0796'
+            - 'poc.py'
+            - 'trigger_dos'
+    filter_legitimate:
+        ParentImage|endswith:
+            - '\burp.exe'
+            - '\metasploit.exe'
+    condition: selection_args and not filter_legitimate
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Penetration testers or vulnerability scanners conducting authorized denial-of-service validations during test windows.
+level: high
+tags:
+    - attack.impact
+    - attack.t1499.004
+    - analytic.an0850
+    - detection.det0304

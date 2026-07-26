@@ -1,0 +1,44 @@
+title: Scripting Process Outbound Connection Burst (AN0969-B)
+id: f6fd9cdd-e2f4-41ac-928f-48bbab7cd2df
+status: experimental
+description: Detects non-standard scripting interpreters (Python, PowerShell, cmd) initiating outbound connections. This rule is designed to be paired with SIEM-side aggregation to trigger only when connection rate thresholds are exceeded (e.g. count > 500 in 10 seconds).
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_processes:
+        Image|endswith:
+            - '\python.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    filter_internal:
+        # Filter connections to localhost or internal network endpoints
+        DestinationIp|startswith:
+            - '127.'
+            - '10.'
+            - '192.168.'
+            - '172.16.'
+            - '::1'
+    filter_admin:
+        ParentImage|endswith:
+            - '\explorer.exe'
+            - '\mmc.exe'
+    condition: selection_processes and not (filter_internal or filter_admin)
+fields:
+    - Image
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Legitimate administrative scripts retrieving public APIs or running cloud updates.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1498.001
+    - analytic.an0969
+    - detection.det0343

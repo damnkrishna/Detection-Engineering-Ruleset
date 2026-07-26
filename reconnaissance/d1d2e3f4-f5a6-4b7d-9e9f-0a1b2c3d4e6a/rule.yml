@@ -1,0 +1,37 @@
+title: Phishing for Information from Compromised Internal Account (AN2073-Phishing-Internal)
+id: d05e658d-48ab-4913-b4ad-a79327291ce3
+status: experimental
+description: Detects internal emails querying for sensitive configurations or employee details, which may indicate a compromised mailbox. Note - Ingestion pipeline should normalize Unicode representations (NFKC) on incoming subjects to prevent evasion via multi-lingual or homoglyphic characters.
+logsource:
+    category: email
+    product: msexchange
+detection:
+    selection_phish:
+        subject|contains:
+            - 'vpn config'
+            - 'antivirus config'
+            - 'firewall rules'
+            - 'employee directory'
+            - 'org chart'
+            - 'infrastructure details'
+            - 'network topology'
+            - 'it system query'
+    selection_internal:
+        sender_type: 'internal'
+    filter_training:
+        subject|contains:
+            - '[PHISHING TEST]'
+            - 'Awareness Training'
+        sender|endswith:
+            - '@phishing-training-platform.com'
+    condition: selection_phish and selection_internal and not filter_training
+fields:
+    - sender
+    - recipient
+    - subject
+falsepositives:
+    - Internal security awareness training tests.
+level: high
+tags:
+    - attack.reconnaissance
+    - attack.t1598

@@ -1,0 +1,42 @@
+title: Collection - Anomaly Audio Capture Library Load (AN0619)
+id: 0ddbcee7-b1c6-4bb7-9c21-066a629e4d55
+status: experimental
+description: Detects unsigned or non-standard executables loading Windows multimedia and audio recording DLLs (winmm.dll, dsound.dll), indicating potential unauthorized microphone recording.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: image_load
+    product: windows
+    # Relies on Sysmon Event ID 7
+detection:
+    selection_dll:
+        ImageLoaded|endswith:
+            - '\winmm.dll'
+            - '\dsound.dll'
+    filter_signed:
+ # Exclude known web conferencing and system media programs
+        Image|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\teams.exe'
+            - '\zoom.exe'
+            - '\skype.exe'
+            - '\slack.exe'
+            - '\discord.exe'
+            - '\audacity.exe'
+            - '\obs64.exe'
+            - '\SoundRecorder.exe'
+    condition: selection_dll and not filter_signed
+fields:
+    - Image
+    - ImageLoaded
+    - Signed
+    - SignatureStatus
+falsepositives:
+    - Authorized corporate meeting applications or screen recording packages not covered in the static exclusion list.
+level: high
+tags:
+    - attack.collection
+    - attack.t1123
+    - analytic.an0619
+    - detection.det0221

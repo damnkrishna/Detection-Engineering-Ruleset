@@ -1,0 +1,39 @@
+title: Collection - Clipboard Data Retrieval Command (AN0965)
+id: 3bc37f67-0462-447f-b3ea-680d40995b30
+status: experimental
+description: Detects command-line parameters or PowerShell scripting commands executing clipboard-reading commands (such as Get-Clipboard or clipboard APIs), suggesting unauthorized credential or data harvesting.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_cmd:
+        CommandLine|contains:
+            - 'Get-Clipboard'
+            - 'Windows.Forms.Clipboard'
+            - 'clip.exe' # typically used for piping, but checks for direct execution too
+    selection_powershell:
+        EventID: 4104
+        ScriptBlockText|contains:
+            - 'Get-Clipboard'
+            - 'Windows.Forms.Clipboard'
+    condition: selection_cmd or selection_powershell
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - user-run administrative helper scripts that query the clipboard for convenience tasks.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1115
+    - analytic.an0965
+    - detection.det0341

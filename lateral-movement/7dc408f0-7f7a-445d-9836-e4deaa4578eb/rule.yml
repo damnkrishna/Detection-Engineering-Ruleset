@@ -1,0 +1,50 @@
+title: Lateral Movement - Suspicious Service Executable Spawned by Services.exe (AN1468)
+id: 95a0244e-ce37-40f2-a6aa-bc6db7f8462e
+status: experimental
+description: Detects the Service Control Manager (services.exe) spawning non-standard, temporary, or suspicious child processes (such as PSEXESVC.exe or administrative tools), indicating lateral movement via SMB shares.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\services.exe'
+    selection_child:
+        - Image|endswith:
+            - '\PSEXESVC.exe'
+            - '\paexec.exe'
+            - '\cmd.exe'
+            - '\powershell.exe'
+        - OriginalFileName:
+            - 'psexesvc.exe'
+            - 'PAExec.exe'
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+        - Image|contains:
+            - '\Windows\Temp\'
+            - '\Windows\psexesvc'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_parent and selection_child and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative utilities installed as standard services that spawn command shells on startup (highly rare and bad practice).
+level: critical
+tags:
+    - attack.lateral-movement
+    - attack.t1021.002
+    - analytic.an1468
+    - detection.det0530

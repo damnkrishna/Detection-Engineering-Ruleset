@@ -1,0 +1,26 @@
+title: 'AN0123 - Software Extensions: Browser Extensions'
+id: 8ff9bf03-1737-4aa8-a975-cad1ab782d83
+status: experimental
+description: 'Detects suspicious registry modifications or file drops targeting browser extensions, indicative of persistence or credential theft.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: registry_set
+detection:
+  selection_chrome:
+    TargetObject|contains: '\Software\Policies\Google\Chrome\ExtensionInstallForcelist'
+  selection_edge:
+    TargetObject|contains: '\Software\Policies\Microsoft\Edge\ExtensionInstallForcelist'
+  selection_event:
+    EventType: 'SetValue'
+  condition: (selection_chrome or selection_edge) and selection_event
+fields:
+  - EventID
+  - TargetObject
+  - Image
+  - Details
+level: high
+tags:
+  - attack.persistence
+  - attack.t1176.001
+  - analytic.an0123

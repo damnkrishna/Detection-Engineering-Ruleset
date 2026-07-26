@@ -1,0 +1,23 @@
+{
+  "rule_id": "8f3b6d94-1e7c-4a52-b9f5-2c8e4a37d582",
+  "rule_name": "Forced Authentication via UNC Path or SCF File Creation (AN2104)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

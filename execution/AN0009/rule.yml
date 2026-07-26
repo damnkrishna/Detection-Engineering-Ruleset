@@ -1,0 +1,55 @@
+title: Environment PATH Variable Modification via CLI (AN0009)
+id: 8246dd28-b990-4a4b-b049-886147358bff
+status: experimental
+description: Detects command-line modifications to the system or user environment PATH variables using setx.exe, reg.exe, or PowerShell, which may indicate path interception attempts.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_setx:
+        - Image|endswith: '\setx.exe'
+        - OriginalFileName: 'setx.exe'
+    selection_setx_args:
+        CommandLine|contains:
+            - ' path '
+            - ' PATH '
+    selection_reg:
+        - Image|endswith:
+            - '\reg.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'reg.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_reg_args:
+        CommandLine|contains:
+            - 'Session Manager\Environment'
+            - '\Environment'
+        CommandLine|contains:
+            - 'add'
+            - 'SetEnvironmentVariable'
+            - 'Path'
+    condition: (selection_setx and selection_setx_args) or (selection_reg and selection_reg_args)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate software installers configuring paths during system integration or administrative path updates.
+level: medium
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1574.007
+    - analytic.an0009
+    - detection.det0004

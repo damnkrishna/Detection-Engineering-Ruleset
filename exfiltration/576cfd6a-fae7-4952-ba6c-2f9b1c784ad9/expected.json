@@ -1,0 +1,23 @@
+{
+  "rule_id": "576cfd6a-fae7-4952-ba6c-2f9b1c784ad9",
+  "rule_name": "CLI Copy Command Targeting Removable Media (AN0616-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

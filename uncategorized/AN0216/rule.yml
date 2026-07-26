@@ -1,0 +1,94 @@
+title: RDP Session Hijacking via tscon.exe (AN0216)
+id: 8efe5204-f23e-41c1-b3c5-e7233894dad2
+status: experimental
+description: Detects RDP session hijacking via tscon.exe executed under SYSTEM context or via sc.exe creating a service with tscon in the binary path. Adversaries with SYSTEM privileges use this native Windows utility to take control of disconnected RDP sessions without requiring credentials (T1563.002).
+author: Krishna Gupta
+date: 2026-06-12
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_tscon_img:
+        - Image|endswith: '\tscon.exe'
+        - OriginalFileName: 'tscon.exe'
+    selection_tscon_system:
+        User|contains:
+            - 'SYSTEM'
+            - 'NT AUTHORITY\SYSTEM'
+    selection_sc_img:
+        - Image|endswith: '\sc.exe'
+        - OriginalFileName: 'sc.exe'
+    selection_sc_args:
+        CommandLine|contains|all:
+            - 'create'
+            - 'tscon'
+            - '/dest:'
+    selection_query_user:
+        - Image|endswith:
+            - '\query.exe'
+            - '\qwinsta.exe'
+        - OriginalFileName:
+            - 'query.exe'
+            - 'qwinsta.exe'
+    selection_query_args:
+        CommandLine|contains:
+            - ' user'
+            - ' session'
+    filter_console_reconnect:
+        CommandLine|contains: '/dest:console'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: ((selection_tscon_img and selection_tscon_system) or (selection_sc_img and selection_sc_args) or (selection_query_user and selection_query_args)) and not filter_console_reconnect and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - IT administrators reconnecting to their own disconnected sessions
+    - Terminal server maintenance reconnecting sessions via scripts
+    - Helpdesk tooling that uses tscon.exe for user session management
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1563.002
+    - analytic.an0216
+    - detection.det0079
+---
+title: RDP Session Hijacking via Service Creation (AN0216-B)
+id: a378d909-a78e-439c-bcf0-82eaf050c398
+status: experimental
+description: Detects service installation pointing to tscon.exe for session hijacking by monitoring System Event ID 7045.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    service: system
+    product: windows
+detection:
+    selection_eid:
+        EventID: 7045
+    selection_cmd:
+        ImagePath|contains:
+            - 'tscon'
+            - '/dest:'
+    condition: selection_eid and selection_cmd
+fields:
+    - EventID
+    - ServiceName
+    - ImagePath
+    - ServiceType
+    - StartType
+falsepositives:
+    - None. IT administrators should not configure tscon as a system service.
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1563.002
+    - analytic.an0216
+    - detection.det0079

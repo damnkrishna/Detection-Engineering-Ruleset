@@ -1,0 +1,67 @@
+title: Disabling or Tampering with Windows Firewall (AN0406)
+id: 5600a578-d0de-4251-9fb8-2f422c625a7e
+status: experimental
+description: Detects command-line operations that attempt to disable, modify, or stop the Windows Defender Firewall service or profiles using netsh.exe, PowerShell, or service control utilities.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_netsh:
+        - Image|endswith: '\netsh.exe'
+        - OriginalFileName: 'netsh.exe'
+    selection_netsh_args:
+        CommandLine|contains|all:
+            - 'advfirewall'
+            - 'set'
+            - 'state'
+            - 'off'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_cmdlets:
+        CommandLine|contains:
+            - 'Set-NetFirewallProfile'
+            - 'Disable-NetFirewallRule'
+            - 'Remove-NetFirewallRule'
+    selection_powershell_args:
+        CommandLine|contains:
+            - 'False'
+            - 'off'
+    selection_service_control:
+        - Image|endswith:
+            - '\sc.exe'
+            - '\net.exe'
+        - OriginalFileName:
+            - 'sc.exe'
+            - 'net.exe'
+    selection_service_args:
+        CommandLine|contains|all:
+            - 'mpssvc'
+        CommandLine|contains:
+            - 'stop'
+            - 'disable'
+    condition: (selection_netsh and selection_netsh_args) or (selection_powershell and selection_powershell_cmdlets and selection_powershell_args) or (selection_service_control and selection_service_args)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative troubleshooting or network configuration scripts that temporarily disable profiles or remove rules.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1686
+    - analytic.an0406
+    - detection.det0145

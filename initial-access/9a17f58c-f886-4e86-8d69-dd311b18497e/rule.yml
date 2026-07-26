@@ -1,0 +1,38 @@
+title: Drive-by Compromise - PowerShell Script Block executing from Web Browser Parent (AN0498-B)
+id: 4e112a68-c4d4-46cf-9501-d781024ed621
+status: experimental
+description: Detects PowerShell script block logs executing commands associated with browser parent processes, suggesting browser-compromise execution.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_cmd:
+        ScriptBlockText|contains:
+            - 'Invoke-Expression'
+            - 'iex'
+            - 'Invoke-WebRequest'
+            - 'iwr'
+            - 'Net.WebClient'
+            - 'DownloadFile'
+            - 'DownloadString'
+    selection_browsers:
+        ScriptBlockText|contains:
+            - 'chrome'
+            - 'msedge'
+            - 'firefox'
+            - 'brave'
+            - 'opera'
+            - 'iexplore'
+    condition: selection_cmd and selection_browsers
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Developer scripting tools or administrative tasks triggered locally.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1189
+    - analytic.an0498
+    - detection.det0176

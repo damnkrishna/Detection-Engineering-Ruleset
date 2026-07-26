@@ -1,0 +1,79 @@
+title: Lateral Tool Transfer to Administrative Shares (AN0516)
+id: 83c63f69-2fb5-4329-9104-55a05018a7f7
+status: experimental
+description: Detects command-line copy or file transfer utilities (copy, move, xcopy, robocopy) targeting administrative shares (e.g. C$, ADMIN$), which can indicate lateral tool transfer.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_utilities:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\xcopy.exe'
+            - '\robocopy.exe'
+        - OriginalFileName:
+            - 'Cmd.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'xcopy.exe'
+            - 'robocopy.exe'
+    selection_shares:
+        CommandLine|contains:
+            - '\C$'
+            - '\ADMIN$'
+            - '\IPC$'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_utilities and selection_shares and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Normal administrative scripts or deployment agents transferring tools, configuration scripts, or patches to administrative shares.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1570
+    - analytic.an0516
+    - detection.det0183
+---
+title: File Copy to Administrative Shares (AN0516-B)
+id: b766e1b5-3edb-4a8e-b648-cf65468e031c
+status: experimental
+description: Detects file creation events on administrative shares (C$, ADMIN$), which can indicate lateral tool transfer.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_shares:
+        TargetFilename|contains:
+            - '\C$\'
+            - '\Admin$\'
+            - '\ADMIN$\'
+    condition: selection_shares
+fields:
+    - Image
+    - TargetFilename
+    - User
+falsepositives:
+    - Administrative scripts or patch management tools deploying files.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1570
+    - analytic.an0516
+    - detection.det0183

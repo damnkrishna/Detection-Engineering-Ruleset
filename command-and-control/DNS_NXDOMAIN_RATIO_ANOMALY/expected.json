@@ -1,0 +1,23 @@
+{
+  "rule_id": "DNS_NXDOMAIN_RATIO_ANOMALY",
+  "rule_name": "≥15 NXDOMAIN responses from single host in 5 minutes — DGA C2 lookup pattern, behavior-driven, no signature dependency (T1568.002)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-zeek",
+  "event_source": "zeek",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 15
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 15
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 14
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 15
+  }
+}

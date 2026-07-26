@@ -1,0 +1,28 @@
+title: Tamper SafeBoot Registry Configuration (AN0323-B)
+id: 371d3fc7-4087-4257-a029-f2e6427dc992
+status: experimental
+description: Detects registry modifications under the SafeBoot control key, indicating attempts to persist drivers/services in Safe Mode.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains:
+            - '\System\CurrentControlSet\Control\SafeBoot\Minimal\'
+            - '\System\CurrentControlSet\Control\SafeBoot\Network\'
+    condition: selection
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Authorized software installations registering drivers for safe mode support.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1688
+    - analytic.an0323
+    - detection.det0116

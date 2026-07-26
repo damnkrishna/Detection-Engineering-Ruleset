@@ -1,0 +1,127 @@
+title: Suspicious SAM Registry Hive Export via CLI (AN0235-A)
+id: 55d3678c-1daf-41aa-829d-54a2ccb0aeb0
+status: experimental
+description: Detects attempts to export the SAM, SYSTEM, or SECURITY registry hives using the reg.exe command line utility, indicating potential credential dumping.
+author: Krishna Gupta
+date: 2026-06-12
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_img:
+        - Image|endswith: '\reg.exe'
+        - OriginalFileName: 'reg.exe'
+    selection_action:
+        CommandLine|contains:
+            - 'save'
+            - 'export'
+            - 'backup'
+    selection_target:
+        CommandLine|contains:
+            - 'HKLM\SAM'
+            - 'HKLM\SYSTEM'
+            - 'HKLM\SECURITY'
+            - 'HKEY_LOCAL_MACHINE\SAM'
+            - 'HKEY_LOCAL_MACHINE\SYSTEM'
+            - 'HKEY_LOCAL_MACHINE\SECURITY'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_img and selection_action and selection_target and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate system backup operations or imaging tools.
+    - Rare administrative troubleshooting by IT personnel.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1003.002
+    - analytic.an0235
+    - detection.det0085
+---
+title: Suspicious SAM Registry Hive Modification via Registry Set (AN0235-B)
+id: b67bcc0c-0fbb-47d6-8fbf-67eab4566e6b
+status: experimental
+description: Detects registry value additions or modifications targeting SAM, SYSTEM, or SECURITY registry hives, indicating potential credential dumping or manipulation.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_target:
+        TargetObject|contains:
+            - 'HKLM\SAM'
+            - 'HKLM\SYSTEM'
+            - 'HKLM\SECURITY'
+            - 'HKEY_LOCAL_MACHINE\SAM'
+            - 'HKEY_LOCAL_MACHINE\SYSTEM'
+            - 'HKEY_LOCAL_MACHINE\SECURITY'
+    filter_system:
+        Image|endswith:
+            - '\services.exe'
+            - '\wininit.exe'
+            - '\lsass.exe'
+            - '\svchost.exe'
+    condition: selection_target and not filter_system
+fields:
+    - Image
+    - TargetObject
+    - User
+falsepositives:
+    - Legitimate system updates or domain join operations.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1003.002
+    - analytic.an0235
+    - detection.det0085
+---
+title: Suspicious SAM Registry Hive Export via File Event (AN0235-C)
+id: 78750f7f-c735-469d-b1ed-fa7b1925e6a1
+status: experimental
+description: Detects creation of files named sam, system, or security (or with those extensions) by non-system processes in temp directories.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_target:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - 'C:\Windows\Temp\'
+            - 'C:\Temp\'
+    selection_files:
+        TargetFilename|endswith:
+            - '\sam'
+            - '\system'
+            - '\security'
+            - '.hiv'
+            - '.hive'
+            - '.bak'
+    filter_system:
+        Image|startswith:
+            - 'C:\Windows\System32\'
+            - 'C:\Windows\SysWOW64\'
+    condition: selection_target and selection_files and not filter_system
+fields:
+    - Image
+    - TargetFilename
+falsepositives:
+    - Legitimate backup agents or system troubleshooting tools.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1003.002
+    - analytic.an0235
+    - detection.det0085

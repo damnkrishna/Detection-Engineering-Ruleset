@@ -1,0 +1,58 @@
+title: Suspicious File and Directory Permissions Modification (AN0834)
+id: 9adae606-6dc7-46ef-863c-bcbb3416a86a
+status: experimental
+description: Detects command-line permissions modifications using built-in Windows utilities (icacls, cacls, takeown, attrib) targeting directory ownership, granting excessive rights, denying access, or hiding files.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_takeown:
+        - Image|endswith: '\takeown.exe'
+        - OriginalFileName: 'takeown.exe'
+    selection_takeown_cmd:
+        CommandLine|contains|all:
+            - ' /f '
+            - ' /r'
+    selection_icacls:
+        - Image|endswith:
+            - '\icacls.exe'
+            - '\cacls.exe'
+        - OriginalFileName:
+            - 'iCACLS.EXE'
+            - 'cacls.exe'
+    selection_icacls_cmd:
+        CommandLine|contains:
+            - 'Everyone:F'
+            - 'Everyone:FA'
+            - ' /deny '
+            - ' /reset'
+    selection_attrib:
+        - Image|endswith: '\attrib.exe'
+        - OriginalFileName: 'attrib.exe'
+    selection_attrib_cmd:
+        CommandLine|contains|all:
+            - ' +h'
+            - ' +s'
+    condition: (selection_takeown and selection_takeown_cmd) or (selection_icacls and selection_icacls_cmd) or (selection_attrib and selection_attrib_cmd)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Administrative scripts, software installation, or updates modifying permissions or attributes on legacy applications.
+    - System setup utilities configuring system files.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.privilege-escalation
+    - attack.t1222.001
+    - analytic.an0834
+    - detection.det0299

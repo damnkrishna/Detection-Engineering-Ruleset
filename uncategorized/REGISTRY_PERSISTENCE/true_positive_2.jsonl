@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","signature_name":"C:\\Windows\\System32 CurrentVersion\\RunOnce","hostname":"ENG-WKS-377","agent_ip":"10.42.68.71","severity_id":3,"event_uid":"golden|REGISTRY_PERSISTENCE|0|906600","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T10:05:00.000Z","tactic":"TA0002","hostname":"ENG-WKS-377","agent_ip":"10.42.68.71","severity_id":3,"event_uid":"golden|REGISTRY_PERSISTENCE|1|906601","proto":"tcp","src_port":"50412","dst_port":"443"}

@@ -1,0 +1,23 @@
+{
+  "rule_id": "1d799b7b-8c5f-45bc-9a82-9c054e7d86ee",
+  "rule_name": "Remote Thread Creation in Transaction Application Processes (AN1097-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

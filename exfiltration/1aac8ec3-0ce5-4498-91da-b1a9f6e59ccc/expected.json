@@ -1,0 +1,23 @@
+{
+  "rule_id": "1aac8ec3-0ce5-4498-91da-b1a9f6e59ccc",
+  "rule_name": "Exfiltration - Command-Line Cloud Storage Sync Execution (AN1571)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

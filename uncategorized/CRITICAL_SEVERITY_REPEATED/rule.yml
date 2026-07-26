@@ -1,0 +1,47 @@
+{
+  "id": "CRITICAL_SEVERITY_REPEATED",
+  "description": "3+ high/critical-severity alerts against same entity in 30 min \u2014 sustained active attack",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.0,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "NIDS"
+  ],
+  "stages": [
+    {
+      "label": "high_sev",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0001",
+            "TA0002",
+            "TA0004",
+            "TA0006",
+            "TA0008",
+            "TA0010",
+            "TA0011",
+            "TA0040"
+          ]
+        },
+        {
+          "field": "severity",
+          "op": "IN",
+          "values": [
+            "4",
+            "5"
+          ]
+        }
+      ],
+      "optional": false,
+      "minOccurrences": 3,
+      "excludeSignatureContains": [
+        "bittorrent",
+        "vuze",
+        "dht",
+        "torrent"
+      ]
+    }
+  ]
+}

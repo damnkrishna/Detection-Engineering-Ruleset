@@ -1,0 +1,42 @@
+title: Archive File Creation on Removable Media (AN0342)
+id: 3102cb26-9c59-4b66-9985-07edf49c3239
+status: experimental
+description: Detects the creation or writing of compressed archive files (such as .zip, .rar, .7z) onto removable storage drive paths (e.g. D:, E:, F:, G:, H:\), which may indicate staging data for physical exfiltration.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|startswith:
+            - 'D:\'
+            - 'E:\'
+            - 'F:\'
+            - 'G:\'
+            - 'H:\'
+            - 'I:\'
+            - 'J:\'
+    selection_archives:
+        TargetFilename|endswith:
+            - '.zip'
+            - '.rar'
+            - '.7z'
+            - '.tar'
+            - '.cab'
+            - '.tgz'
+            - '.iso'
+    condition: selection_paths and selection_archives
+fields:
+    - Image
+    - TargetFilename
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate users saving archives or backing up data to USB flash drives or external drives.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1052
+    - analytic.an0342
+    - detection.det0123

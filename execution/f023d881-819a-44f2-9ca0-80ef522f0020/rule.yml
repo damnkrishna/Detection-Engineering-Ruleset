@@ -1,0 +1,45 @@
+title: Obfuscated or Encoded PowerShell CommandLine (AN1252-A)
+id: 1b69ac6b-b441-4507-a768-50e8183e16f8
+status: experimental
+description: Detects command-line execution of PowerShell with suspicious switches, encoding, or download strings.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'pwsh.exe'
+    selection_cli:
+        CommandLine|contains:
+            - ' -enc'
+            - ' -encoded'
+            - ' -e '
+            - ' bypass'
+            - ' hidden'
+            - 'iex'
+            - 'downloadstring'
+            - 'downloadfile'
+            - 'invoke-expression'
+            - '[char[]]'
+            - '[convert]::'
+    condition: (selection_images or selection_orig) and selection_cli
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Administrative maintenance or backup scripts implementing encoded or hidden windows configurations.
+level: high
+tags:
+    - attack.execution
+    - attack.t1059.001
+    - analytic.an1252
+    - detection.det0455

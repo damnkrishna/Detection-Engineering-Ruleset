@@ -1,0 +1,72 @@
+{
+  "id": "LOLBIN_EXECUTION",
+  "description": "Living-off-the-land binary abused for malicious activity then C2/persistence",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 2.5,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "lolbin",
+      "signatureContains": [
+        "certutil",
+        "bitsadmin",
+        "mshta",
+        "regsvr32",
+        "wscript",
+        "cscript",
+        "rundll32",
+        "msiexec",
+        "wmic",
+        "powershell",
+        "schtasks",
+        "at.exe",
+        "forfiles",
+        "pcalua",
+        "desktopimgdownldr",
+        "esentutl",
+        "ieexec",
+        "mavinject",
+        "odbcconf",
+        "curl.exe",
+        "wget.exe",
+        "finger.exe",
+        "bash.exe",
+        "wsl.exe",
+        "ssh.exe",
+        "netsh.exe",
+        "xwizard.exe",
+        "syncappvpublishingserver.exe"
+      ],
+      "optional": false
+    },
+    {
+      "label": "followup",
+      "tactics": [
+        "TA0011",
+        "TA0003",
+        "TA0002",
+        "TA0009",
+        "TA0010",
+        "TA0004"
+      ],
+      "optional": false,
+      "signatureContains": [
+        "beacon",
+        "c2",
+        "c&c",
+        "connect",
+        "callback",
+        "check-in",
+        "dns beacon",
+        "http beacon",
+        "cobalt",
+        "metasploit",
+        "empire",
+        "persist"
+      ]
+    }
+  ]
+}

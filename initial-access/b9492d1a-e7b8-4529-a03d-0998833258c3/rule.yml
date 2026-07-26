@@ -1,0 +1,36 @@
+title: Wi-Fi Network Anomalies - Wireless Profile Query (AN1476-A)
+id: de315add-6990-47a8-bc98-b04fb4c20291
+status: experimental
+description: Detects processes executing wireless profile queries or WLAN auto-config events logging successful connection to unsecured (open) networks.
+author: Antigravity
+date: 2026-06-12
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\netsh.exe'
+        CommandLine|contains:
+            - 'wlan'
+            - 'show profiles'
+            - 'show networks'
+            - 'export profile'
+    condition: selection_process
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrator troubleshooting network connectivity.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1669
+    - analytic.an1476
+    - detection.det0536

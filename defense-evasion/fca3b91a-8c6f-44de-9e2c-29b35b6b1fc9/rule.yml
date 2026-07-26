@@ -1,0 +1,33 @@
+title: SIP and Trust Provider Hijacking (AN1222)
+id: 2fab116b-6c55-4c19-8fad-64667e10d7c4
+status: experimental
+description: Detects abnormal registry modifications to Subject Interface Packages (SIPs) and Trust Providers.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 13
+detection:
+    selection_keys:
+        TargetObject|contains:
+            - 'SOFTWARE\Microsoft\Cryptography\Providers\Trust'
+            - 'SOFTWARE\Microsoft\Cryptography\OID\EncodingType 0\CryptSIPDll'
+    condition: selection_keys
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - TargetObject
+    - Details
+    - User
+    - LogonId
+falsepositives:
+    - Installation of legitimate third-party security software or custom trust providers.
+    - Major Windows OS upgrades patching cryptographic components.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1553.003
+    - analytic.an1222
+    - detection.det0442

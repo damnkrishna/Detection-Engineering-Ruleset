@@ -1,0 +1,37 @@
+title: Service Installation of Unquoted Binary Path (AN0176-B)
+id: 93a0f150-8ec2-4a82-8176-2146b73b36db
+status: experimental
+description: Detects the installation of a new Windows service where the service image path contains spaces but is unquoted, which could be abused for path interception.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    service: system
+    product: windows
+detection:
+    selection_eid:
+        EventID: 7045
+    selection_spaces:
+        ImagePath|contains:
+            - 'Program Files'
+            - 'Documents and Settings'
+            - 'Users\'
+    filter_quotes:
+        ImagePath|contains:
+            - '"'
+    condition: selection_eid and selection_spaces and not filter_quotes
+fields:
+    - EventID
+    - ServiceName
+    - ImagePath
+    - ServiceType
+    - StartType
+falsepositives:
+    - Software installers registering services with unquoted paths.
+level: medium
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1574.009
+    - analytic.an0176
+    - detection.det0064

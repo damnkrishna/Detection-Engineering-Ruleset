@@ -1,0 +1,23 @@
+{
+  "rule_id": "33b5dfcd-fce4-48f1-9b11-70c583e472e8",
+  "rule_name": "Rogue Domain Controller - Kerberos DRS SPN Request by Non-DC Host (AN0770)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

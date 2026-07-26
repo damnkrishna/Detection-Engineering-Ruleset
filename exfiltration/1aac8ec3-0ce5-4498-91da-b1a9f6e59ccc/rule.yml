@@ -1,0 +1,54 @@
+title: Exfiltration - Command-Line Cloud Storage Sync Execution (AN1571)
+id: ecdfcd2a-36d2-446d-9fdd-3432e813de47
+status: experimental
+description: Detects the execution of command-line cloud synchronization tools (like rclone, megacmd) or cloud provider CLI platforms (AWS, Azure) transferring files, indicating potential exfiltration.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_utilities_image:
+        Image|endswith:
+            - '\rclone.exe'
+            - '\mega-cmd.exe'
+            - '\mega.exe'
+            - '\MegaSync.exe'
+            - '\aws.exe'
+            - '\az.exe'
+            - '\gsutil.exe'
+    selection_utilities_original:
+        OriginalFileName:
+            - 'rclone.exe'
+            - 'mega-cmd.exe'
+            - 'mega.exe'
+            - 'MegaSync.exe'
+            - 'aws.exe'
+            - 'az.exe'
+            - 'gsutil.py'
+    selection_sync_commands:
+        CommandLine|contains:
+            - ' sync '
+            - ' copy '
+            - ' upload '
+            - ' s3 cp '
+            - ' blob upload '
+    condition: (selection_utilities_image or selection_utilities_original) and selection_sync_commands
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - IT administrators using rclone or cloud CLIs to manage system backups or sync server repositories to enterprise cloud storage.
+level: high
+tags:
+    - attack.exfiltration
+    - attack.t1567.002
+    - analytic.an1571
+    - detection.det0570

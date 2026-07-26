@@ -1,0 +1,31 @@
+title: Suspicious AD FS Database Query for SAML Certificate Extraction via PowerShell Script Block (AN0420-B)
+id: 18b93087-46af-4fa6-b311-aac50ba4c62d
+status: experimental
+description: Detects PowerShell script block logs containing keywords related to AD FS database queries or certificate exports, indicating potential SAML token signing key extraction.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Export-AdfsCertificate'
+            - 'ADFSpoof'
+            - 'AdfsConfiguration'
+            - 'IdentityServerPolicy'
+            - 'microsoft##ssee'
+            - 'Get-AdfsProperties'
+            - 'Get-AdfsSslCertificate'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative troubleshooting or backup operations.
+level: critical
+tags:
+    - attack.credential-access
+    - attack.defense-evasion
+    - attack.t1606.002
+    - analytic.an0420
+    - detection.det0148

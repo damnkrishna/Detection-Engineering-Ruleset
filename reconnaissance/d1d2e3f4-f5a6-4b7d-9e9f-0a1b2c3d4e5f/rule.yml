@@ -1,0 +1,40 @@
+title: Phishing for Information (AN2073)
+id: d8f81f86-fc6f-41f5-9143-b52e16739b3d
+status: experimental
+description: Detects inbound phishing emails soliciting sensitive organizational information or credential verifications. Note - Subject-line obfuscation (zero-width spaces, homoglyphs, multi-lingual text) should be resolved by performing Unicode Normalization (NFKC) on incoming email subjects at the log ingestion pipeline level prior to parsing.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: email
+    product: msexchange
+detection:
+    selection_phish:
+        subject|contains:
+            - 'vpn config'
+            - 'antivirus config'
+            - 'firewall rules'
+            - 'employee directory'
+            - 'org chart'
+            - 'infrastructure details'
+            - 'network topology'
+            - 'it system query'
+    selection_sender:
+        sender_type: 'external'
+    filter_legitimate:
+        sender|endswith:
+            - '@authorized-vendor.com'
+            - '@internal-domain.com'
+    condition: selection_phish and selection_sender and not filter_legitimate
+fields:
+    - sender
+    - recipient
+    - subject
+    - mail_headers
+falsepositives:
+    - Legitimate IT notifications or surveys from authorized external vendors.
+level: high
+tags:
+    - attack.reconnaissance
+    - attack.t1598
+    - analytic.an2073
+    - detection.det0930

@@ -1,0 +1,40 @@
+title: Domain Administrator Network Connection (AN0590-B)
+id: 777a510a-9825-4567-93c2-b6d5d0d1db34
+status: experimental
+description: Detects network connections made over Active Directory authentication ports (Kerberos, LDAP, SMB) from standard workstations, indicating domain administrator lateral movement or authentication traffic.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_ports:
+        DestinationPort:
+            - 88   # Kerberos
+            - 389  # LDAP
+            - 445  # SMB
+            - 636  # LDAPS
+    selection_image_filter:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    condition: selection_ports and selection_image_filter
+fields:
+    - Image
+    - SourceIp
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - IT admin staff running scripts connecting directly to Domain Controllers.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1078.002
+    - analytic.an0590
+    - detection.det0210

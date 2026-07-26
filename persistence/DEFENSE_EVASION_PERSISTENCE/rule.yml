@@ -1,0 +1,51 @@
+{
+  "id": "DEFENSE_EVASION_PERSISTENCE",
+  "description": "Anti-forensic evasion (timestomping, log clearing) followed by persistence",
+  "correlationKey": "entity_key",
+  "scoreMultiplier": 3.0,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "antiforensic",
+      "techniques": [
+        "T1070",
+        "T1099"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "timestomp",
+        "log cleared",
+        "1102",
+        "4616",
+        "SetFileTime",
+        "event log",
+        "prefetch deleted",
+        "artifact removal",
+        "log tamper"
+      ]
+    },
+    {
+      "label": "persistence",
+      "tactics": [
+        "TA0003"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "persist",
+        "schedule",
+        "registry",
+        "startup",
+        "service install",
+        "boot",
+        "4698",
+        "4702",
+        "4720",
+        "run key",
+        "autorun"
+      ]
+    }
+  ]
+}

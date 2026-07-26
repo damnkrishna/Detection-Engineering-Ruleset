@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","tactic":"TA0002","hostname":"SEC-WKS-249","agent_ip":"10.42.40.12","severity_id":3,"event_uid":"golden|DEFENCE_EVASION_THEN_EXEC|1|532101","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:00:01.000Z","signature_name":"Windows audit failure event event log cleared","hostname":"SEC-WKS-249","agent_ip":"10.42.40.12","severity_id":3,"event_uid":"golden|DEFENCE_EVASION_THEN_EXEC|0|532100","proto":"tcp","src_port":"50412","dst_port":"443"}

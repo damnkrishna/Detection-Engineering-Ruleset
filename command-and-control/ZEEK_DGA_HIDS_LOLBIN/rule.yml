@@ -1,0 +1,89 @@
+{
+  "id": "ZEEK_DGA_HIDS_LOLBIN",
+  "description": "Cross-sensor: Zeek detects DGA/NXDOMAIN burst (behavior-driven) + HIDS detects LOLBin execution on same host \u2014 confirms active implant communicating out, not scanning noise (T1568.002 + T1218)",
+  "correlationKey": "entity_key",
+  "scoreMultiplier": 4.0,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "ZEEK",
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "zeek_dga_burst",
+      "tactics": [
+        "TA0011"
+      ],
+      "techniques": [
+        "T1568.002"
+      ],
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0011",
+            "TA0043"
+          ]
+        },
+        {
+          "field": "sensor",
+          "op": "IN",
+          "values": [
+            "ZEEK"
+          ]
+        }
+      ],
+      "signatureContains": [
+        "NXDOMAIN",
+        "non-existent domain",
+        "dns_nxdomain",
+        "dga",
+        "random subdomain",
+        "high entropy dns",
+        "dns spike"
+      ],
+      "optional": false,
+      "minOccurrences": 10
+    },
+    {
+      "label": "hids_lolbin_exec",
+      "techniques": [
+        "T1218"
+      ],
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0002",
+            "TA0011",
+            "TA0003"
+          ]
+        },
+        {
+          "field": "sensor",
+          "op": "IN",
+          "values": [
+            "HIDS"
+          ]
+        }
+      ],
+      "signatureContains": [
+        "mshta.exe",
+        "wscript.exe",
+        "cscript.exe",
+        "regsvr32.exe",
+        "rundll32.exe",
+        "certutil.exe",
+        "bitsadmin",
+        "InstallUtil.exe",
+        "MSBuild.exe",
+        "LOLBin",
+        "signed binary proxy"
+      ],
+      "optional": false,
+      "maxGapSeconds": 600
+    }
+  ]
+}

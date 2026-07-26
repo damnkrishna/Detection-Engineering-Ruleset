@@ -1,0 +1,23 @@
+{
+  "rule_id": "c95af279-b364-4f47-9199-8016ebb95fb8",
+  "rule_name": "Endpoint CPU or Memory Stressing Execution (AN0584-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

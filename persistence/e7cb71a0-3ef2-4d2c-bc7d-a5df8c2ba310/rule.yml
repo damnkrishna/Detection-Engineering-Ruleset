@@ -1,0 +1,25 @@
+title: Exclusive Control Service State Change (AN0045-B)
+id: dd6eb9b5-90d0-4881-9a21-d10d7782eefa
+status: experimental
+description: Detects service state changes to stopped in the System logs, representing the outcome of service termination for exclusive control.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    product: windows
+    service: system
+detection:
+    selection_event:
+        EventID: 7036
+    condition: selection_event
+fields:
+    - EventID
+    - Param1
+    - Param2
+falsepositives:
+    - Legitimate service stops during administrative updates or system shutdown.
+level: medium
+tags:
+    - attack.persistence
+    - attack.t1668
+    - analytic.an0045
+    - detection.det0015

@@ -1,0 +1,45 @@
+title: Trusted Relationship Abuse - Anomalous Third-Party Administrative Logon (AN1344)
+id: e952cc22-300a-4b8d-bde3-37b49183c61b
+status: experimental
+description: Detects successful authentication events by service provider (MSP) or third-party vendor accounts from non-standard source IP addresses or outside baseline administrative windows.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_logon:
+        EventID: 4624
+        LogonType:
+            - 3  # Network logon (e.g., remote administration, API)
+            - 10 # RDP logon
+    selection_accounts:
+        - TargetUserName|contains:
+            - 'vendor_'
+            - 'msp_'
+            - 'admin_'
+            - 'support_'
+        - TargetDomainName|contains:
+            - 'partner'
+            - 'vendor'
+            - 'service'
+    filter_internal:
+ # Exclude standard internal subnets if necessary (tune as per business baselines)
+        IpAddress:
+            - '127.0.0.1'
+            - '::1'
+    condition: selection_logon and selection_accounts and not filter_internal
+fields:
+    - EventID
+    - IpAddress
+    - LogonType
+    - TargetDomainName
+    - TargetUserName
+falsepositives:
+    - Legitimate remote administrative support by MSPs or external consultants.
+level: high
+tags:
+    - attack.initial-access
+    - attack.t1199
+    - analytic.an1344
+    - detection.det0488

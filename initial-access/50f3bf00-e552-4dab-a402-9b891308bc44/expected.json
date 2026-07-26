@@ -1,0 +1,23 @@
+{
+  "rule_id": "50f3bf00-e552-4dab-a402-9b891308bc44",
+  "rule_name": "Supply Chain Tampering - Suspicious Process Spawned by Development Tool via CLI (AN0021-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

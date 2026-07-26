@@ -1,0 +1,29 @@
+title: Scheduled Task Deletion via Security Logs (AN0113-C)
+id: fd526409-61ae-4e5f-b16f-d4a4adf17191
+status: experimental
+description: Detects the deletion of scheduled tasks by monitoring Windows Security Event ID 4699, which is common during post-exploit cleanup activities.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    service: security
+    product: windows
+    # Relies on Windows Security Event ID 4699
+detection:
+    selection_eid:
+        EventID: 4699
+    filter_system:
+        SubjectUserName|endswith: '$'
+    condition: selection_eid and not filter_system
+fields:
+    - EventID
+    - TaskName
+    - SubjectUserName
+    - SubjectUserSid
+falsepositives:
+    - Legitimate software uninstallation deleting its scheduled tasks.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1070.009
+    - analytic.an0113
+    - detection.det0040

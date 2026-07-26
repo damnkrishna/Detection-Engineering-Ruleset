@@ -1,0 +1,52 @@
+title: CDN or External Hosting Update Command Line (AN1622-A)
+id: 96c1e183-7a69-4c28-ab02-f262a24d7f19
+status: experimental
+description: Detects command-line arguments indicating CLI or scripting modifications targeting public CDN or cloud static assets.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\aws.exe'
+            - '\az.exe'
+            - '\python.exe'
+            - '\node.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 's3 sync'
+            - 's3 cp'
+            - 'cdn profile'
+            - 'cloudflare'
+            - 'invalidate'
+            - 'defaced'
+    filter_cicd_images:
+        Image|endswith:
+            - '\gitlab-runner.exe'
+            - '\agent.exe'
+            - '\jenkins.exe'
+            - '\tcagent.exe'
+    filter_cicd_users:
+        User|contains:
+            - 'service'
+            - 'build'
+            - 'deploy'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_images and selection_cli and not (filter_cicd_images or filter_cicd_users or filter_installers)
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Legitimate CI/CD pipelines deploying standard corporate assets to public facing CDNs.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1491.002
+    - analytic.an1622
+    - detection.det0590

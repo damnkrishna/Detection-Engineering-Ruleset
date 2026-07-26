@@ -1,0 +1,42 @@
+title: Collection - Screen Capture Utility Execution (AN0980)
+id: 3fd63375-4df2-42c0-a532-9ac5db2540fa
+status: experimental
+description: Detects command-line utilities (psr.exe, nircmd.exe) or PowerShell scripting commands executing screen capture API calls, suggesting unauthorized information gathering.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_utilities:
+        - Image|endswith:
+            - '\psr.exe'
+            - '\nircmd.exe'
+        - CommandLine|contains:
+            - 'savescreenshot' # nircmd flag
+            - 'savescreenshotwin'
+            - 'psr.exe /start' # psr start recording
+    selection_powershell:
+        CommandLine|contains:
+            - 'CopyFromScreen'
+            - 'System.Drawing.Graphics'
+    condition: selection_utilities or selection_powershell
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - administrators using Problem Steps Recorder (psr.exe) to document system issues for helpdesk tickets.
+    - Automated user interface testing tools (e.g. Selenium) taking screenshots during tests.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1113
+    - analytic.an0980
+    - detection.det0346

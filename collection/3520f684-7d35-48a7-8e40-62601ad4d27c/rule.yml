@@ -1,0 +1,41 @@
+title: Collection - Archive File Written to Remote UNC Share (AN0194)
+id: 8950a94c-5157-4214-8356-1aa4b3298d57
+status: experimental
+description: Detects processes writing compressed archive files (such as .zip, .7z, .rar) to remote UNC network paths, which may indicate remote data staging prior to exfiltration.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: file_event
+    product: windows
+    # Relies on Sysmon Event ID 11
+detection:
+    selection_unc:
+        TargetFilename|startswith: '\\'
+    selection_archive:
+        TargetFilename|endswith:
+            - '.zip'
+            - '.7z'
+            - '.rar'
+            - '.tar'
+            - '.gz'
+            - '.cab'
+    filter_system:
+ # Exclude standard system processes writing back up shares
+        Image|endswith:
+            - '\System32\ntbackup.exe'
+            - '\System32\wbengine.exe'
+    condition: selection_unc and selection_archive and not filter_system
+fields:
+    - Image
+    - TargetFilename
+    - User
+    - LogonId
+falsepositives:
+    - administrators copy-pasting system backup zips or patch files to network servers.
+    - Automated scheduled backup software copying archives to target backup shares.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1074.002
+    - analytic.an0194
+    - detection.det0071

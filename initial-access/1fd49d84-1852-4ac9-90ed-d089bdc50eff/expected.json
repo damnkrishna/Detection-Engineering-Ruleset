@@ -1,0 +1,23 @@
+{
+  "rule_id": "1fd49d84-1852-4ac9-90ed-d089bdc50eff",
+  "rule_name": "Supply Chain Tampering - Suspicious Process Spawned by Development Tool via PowerShell Script Block (AN0021-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

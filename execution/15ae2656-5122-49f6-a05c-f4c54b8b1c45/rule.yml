@@ -1,0 +1,28 @@
+title: Loading Shared Modules via PowerShell (AN0052-B)
+id: 940d721f-0ac7-4048-a47e-aa8592887ff0
+status: experimental
+description: Detects PowerShell script blocks loading assemblies or DLLs dynamically.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection:
+        ScriptBlockText|contains:
+            - '[System.Reflection.Assembly]::Load'
+            - 'Add-Type'
+        ScriptBlockText|contains:
+            - '.dll'
+    condition: selection
+fields:
+    - ScriptBlockText
+    - User
+falsepositives:
+    - Administrative automation or development scripts.
+level: medium
+tags:
+    - attack.execution
+    - attack.t1129
+    - analytic.an0052
+    - detection.det0018

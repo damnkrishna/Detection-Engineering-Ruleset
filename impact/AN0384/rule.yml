@@ -1,0 +1,48 @@
+title: Disk Wiping and Partition Destruction Utilities via CLI (AN0384-A)
+id: ea0f5524-e83c-469f-99a6-ebf89ff8f992
+status: experimental
+description: Detects command-line execution of disk formatting, partition management, or raw volume dismounting tools (such as diskpart, format, fsutil) used in disk wiping.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_diskpart:
+        - Image|endswith:
+            - '\diskpart.exe'
+            - '\format.com'
+            - '\fsutil.exe'
+        - OriginalFileName:
+            - 'diskpart.exe'
+            - 'format.com'
+            - 'fsutil.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'clean'
+            - 'delete partition'
+            - 'format'
+            - 'dismount'
+            - 'volume dismount'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_diskpart and selection_args and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - IT administrators formatting external drives or scripting storage setups on new server clusters.
+level: high
+tags:
+    - attack.impact
+    - attack.t1561
+    - analytic.an0384
+    - detection.det0384

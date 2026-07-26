@@ -1,0 +1,23 @@
+{
+  "rule_id": "27ba2a0d-92c4-4a3d-9436-55fc2e0aea6e",
+  "rule_name": "Exfiltration - Outbound Unencrypted Connection by Scripting Host (AN0423)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

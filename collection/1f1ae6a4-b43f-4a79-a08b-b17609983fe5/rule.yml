@@ -1,0 +1,50 @@
+title: Collection - Data Archiving via Utility (AN0831)
+id: db9dcde2-ce87-4d8f-a9a2-aeb6fd5178a8
+status: experimental
+description: Detects command-line parameters of compression utilities (such as 7z, rar, tar) or PowerShell archiving cmdlets (Compress-Archive) indicating data packaging, typically prior to exfiltration.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_utilities:
+        - Image|endswith:
+            - '\7z.exe'
+            - '\7za.exe'
+            - '\rar.exe'
+            - '\winrar.exe'
+            - '\tar.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - '7z.exe'
+            - '7za.exe'
+            - 'Rar.exe'
+            - 'tar.exe'
+    selection_args:
+        CommandLine|contains:
+            - ' a '       # 7z/Rar add to archive
+            - ' -cf '     # tar create file
+            - ' -cvf '    # tar verbose create file
+            - 'Compress-Archive'
+    condition: selection_utilities and selection_args
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - administrative backup scripts archiving logs or database files.
+    - Software developers creating distribution packages.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1560.001
+    - analytic.an0831
+    - detection.det0298

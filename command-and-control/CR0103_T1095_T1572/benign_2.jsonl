@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","hostname":"SEC-WKS-834","agent_ip":"10.42.125.90","severity_id":3,"event_uid":"golden|CR0103_T1095_T1572|0|997400","proto":"tcp","src_port":"50412","dst_port":"443","src_ip":"10.42.125.90","dst_ip":"198.51.100.144"}

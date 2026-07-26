@@ -1,0 +1,95 @@
+title: AV Exclusion Path Addition or Abuse (AN0139-A)
+id: a19753e3-78a1-45e3-9b62-c66437a40018
+status: experimental
+description: Detects adversarial modification of Windows Defender exclusion lists via PowerShell Add-MpPreference, or execution of binaries from paths commonly excluded from AV scanning (e.g., C:\Windows\Temp, Exchange directories).
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_add_exclusion:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_add_exclusion_args:
+        CommandLine|contains:
+            - 'Add-MpPreference'
+            - '-ExclusionPath'
+            - '-ExclusionExtension'
+            - '-ExclusionProcess'
+            - 'ExclusionPath'
+    selection_excluded_paths:
+        Image|contains:
+            - '\Windows\Temp\'
+            - '\AppData\Local\Temp\'
+            - '\ProgramData\Microsoft\Windows\Start Menu\'
+            - '\Users\Public\'
+            - '\Recycle.Bin\'
+        Image|endswith:
+            - '.exe'
+            - '.dll'
+    filter_system:
+        Image|startswith:
+            - 'C:\Windows\System32\'
+            - 'C:\Windows\SysWOW64\'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: ((selection_add_exclusion and selection_add_exclusion_args) or (selection_excluded_paths and not filter_system)) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate software installers placing executables in temp directories as part of installation workflows, or enterprise IT adding managed AV exclusions via deployment scripts.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1564.012
+    - analytic.an0139
+    - detection.det0051
+---
+title: AV Exclusion Registry Modification (AN0139-B)
+id: b2c55986-57a1-4a50-a617-4be8bf8a3ac3
+status: experimental
+description: Detects registry value additions under Windows Defender exclusions registry keys, indicating direct AV evasion attempts bypassing standard PowerShell commands.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 13
+detection:
+    selection_path:
+        TargetObject|contains:
+            - 'HKLM\SOFTWARE\Microsoft\Windows Defender\Exclusions\'
+            - '\Exclusions\Paths\'
+            - '\Exclusions\Extensions\'
+            - '\Exclusions\Processes\'
+    filter_legitimate:
+        Image|endswith: '\MsMpEng.exe'
+    condition: selection_path and not filter_legitimate
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - System administration tools or configuration scripts adding Defender exclusions legitimately.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1564.012
+    - analytic.an0139
+    - detection.det0051

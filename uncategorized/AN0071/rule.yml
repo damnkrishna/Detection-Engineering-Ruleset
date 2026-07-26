@@ -1,0 +1,139 @@
+title: Electron Application Abuse for Proxy Execution (AN0071-A)
+id: 99f83bd8-1f56-4875-ab16-98d3b03bb041
+status: experimental
+description: Detects abuse of trusted Electron applications (Teams, Slack, VS Code, Discord) via malicious command-line flags (--gpu-launcher, --inspect) or spawning of unexpected child shell processes.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_electron_flags:
+        Image|contains:
+            - '\Microsoft\Teams\current\Teams.exe'
+            - '\Slack\slack.exe'
+            - '\Microsoft VS Code\Code.exe'
+            - '\Discord\Discord.exe'
+        CommandLine|contains:
+            - '--gpu-launcher'
+            - '--renderer-startup-dialog'
+            - '--inspect='
+            - '--inspect-brk='
+            - '--no-sandbox'
+    selection_electron_child:
+        ParentImage|contains:
+            - '\Microsoft\Teams\current\Teams.exe'
+            - '\Slack\slack.exe'
+            - '\Microsoft VS Code\Code.exe'
+            - '\Discord\Discord.exe'
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\rundll32.exe'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_electron_flags or selection_electron_child) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Developer workflows using VS Code with --inspect for debugging Node.js apps, or Electron app updates that spawn installer child processes.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1218.015
+    - analytic.an0071
+    - detection.det0025
+---
+title: Suspicious Electron Library Load (AN0071-B)
+id: ddd9ac1d-7091-414d-97e1-6f8f1dc469fa
+status: experimental
+description: Detects the loading of node.dll or electron.dll by unexpected processes or from non-standard directories, which may indicate payload execution proxying.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: image_load
+    product: windows
+    # Relies on Sysmon Event ID 7
+detection:
+    selection_dll:
+        ImageLoaded|endswith:
+            - '\node.dll'
+            - '\electron.dll'
+    filter_legitimate:
+        Image|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\slack.exe'
+            - '\Teams.exe'
+            - '\Code.exe'
+            - '\discord.exe'
+            - '\explorer.exe'
+    condition: selection_dll and not filter_legitimate
+fields:
+    - Image
+    - ImageLoaded
+    - Signed
+    - SignatureStatus
+falsepositives:
+    - Other legitimate node/electron-based apps installed in the environment that are not in the filter list.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1218.015
+    - analytic.an0071
+    - detection.det0025
+---
+title: Electron ASAR File Modification (AN0071-C)
+id: d17cebe8-b67b-4fe5-a3cf-c4c1a9a526c1
+status: experimental
+description: Detects modifications or writes to Electron application resource archives (.asar files) by non-application updater processes, indicating potential backdoor persistence.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: file_event
+    product: windows
+    # Relies on Sysmon Event ID 11
+detection:
+    selection_path:
+        TargetFilename|contains:
+            - '\Microsoft\Teams\'
+            - '\Slack\'
+            - '\Microsoft VS Code\'
+            - '\Discord\'
+    selection_file:
+        TargetFilename|endswith: '\.asar'
+    filter_updater:
+        Image|endswith:
+            - '\Teams.exe'
+            - '\slack.exe'
+            - '\Code.exe'
+            - '\Discord.exe'
+            - '\Update.exe'
+            - '\Squirrel.exe'
+    condition: selection_path and selection_file and not filter_updater
+fields:
+    - Image
+    - TargetFilename
+    - User
+falsepositives:
+    - Manual application updates or administrative modifications by system management tools.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1218.015
+    - analytic.an0071
+    - detection.det0025

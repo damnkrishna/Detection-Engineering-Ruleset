@@ -1,0 +1,28 @@
+title: 'AN0511 - Server Software Component: SQL Stored Procedures'
+id: 696918e9-16d0-4178-b8c4-2b93c64e078e
+status: experimental
+description: 'Detects process execution originating from SQL Server involving dangerous stored procedures (xp_cmdshell, sp_OACreate), typically used for code execution or persistence.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_parent:
+    ParentImage|endswith: '\sqlservr.exe'
+  selection_cmd:
+    CommandLine|contains:
+      - 'xp_cmdshell'
+      - 'sp_OACreate'
+      - 'sp_OAMethod'
+  condition: selection_parent and selection_cmd
+fields:
+  - EventID
+  - Image
+  - CommandLine
+  - ParentImage
+level: critical
+tags:
+  - attack.persistence
+  - attack.execution
+  - attack.t1505.001
+  - analytic.an0511

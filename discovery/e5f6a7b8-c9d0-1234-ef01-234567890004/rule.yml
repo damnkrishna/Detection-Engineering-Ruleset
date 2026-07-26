@@ -1,0 +1,44 @@
+title: Windows Event Log Enumeration (AN2091)
+id: 4d57fab8-52be-4340-b3cf-206751ae8e30
+status: experimental
+description: Detects command-line utilities enumerating or exporting Windows event logs, used by attackers to assess security tooling and forensic visibility. Covers renamed binaries via OriginalFileName to resist trivial binary-rename evasion.
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_wevtutil:
+        Image|endswith:
+            - '\wevtutil.exe'
+    selection_wevtutil_ofn:
+        OriginalFileName: 'wevtutil.exe'
+    selection_wevtutil_cli:
+        CommandLine|re:
+            - '(?i)wevtutil(\.exe)?\s+(el|gl|qe|epl)\b'
+    selection_ps:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_ps_ofn:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.exe'
+    selection_ps_cli:
+        CommandLine|contains:
+            - 'Get-EventLog'
+            - 'Get-WinEvent'
+    condition: ((selection_wevtutil or selection_wevtutil_ofn) and selection_wevtutil_cli) or ((selection_ps or selection_ps_ofn) and selection_ps_cli)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - SOC analysts or automated monitoring scripts reviewing event logs for incident investigation.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1654
+    - analytic.an2091
+    - detection.det0948

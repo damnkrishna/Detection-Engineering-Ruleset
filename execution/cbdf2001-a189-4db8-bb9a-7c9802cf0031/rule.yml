@@ -1,0 +1,41 @@
+title: Process Access Handle for Direct Syscalls (AN1465-B)
+id: c8e53c75-7c9e-4b4b-ad58-6240027fb0af
+status: experimental
+description: Detects user-space processes requesting high-privilege write or full control memory access handles targeting standard system processes.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_access
+    product: windows
+detection:
+    selection_access:
+        GrantedAccess:
+            - '0x1F0FFF'
+            - '0x1F1FFF'
+            - '0x1410'
+            - '0x1F3FFF'
+    selection_source_paths:
+        SourceImage|contains:
+            - '\Users\'
+            - '\Temp\'
+            - '\AppData\'
+    filter_standard:
+        SourceImage|endswith:
+            - '\chrome.exe'
+            - '\firefox.exe'
+            - '\msedge.exe'
+            - '\MsMpEng.exe'
+    condition: selection_access and selection_source_paths and not filter_standard
+fields:
+    - SourceImage
+    - TargetImage
+    - GrantedAccess
+    - User
+falsepositives:
+    - Software performance counters or diagnostic monitors launched from local directories.
+level: high
+tags:
+    - attack.execution
+    - attack.t1106
+    - analytic.an1465
+    - detection.det0529

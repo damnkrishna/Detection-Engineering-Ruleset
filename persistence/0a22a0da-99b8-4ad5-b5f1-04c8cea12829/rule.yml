@@ -1,0 +1,30 @@
+title: Application Shim Database File Creation (AN0051-B)
+id: b338b9da-2b32-42b1-bae8-50d5b57296ec
+status: experimental
+description: Detects creation or modification of custom shim database (.sdb) files in the AppPatch directory.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_path:
+        TargetFilename|contains:
+            - '\Windows\AppPatch\'
+            - '\AppPatch\Custom\'
+    selection_ext:
+        TargetFilename|endswith: '.sdb'
+    condition: selection_path and selection_ext
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Installation of compatibility databases by legitimate applications.
+level: high
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1546.011
+    - analytic.an0051
+    - detection.det0017

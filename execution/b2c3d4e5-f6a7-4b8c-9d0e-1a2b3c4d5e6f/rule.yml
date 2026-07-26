@@ -1,0 +1,32 @@
+title: Suspicious Process Spawning from Web Server Parent (AN2069-WebShell-Spawning)
+id: 38b1feef-0464-4abf-9c02-dd6477de7f29
+status: experimental
+description: Detects suspicious command shells (cmd, powershell, bash) spawned by web server processes.
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        ParentImage|endswith:
+            - '\w3wp.exe'
+            - '\httpd.exe'
+            - '\nginx.exe'
+            - '\apache2.exe'
+            - '\tomcat.exe'
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\bash.exe'
+            - '\sh.exe'
+    filter_apppool:
+        User|re: 'NETWORK SERVICE|IIS AppPool'
+    filter_legitimate:
+        CommandLine|contains:
+            - 'iisreset'
+            - 'logrotate'
+            - 'systemctl'
+    condition: selection and not filter_apppool and not filter_legitimate
+level: high
+tags:
+    - attack.execution
+    - attack.t1505.003

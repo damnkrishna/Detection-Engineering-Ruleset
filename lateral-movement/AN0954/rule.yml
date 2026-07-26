@@ -1,0 +1,28 @@
+title: Alternate Authentication Material - Logon Type 9 (AN0954)
+id: 7bb831d2-5625-492b-8342-dac360a93e79
+status: experimental
+description: Detects successful authentication events utilizing logon type 9 (NewCredentials), which is generated when alternate credentials are used for outbound authentication (e.g. Pass-the-Hash or Pass-the-Ticket).
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType: 9
+    condition: selection
+fields:
+    - EventID
+    - LogonType
+    - IpAddress
+    - TargetDomainName
+    - TargetUserName
+falsepositives:
+    - Administrative scripts or software deployment tools (e.g. runas /netonly, backup utilities) connecting to remote shares under alternate administrative profiles.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1550
+    - analytic.an0954
+    - detection.det0338

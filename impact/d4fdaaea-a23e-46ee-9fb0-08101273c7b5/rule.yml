@@ -1,0 +1,45 @@
+title: Outbound Network Connection to Cryptomining Stratum Pools (AN0741-B)
+id: 93944078-cda1-4ee3-85e4-c42afa19b27a
+status: experimental
+description: Detects outbound network traffic from endpoints targeting common cryptomining pool ports.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_ports:
+        DestinationPort:
+            - 3333
+            - 4444
+            - 5555
+            - 7777
+            - 14444
+    filter_browsers:
+        Image|endswith:
+            - '\chrome.exe'
+            - '\firefox.exe'
+            - '\msedge.exe'
+    filter_internal:
+        DestinationIp|cidr:
+            - '127.0.0.0/8'
+            - '10.0.0.0/8'
+            - '192.168.0.0/16'
+            - '172.16.0.0/12'
+    filter_jupyter:
+        Image|endswith:
+            - '\jupyter.exe'
+    condition: selection_ports and not (filter_browsers or filter_internal or filter_jupyter)
+fields:
+    - Image
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Legitimate corporate applications utilizing these ports or web pages running javascript miner scripts.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1496
+    - analytic.an0741
+    - detection.det0267

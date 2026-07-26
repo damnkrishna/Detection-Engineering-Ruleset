@@ -1,0 +1,23 @@
+{
+  "rule_id": "546582b8-f15e-45a2-91e3-24cf83f7b1a5",
+  "rule_name": "LLMNR/NBT-NS Spoofing Tool Execution (AN1274-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

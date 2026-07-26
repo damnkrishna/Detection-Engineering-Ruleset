@@ -1,0 +1,23 @@
+{
+  "rule_id": "ea6a62c8-4f78-4cf1-a47c-6a718b773c04",
+  "rule_name": "Exploit Public-Facing Application - Outbound Network Connection from Web Server (AN0219-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

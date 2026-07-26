@@ -1,0 +1,23 @@
+{
+  "rule_id": "e285b0c8-2b6f-4013-bf09-69d41182db98",
+  "rule_name": "Hosts File Tampering or Static DNS Routing Modification (AN0702-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

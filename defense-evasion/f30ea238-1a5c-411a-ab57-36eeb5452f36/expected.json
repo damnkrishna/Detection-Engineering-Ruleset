@@ -1,0 +1,23 @@
+{
+  "rule_id": "f30ea238-1a5c-411a-ab57-36eeb5452f36",
+  "rule_name": "Clear Windows Event Logs - CLI Utilities (AN1472)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

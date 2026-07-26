@@ -1,0 +1,51 @@
+title: Collection - Archiving or Encryption via Custom Method (AN1213)
+id: 3af9cb06-77f1-43ec-9332-3a8c35606103
+status: experimental
+description: Detects PowerShell or scripting engines executing low-level cryptographic or compression APIs to perform custom file archiving/encryption, bypassing standard archiving controls.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'wscript.exe'
+            - 'cscript.exe'
+    selection_crypto_api:
+        CommandLine|contains:
+            - 'Security.Cryptography'
+            - 'System.IO.Compression'
+            - 'DeflateStream'
+            - 'GZipStream'
+            - '-bxor'
+            - 'Crypt32'
+            - 'CryptEncrypt'
+            - 'CryptDecrypt'
+    condition: selection_powershell and selection_crypto_api
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - administrative scripts encrypting backup logs or certificates.
+    - Software installer scripts deploying compressed components.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1560.003
+    - analytic.an1213
+    - detection.det0438

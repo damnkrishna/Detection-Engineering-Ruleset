@@ -1,0 +1,34 @@
+title: SCM Event Log Service Crash Loop (AN0850-A)
+id: 3d4e2c1f-f3de-4dd0-937f-9087adae6894
+status: experimental
+description: Detects Service Control Manager Event ID 7031 logs showing service crashes leading to configured recovery actions. This rule should be aggregated in the SIEM layer to count loop patterns.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: windows
+    service: system
+detection:
+    selection_scm:
+        EventID: 7031
+    selection_services:
+        Description|contains:
+            - 'Local Security Authority'
+            - 'Windows Defender'
+            - 'Sysmon'
+            - 'Wazuh'
+            - 'Exchange'
+            - 'IISAdmin'
+            - 'MSSQL'
+    condition: selection_scm and selection_services
+fields:
+    - EventID
+    - Description
+    - Source
+falsepositives:
+    - Failing system updates, memory leaks in legacy applications, or hardware failure leading to application instability.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1499.004
+    - analytic.an0850
+    - detection.det0304

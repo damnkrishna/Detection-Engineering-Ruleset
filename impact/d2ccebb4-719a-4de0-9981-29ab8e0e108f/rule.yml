@@ -1,0 +1,40 @@
+title: Remote System Shutdown Invocations (AN1538-B)
+id: 00354e8c-1b66-425e-b051-979dd3c44040
+status: experimental
+description: Detects command-line commands targeting remote systems for shutdown. Designed to be aggregated at the SIEM layer.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\shutdown.exe'
+    selection_remote_args:
+        CommandLine|contains:
+            - ' /m'
+            - ' -m'
+            - ' /g'
+            - ' -g'
+    selection_wmic:
+        Image|endswith:
+            - '\wmic.exe'
+            - '\wbem\WmiPrvSE.exe'
+        CommandLine|contains:
+            - 'Win32_OperatingSystem'
+            - 'Reboot'
+            - 'Shutdown'
+    condition: (selection_images and selection_remote_args) or selection_wmic
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - IT administrators remotely rebooting servers during maintenance windows.
+level: high
+tags:
+    - attack.impact
+    - attack.t1529
+    - analytic.an1538
+    - detection.det0559

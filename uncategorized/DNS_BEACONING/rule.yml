@@ -1,0 +1,26 @@
+{
+  "id": "DNS_BEACONING",
+  "description": "Repeated suspicious DNS queries (DGA / DNS tunnelling) from same host",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 2.5,
+  "windowMinutes": 20,
+  "sensorFilter": [
+    "ZEEK",
+    "NIDS"
+  ],
+  "stages": [
+    {
+      "label": "suspicious_dns",
+      "signatureContains": [
+        "dns_suspicious",
+        "dns tunnel",
+        "dga",
+        "high entropy",
+        "long domain",
+        "dns exfil"
+      ],
+      "optional": false,
+      "minOccurrences": 3
+    }
+  ]
+}

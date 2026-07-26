@@ -1,0 +1,23 @@
+{
+  "rule_id": "7e8f9a0b-1c2d-4e5f-6a7b-8c9d0e1f2a3b",
+  "rule_name": "Reconnaissance via robots.txt and Sitemap Access (AN2069-Recon-Files)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

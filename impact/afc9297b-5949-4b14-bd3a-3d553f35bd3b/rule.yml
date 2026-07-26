@@ -1,0 +1,37 @@
+title: Potential Endpoint Service Exhaustion Flood Tool Execution via Network Connection (AN0489-B)
+id: abe3fafb-890b-40a5-9a34-70b9b8f564e4
+status: experimental
+description: Detects rapid outbound network connections to common web service ports initiated by known flooding or load testing utilities.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\ab.exe'
+            - '\slowhttptest.exe'
+            - '\hping3.exe'
+    selection_ports:
+        DestinationPort:
+            - 80
+            - 443
+            - 8080
+            - 8443
+    condition: selection_process and selection_ports
+fields:
+    - Image
+    - User
+    - DestinationIp
+    - DestinationPort
+falsepositives:
+    - Authorized application load testing conducted by QA teams or web developers within testing subnets.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1499.002
+    - analytic.an0489
+    - detection.det0173

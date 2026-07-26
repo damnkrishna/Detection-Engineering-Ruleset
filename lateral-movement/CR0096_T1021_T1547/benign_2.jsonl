@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","hostname":"HR-WKS-046","agent_ip":"10.42.137.22","severity_id":3,"event_uid":"golden|CR0096_T1021_T1547|0|522600","proto":"tcp","src_port":"50412","dst_port":"443","logon_type":"3","auth_category":"network","is_remote_auth":true}

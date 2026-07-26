@@ -1,0 +1,40 @@
+title: RDP Session Hijacking via tscon (AN1620)
+id: 2b5821b3-e158-4efa-8ee9-9b9ce5e3c54b
+status: experimental
+description: Detects RDP session hijacking attempts using the native Windows tscon.exe utility, which transfers an active terminal session to a different destination session.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection:
+        - Image|endswith: '\tscon.exe'
+        - OriginalFileName: 'tscon.exe'
+    selection_args:
+        CommandLine|contains:
+            - ' /dest:'
+            - '/dest:'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection and selection_args and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate terminal services administration where administrative sessions are transferred or connected by authorized administrators.
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1563.002
+    - analytic.an1620
+    - detection.det0588

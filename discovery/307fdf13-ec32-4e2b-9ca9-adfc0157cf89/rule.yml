@@ -1,0 +1,38 @@
+title: Backup Software Registry Key Modifications (AN0240-C)
+id: e87d1e85-4f62-4ce9-8068-c8c134958a0e
+status: experimental
+description: Detects registry value modifications or additions targeting known backup software paths.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 13
+detection:
+    selection_path:
+        TargetObject|contains:
+            - 'HKLM\SOFTWARE\Veeam'
+            - 'HKLM\SOFTWARE\Acronis'
+            - 'HKLM\SOFTWARE\CrashPlan'
+            - 'HKLM\SOFTWARE\Symantec\Backup Exec'
+            - 'HKLM\SOFTWARE\Microsoft\Windows Image Backup'
+    filter_legitimate:
+        Image|endswith:
+            - '\VeeamAgent.exe'
+            - '\AcronisService.exe'
+            - '\wininit.exe'
+            - '\services.exe'
+    condition: selection_path and not filter_legitimate
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - Authorized installations or backup product management events.
+level: high
+tags:
+    - attack.discovery
+    - attack.t1518.002
+    - analytic.an0240
+    - detection.det0088

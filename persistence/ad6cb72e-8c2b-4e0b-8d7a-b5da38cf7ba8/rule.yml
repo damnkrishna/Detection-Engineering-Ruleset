@@ -1,0 +1,31 @@
+title: Malicious IIS Component File Drop (AN0184-B)
+id: 5e9b3eb2-7a53-435a-9d83-fda88b158212
+status: experimental
+description: Detects drops of new DLL or config files to IIS system directories, representing the dropping phase of a malicious IIS native module or filter.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\System32\inetsrv\'
+            - '\inetsrv\config\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.dll'
+            - '.config'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Software updates or deployment scripts updating IIS configuration files.
+level: high
+tags:
+    - attack.persistence
+    - attack.t1505.004
+    - analytic.an0184
+    - detection.det0068

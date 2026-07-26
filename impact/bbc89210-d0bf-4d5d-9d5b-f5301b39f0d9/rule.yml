@@ -1,0 +1,38 @@
+title: Stopping or Disabling Critical System Services via PowerShell Script Block (AN0061-B)
+id: a0d06f6f-f5f7-425c-8323-97afa6ee26b0
+status: experimental
+description: Detects PowerShell script block logs containing commands attempting to stop or disable critical system services.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_cmdlets:
+        ScriptBlockText|contains:
+            - 'Stop-Service'
+            - 'Set-Service'
+    selection_targets:
+        ScriptBlockText|contains:
+            - 'WinDefend'
+            - 'MpsSvc'
+            - 'Sentinel'
+            - 'Wazuh'
+            - 'Sysmon'
+            - 'CarbonBlack'
+            - 'CrowdStrike'
+            - 'Sophos'
+            - 'MSExchange'
+            - 'MSSQL'
+            - 'Disabled'
+    condition: selection_cmdlets and selection_targets
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administration scripts or service management automation.
+level: high
+tags:
+    - attack.impact
+    - attack.t1489
+    - analytic.an0061
+    - detection.det0021

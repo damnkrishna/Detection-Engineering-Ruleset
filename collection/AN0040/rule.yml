@@ -1,0 +1,54 @@
+title: Data Staging via Archive Utilities in Temp Directories (AN0040)
+id: 09476c3d-2c5c-4390-b03f-bb76733d6a76
+status: experimental
+description: Detects archiving utilities (7z, WinRAR, PowerShell Compress-Archive) creating archive files in temporary or public staging directories, which may indicate data collection and staging prior to exfiltration.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_7zip:
+        - Image|endswith: '\7z.exe'
+        - OriginalFileName: '7z.exe'
+    selection_winrar:
+        - Image|endswith: '\WinRAR.exe'
+        - OriginalFileName: 'WinRAR.exe'
+    selection_rar:
+        - Image|endswith: '\rar.exe'
+        - OriginalFileName: 'rar.exe'
+    selection_staging_paths:
+        CommandLine|contains:
+            - '\Windows\Temp\'
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\ProgramData\'
+            - 'C:\Temp\'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_compress_archive:
+        CommandLine|contains:
+            - 'Compress-Archive'
+    condition: ((selection_7zip or selection_winrar or selection_rar) and selection_staging_paths) or (selection_powershell and selection_compress_archive and selection_staging_paths)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - IT administrators compressing files for routine archival into temp directories during migration tasks.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1074
+    - analytic.an0040
+    - detection.det0014

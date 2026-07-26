@@ -1,0 +1,36 @@
+title: Ransom Note File Drop (AN0602-A)
+id: 062921d9-630f-4bc9-a1b7-59facc368476
+status: experimental
+description: Detects the drop of ransomware ransom instructions or help files.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_notes:
+        TargetFilename|endswith:
+            - '\README_TO_DECRYPT.txt'
+            - '\DECRYPT_INSTRUCTIONS.html'
+            - '\HOW_TO_DECRYPT.txt'
+            - '\HELP_DECRYPT.txt'
+            - '\RESTORE_FILES.txt'
+    filter_sys:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\tiworker.exe'
+            - '\setup.exe'
+            - '\update.exe'
+    condition: selection_notes and not filter_sys
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Administrative scripts or tests dropping help files in sandbox systems.
+level: high
+tags:
+    - attack.impact
+    - attack.t1486
+    - analytic.an0602
+    - detection.det0215

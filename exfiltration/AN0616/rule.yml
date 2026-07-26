@@ -1,0 +1,39 @@
+title: File Copy to USB Storage via CLI (AN0616)
+id: e2312a32-ae9b-4d7e-95e5-c408239bb1e0
+status: experimental
+description: Detects command line execution of file copy utilities (xcopy, robocopy) or scripting engines writing files to USB/removable storage drive letters.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\xcopy.exe'
+            - '\robocopy.exe'
+            - '\powershell.exe'
+            - '\cmd.exe'
+    selection_paths:
+        TargetFilename|startswith:
+            - 'D:\'
+            - 'E:\'
+            - 'F:\'
+            - 'G:\'
+            - 'H:\'
+            - 'I:\'
+            - 'J:\'
+    condition: selection_process and selection_paths
+fields:
+    - Image
+    - TargetFilename
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate IT administration or users manually backing up files using command line copy tools to external media.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1052.001
+    - analytic.an0616
+    - detection.det0220

@@ -1,0 +1,41 @@
+title: Clear Windows Event Logs - CLI Utilities (AN1472)
+id: 2401421c-9902-4719-8362-ee9e675c6d8c
+status: experimental
+description: Detects command-line activity using wevtutil.exe or PowerShell to clear Windows event logs.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_wevtutil:
+        Image|endswith: '\wevtutil.exe'
+        CommandLine|contains|all:
+            - 'cl'
+            - 'Security'
+    selection_powershell:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        CommandLine|contains:
+            - 'Clear-EventLog'
+            - 'Remove-EventLog'
+    condition: selection_wevtutil or selection_powershell
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Administrative scripts performing automated log rotation (rare in modern environments due to built-in log wrapping).
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1685.005
+    - analytic.an1472
+    - detection.det0532

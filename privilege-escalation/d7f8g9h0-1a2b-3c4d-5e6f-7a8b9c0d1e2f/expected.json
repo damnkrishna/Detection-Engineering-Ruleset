@@ -1,0 +1,23 @@
+{
+  "rule_id": "d7f8g9h0-1a2b-3c4d-5e6f-7a8b9c0d1e2f",
+  "rule_name": "Suspicious Process Access for Memory Injection (AN0277)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

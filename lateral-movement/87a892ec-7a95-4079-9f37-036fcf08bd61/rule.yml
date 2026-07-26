@@ -1,0 +1,27 @@
+title: Software Deployment Agent Activity in Script Block (AN0623-B)
+id: e0df9bd0-9686-4b64-9836-4db63df1362b
+status: experimental
+description: Detects PowerShell script blocks containing keywords or commands related to software deployment agent wrappers (like SCCM, GPO scripts, PDQ Deploy), suggesting potential abuse.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'CcmExec'
+            - 'PDQDeploy'
+            - 'gpscript'
+            - 'AeXNSAgent'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative software deployment scripts.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1072
+    - analytic.an0623
+    - detection.det0223

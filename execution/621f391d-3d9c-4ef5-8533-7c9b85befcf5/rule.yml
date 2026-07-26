@@ -1,0 +1,32 @@
+title: Image File Execution Options Debugger Hijack (AN0609-B)
+id: c2106a9b-09ed-45ba-ae89-b3261be74ffe
+status: experimental
+description: Detects modifications to the Image File Execution Options registry key to add a debugger value, indicating process execution hijacking.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_path:
+        TargetObject|contains:
+            - '\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\'
+    selection_debugger:
+        TargetObject|endswith:
+            - '\debugger'
+    condition: selection_path and selection_debugger
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Legitimate software debugging configurations.
+level: high
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1574
+    - analytic.an0609
+    - detection.det0218

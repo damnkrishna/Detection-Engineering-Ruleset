@@ -1,0 +1,29 @@
+title: Ingress Tool Transfer via PowerShell Script Block (AN0165-B)
+id: 800c3a8a-050b-4232-81c5-47fd2c2c5f85
+status: experimental
+description: Detects PowerShell script blocks invoking file download methods or cmdlets (DownloadFile, DownloadString, Invoke-WebRequest) to download external files.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'DownloadFile'
+            - 'DownloadString'
+            - 'Invoke-WebRequest'
+            - 'Net.WebClient'
+            - 'Start-BitsTransfer'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative or provisioning scripts downloading tools/updates.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1105
+    - analytic.an0165
+    - detection.det0060

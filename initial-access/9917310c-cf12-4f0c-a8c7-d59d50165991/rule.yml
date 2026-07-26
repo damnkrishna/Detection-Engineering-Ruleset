@@ -1,0 +1,28 @@
+title: Wi-Fi Network Anomalies - Wireless Profile Query via Script Block (AN1476-B)
+id: a80f2a13-0aaf-499e-8ef4-80b319a3e5cc
+status: experimental
+description: Detects PowerShell script block logs executing commands to query or export wireless profiles.
+author: Antigravity
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_cmd:
+        ScriptBlockText|contains:
+            - 'netsh'
+            - 'wlan'
+            - 'show profiles'
+            - 'export profile'
+            - 'WlanSvc'
+    condition: selection_cmd
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrator troubleshooting scripts.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1669
+    - analytic.an1476
+    - detection.det0536

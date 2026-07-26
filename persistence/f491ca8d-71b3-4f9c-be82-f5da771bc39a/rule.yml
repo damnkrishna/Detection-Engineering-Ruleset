@@ -1,0 +1,41 @@
+title: Malicious Office Add-in Drop for Persistence (AN0137-B)
+id: 2e714d47-52a3-4920-874d-91b9da0c60b2
+status: experimental
+description: Detects drops of WLL, XLL, XLAM, or DOTM add-in files to Word, Excel, or PowerPoint startup directories.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_addin_paths:
+        TargetFilename|contains:
+            - '\Microsoft\Word\Startup\'
+            - '\Microsoft\Excel\XLSTART\'
+            - '\Microsoft\AddIns\'
+            - '\Microsoft\Office\Root\Office16\STARTUP\'
+    selection_addin_extensions:
+        TargetFilename|endswith:
+            - '.wll'
+            - '.xll'
+            - '.xlam'
+            - '.dotm'
+            - '.ppam'
+            - '.ppa'
+    filter_office_updater:
+        Image|contains:
+            - '\OfficeClickToRun.exe'
+            - '\OfficeC2RClient.exe'
+            - '\setup.exe'
+    condition: (selection_addin_paths or selection_addin_extensions) and not filter_office_updater
+fields:
+    - Image
+    - TargetFilename
+falsepositives:
+    - Sanctioned Office add-in installation or automated deployment.
+level: high
+tags:
+    - attack.persistence
+    - attack.t1137.006
+    - analytic.an0137
+    - detection.det0050

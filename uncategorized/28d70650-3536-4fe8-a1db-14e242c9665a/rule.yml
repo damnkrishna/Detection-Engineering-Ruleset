@@ -1,0 +1,33 @@
+title: LSA Security Packages Registry Modification (AN0757-C)
+id: 308a0238-e7d9-4b2d-b32c-da010945dc29
+status: experimental
+description: Detects registry modifications to the Security Packages list to register custom SSPs.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_packages:
+        TargetObject|contains:
+            - 'SYSTEM\CurrentControlSet\Control\Lsa\Security Packages'
+            - 'SYSTEM\CurrentControlSet\Control\Lsa\Authentication Packages'
+    filter_clean_baselines:
+        # Match only exact standard baseline lists
+        Details:
+            - 'kerberos msv1_0 schannel wdigest tspkg pku2u credssp'
+            - 'kerberos msv1_0 schannel wdigest tspkg pku2u'
+            - 'kerberos msv1_0 schannel wdigest tspkg credssp'
+    condition: selection_packages and not filter_clean_baselines
+fields:
+    - TargetObject
+    - Details
+    - User
+falsepositives:
+    - Installation of approved enterprise multi-factor authentication modules.
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1556.001
+    - analytic.an0757
+    - detection.det0271

@@ -1,0 +1,23 @@
+{
+  "rule_id": "3f7a1c82-4e9d-4b21-8f3d-c5a2e6f91b04",
+  "rule_name": "BITS Job Transfer or Notification Command Abuse (AN2098)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

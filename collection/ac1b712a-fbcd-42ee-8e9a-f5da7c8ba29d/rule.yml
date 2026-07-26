@@ -1,0 +1,38 @@
+title: Local Data Staging File Creation (AN0724-B)
+id: 51fc364e-7f6c-46f3-91e6-6c0382f9a3e9
+status: experimental
+description: Detects creation of staged collection files in local directories such as Temp, Public, or ProgramData.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_staging_paths:
+        TargetFilename|contains:
+            - '\Windows\Temp\'
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - 'C:\Temp\'
+            - '\ProgramData\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.zip'
+            - '.rar'
+            - '.7z'
+            - '.tar'
+            - '.gz'
+            - '.bak'
+    condition: selection_staging_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Standard software installers extracting temp archives.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1074.001
+    - analytic.an0724
+    - detection.det0261

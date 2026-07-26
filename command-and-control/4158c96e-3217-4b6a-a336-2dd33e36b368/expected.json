@@ -1,0 +1,23 @@
+{
+  "rule_id": "4158c96e-3217-4b6a-a336-2dd33e36b368",
+  "rule_name": "Dead Drop Web Service via PowerShell Script Block (AN0158-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

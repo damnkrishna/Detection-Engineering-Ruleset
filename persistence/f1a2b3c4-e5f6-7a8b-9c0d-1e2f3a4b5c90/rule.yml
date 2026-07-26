@@ -1,0 +1,32 @@
+title: User Logon Initialization Script Registry Modification (AN2112)
+id: 2dacd2c9-3245-4243-91ea-cb9f7bc89562
+status: experimental
+description: "Detects modifications to Windows registry keys that configure user logon or initialization scripts (such as UserInitMprLoopbackScript or Userinit parameters), which can be abused by adversaries to achieve persistent execution during user logon."
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry_paths:
+        TargetObject|contains:
+            - '\Environment\UserInitMprLoopbackScript'
+            - '\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Userinit'
+            - '\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\VMApplet'
+    filter_legitimate_userinit:
+        # Default Windows userinit path is normal
+        Details: 'C:\Windows\system32\userinit.exe,'
+    condition: selection_registry_paths and not filter_legitimate_userinit
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Group policy updates or domain administrators legitimately deploying logon scripts for user mappings or login notices.
+level: high
+tags:
+    - attack.persistence
+    - attack.t1037
+    - analytic.an2112
+    - detection.det0969

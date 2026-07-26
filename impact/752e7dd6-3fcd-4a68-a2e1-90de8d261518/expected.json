@@ -1,0 +1,23 @@
+{
+  "rule_id": "752e7dd6-3fcd-4a68-a2e1-90de8d261518",
+  "rule_name": "Boot Configuration Tampering via PowerShell Script Block (AN0474-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "rule_id": "50b50b5b-a891-4c08-9f03-ce7de7e240eb",
+  "rule_name": "Suspicious SPN Enumeration and Kerberoasting Activity via PowerShell Script Block (AN0444-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,40 @@
+title: Local Administrator Network Logon (AN1137)
+id: 6a2f3b5b-2779-46cf-bd5a-072e6125d8ec
+status: experimental
+description: Detects successful network logons (Logon Type 3) using local administrator accounts, which may indicate lateral movement using compromised local credentials.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_event:
+        EventID: 4624
+    selection_logon_type:
+        LogonType: 3 # Network
+    selection_local_admin:
+        TargetUserName:
+            - 'Administrator'
+            - 'admin'
+    selection_domain:
+  # Focus on local accounts or workgroups, not domain
+        TargetDomainName:
+            - 'WORKGROUP'
+            - 'localhost'
+    condition: selection_event and selection_logon_type and selection_local_admin and selection_domain
+fields:
+    - EventID
+    - LogonType
+    - TargetDomainName
+    - TargetUserName
+    - IpAddress
+falsepositives:
+    - Legitimate administrative actions by IT personnel performing system maintenance using local admin accounts.
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1078.003
+    - analytic.an1137
+    - detection.det0360

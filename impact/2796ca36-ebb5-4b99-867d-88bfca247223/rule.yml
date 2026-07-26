@@ -1,0 +1,47 @@
+title: Point-of-Sale RAM Scraper Process Creation (AN1361-A)
+id: daaaa983-9ca1-4987-8e61-24be1d1075ab
+status: experimental
+description: Detects command-line execution of Point-of-Sale memory scrapers or tools scanning memory handles.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\alina.exe'
+            - '\dexter.exe'
+            - '\blackpos.exe'
+            - '\poscard.exe'
+            - '\memdump.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'alina.exe'
+            - 'dexter.exe'
+            - 'blackpos.exe'
+            - 'poscard.exe'
+            - 'memdump.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'pos-scrape'
+            - 'card-grab'
+            - 'track2'
+            - 'dump-ram'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_orig) and selection_cli and not filter_installers
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Diagnostic tools or memory debuggers run by retail application support teams during maintenance.
+level: critical
+tags:
+    - attack.impact
+    - attack.t1657
+    - analytic.an1361
+    - detection.det0495

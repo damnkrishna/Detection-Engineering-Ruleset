@@ -1,0 +1,42 @@
+title: Abuse of UAC Elevation Control Mechanisms (AN0975)
+id: b55659a0-22d3-4425-8542-55362019cb2b
+status: experimental
+description: Detects bypass of User Account Control (UAC) by monitoring auto-elevating Windows binaries spawning shell utilities.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\control.exe'
+            - '\sdclt.exe'
+            - '\fodhelper.exe'
+            - '\eventvwr.exe'
+            - '\computerdefaults.exe'
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    condition: selection_parent
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Administrative maintenance or backup tools using auto-elevating scripts.
+level: high
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1548
+    - analytic.an0975
+    - detection.det0345

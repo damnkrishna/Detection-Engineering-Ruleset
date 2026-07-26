@@ -1,0 +1,38 @@
+title: Content Injection - Execution of Web Server Configuration Tool (AN0992-B)
+id: 8cd3e32a-40ba-41d6-b35f-a6f6011b8396
+status: experimental
+description: Detects command-line executions modifying web server configuration files (like web.config, httpd.conf, nginx.conf) or utilizing IIS configuration tools (appcmd.exe).
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_appcmd:
+        - Image|endswith:
+            - '\appcmd.exe'
+        - OriginalFileName:
+            - 'appcmd.exe'
+    selection_config_files:
+        CommandLine|contains:
+            - 'web.config'
+            - 'httpd.conf'
+            - 'nginx.conf'
+    selection_actions:
+        CommandLine|contains:
+            - 'set config'
+            - 'add module'
+            - 'unlock section'
+    condition: selection_appcmd or (selection_config_files and selection_actions)
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Authorized configuration updates by server administrators.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1659
+    - analytic.an0992
+    - detection.det0349

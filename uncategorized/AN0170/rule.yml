@@ -1,0 +1,88 @@
+title: Change Default File Association via CLI (AN0170)
+id: 8c21ca32-fc7e-4c6e-ab27-0ac2104a3917
+status: experimental
+description: Detects command-line execution of assoc.exe or ftype.exe, or reg.exe modifications to system file association keys, which can be abused for privilege escalation and persistence.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_tools:
+        - Image|endswith:
+            - '\assoc.exe'
+            - '\ftype.exe'
+        - OriginalFileName:
+            - 'assoc.exe'
+            - 'ftype.exe'
+    selection_reg:
+        - Image|endswith:
+            - '\reg.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'reg.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_reg_args:
+        CommandLine|contains:
+            - '\Software\Classes\'
+            - 'HKCR\'
+        CommandLine|contains:
+            - '\shell\open\command'
+        CommandLine|contains:
+            - 'reg'
+            - 'add'
+            - 'Set-ItemProperty'
+            - 'New-ItemProperty'
+    condition: selection_tools or (selection_reg and selection_reg_args)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate application installers altering default handlers during setup.
+level: medium
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1546.001
+    - analytic.an0170
+    - detection.det0061
+---
+title: File Association Registry Modification (AN0170-B)
+id: 88c535dd-2666-4c1a-bf66-18443cfe6a35
+status: experimental
+description: Detects registry value writes altering default application associations for file classes under Software\Classes or HKCR paths.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry_path:
+        TargetObject|contains:
+            - '\Software\Classes\'
+            - 'HKCR\'
+    selection_registry_value:
+        TargetObject|endswith: '\shell\open\command'
+    condition: selection_registry_path and selection_registry_value
+fields:
+    - TargetObject
+    - Image
+    - User
+    - Details
+falsepositives:
+    - Installation of approved applications modifying file associations.
+level: medium
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1546.001
+    - analytic.an0170
+    - detection.det0061

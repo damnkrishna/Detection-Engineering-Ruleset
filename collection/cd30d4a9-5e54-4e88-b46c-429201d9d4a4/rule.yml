@@ -1,0 +1,41 @@
+title: Scripting Process Binding to LLMNR or NetBIOS Ports (AN1274-B)
+id: 3375bd8a-5826-4743-820f-d15f5a1334a6
+status: experimental
+description: Detects Python, PowerShell, or command interpreters binding to LLMNR (UDP 5355) or NetBIOS Name Service (UDP 137) ports.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_processes:
+        Image|endswith:
+            - '\python.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+    selection_ports:
+        SourcePort:
+            - 5355  # LLMNR UDP
+            - 137   # NBT-NS UDP
+    filter_legitimate:
+        Image|endswith:
+            - '\nbtstat.exe'
+            - '\netsh.exe'
+            - '\Wireshark.exe'
+            - '\tshark.exe'
+            - '\nmap.exe'
+    condition: selection_processes and selection_ports and not filter_legitimate
+fields:
+    - Image
+    - SourcePort
+    - DestinationIp
+    - User
+falsepositives:
+    - Legitimate system administration tools or network diagnostic scripts configured to resolve hostnames.
+level: high
+tags:
+    - attack.collection
+    - attack.t1557.001
+    - analytic.an1274
+    - detection.det0462

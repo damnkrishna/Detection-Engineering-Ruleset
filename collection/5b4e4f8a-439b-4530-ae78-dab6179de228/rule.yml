@@ -1,0 +1,37 @@
+title: Collection - Anomaly Video Capture Library Load (AN0568)
+id: 23d8f5e5-56b8-43fd-95c6-070ded03c274
+status: experimental
+description: Detects unsigned or non-standard executables loading the Windows video capture DLL (avicap32.dll), suggesting unauthorized webcam recording or capture.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: image_load
+    product: windows
+    # Relies on Sysmon Event ID 7
+detection:
+    selection_dll:
+        ImageLoaded|endswith: '\avicap32.dll'
+    filter_signed:
+ # Exclude standard web-meeting and system binaries (e.g. Teams, Chrome, Zoom, Camera App)
+        Image|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\teams.exe'
+            - '\zoom.exe'
+            - '\skype.exe'
+            - '\WindowsCamera.exe'
+            - '\obs64.exe'
+    condition: selection_dll and not filter_signed
+fields:
+    - Image
+    - ImageLoaded
+    - Signed
+    - SignatureStatus
+falsepositives:
+    - Legitimate corporate web collaboration tools or third-party camera management utilities not covered in the static exclusion list.
+level: high
+tags:
+    - attack.collection
+    - attack.t1125
+    - analytic.an0568
+    - detection.det0197

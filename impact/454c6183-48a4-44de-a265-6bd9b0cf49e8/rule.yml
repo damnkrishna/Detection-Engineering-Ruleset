@@ -1,0 +1,45 @@
+title: Outbound Connections to Amplification Ports (AN1140-B)
+id: e2119e1f-5740-43de-ae48-cac39c9bb981
+status: experimental
+description: Detects outbound traffic targeting known reflection/amplification ports.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_ports:
+        DestinationPort:
+            - 11211
+            - 1900
+            - 161
+    filter_system:
+        # Exclude standard SNMP and local SSDP discovery engines
+        Image|endswith:
+            - '\system32\svchost.exe'
+            - '\system32\snmp.exe'
+    filter_browsers:
+        Image|endswith:
+            - '\chrome.exe'
+            - '\firefox.exe'
+    filter_multicast:
+        # Exclude local subnet multicast and broadcast SSDP traffic
+        DestinationIp|startswith:
+            - '224.'
+            - '239.'
+            - '255.255.255.255'
+            - 'ff'
+    condition: selection_ports and not (filter_system or filter_browsers or filter_multicast)
+fields:
+    - Image
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Legitimate SNMP network polling tools or media discovery agents.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1498.002
+    - analytic.an1140
+    - detection.det0408

@@ -1,0 +1,48 @@
+title: Windows Defender Selective Exclusion Configuration (AN2127)
+id: 781f68ec-af53-448c-86cf-94e2cf2aae59
+status: experimental
+description: "Detects the modification of security tool exclusions (such as adding Windows Defender folder/process exclusions via Add-MpPreference or registry writes under the Windows Defender\\Exclusions key), which is commonly used to hide malicious files from AV scans."
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_ps:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_ps_ofn:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.exe'
+    selection_cli_exclusions:
+        CommandLine|contains:
+            - 'Add-MpPreference'
+            - 'Set-MpPreference'
+    selection_cli_flags:
+        CommandLine|contains:
+            - ' -ExclusionPath'
+            - ' -ExclusionProcess'
+            - ' -ExclusionExtension'
+    selection_reg_path:
+        CommandLine|contains:
+            - '\SOFTWARE\Microsoft\Windows Defender\Exclusions'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (((selection_ps or selection_ps_ofn) and selection_cli_exclusions and selection_cli_flags) or selection_reg_path) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - IT administrators or deployment software configuring database folders or virtual machine storage directories to be excluded from real-time antivirus scans for performance tuning.
+level: high
+tags:
+    - attack.defense_evasion
+    - attack.t1679
+    - analytic.an2127
+    - detection.det0984

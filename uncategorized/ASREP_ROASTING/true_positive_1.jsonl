@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"Windows audit failure event 4738","hostname":"OPS-WKS-688","agent_ip":"10.42.179.28","severity_id":3,"event_uid":"golden|ASREP_ROASTING|0|770100","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:05:00.000Z","signature_name":"C:\\Windows\\System32 Pre-Authentication Type: 0","hostname":"OPS-WKS-688","agent_ip":"10.42.179.28","severity_id":3,"event_uid":"golden|ASREP_ROASTING|1|770101","proto":"tcp","src_port":"50412","dst_port":"443"}

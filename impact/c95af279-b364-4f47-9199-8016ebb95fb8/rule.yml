@@ -1,0 +1,53 @@
+title: Endpoint CPU or Memory Stressing Execution (AN0584-A)
+id: 47ee00bc-5bd5-4776-88c6-07d082353a5d
+status: experimental
+description: Detects command-line execution of stress-testing tools or scripts designed to exhaust system CPU or memory resources on endpoints.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\cpustres.exe'
+            - '\heavyload.exe'
+            - '\stressapptest.exe'
+            - '\prime95.exe'
+            - '\cinebench.exe'
+            - '\memtest.exe'
+        OriginalFileName:
+            - 'cpustres.exe'
+            - 'heavyload.exe'
+            - 'stressapptest.exe'
+            - 'prime95.exe'
+            - 'cinebench.exe'
+            - 'memtest.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'consume-cpu'
+            - 'consume-mem'
+            - 'stress-ng'
+            - '--cpu-load'
+            - 'burn-in'
+    filter_admin:
+        User: 'NT AUTHORITY\SYSTEM'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_cli) and not (filter_installers or filter_admin)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Performance benchmarks conducted by IT administrators, hardware diagnostics, or developers testing application resource management.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1499
+    - analytic.an0584
+    - detection.det0208

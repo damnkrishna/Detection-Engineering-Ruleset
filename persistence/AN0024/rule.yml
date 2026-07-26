@@ -1,0 +1,54 @@
+title: WMI Event Subscription Creation via CLI (AN0024)
+id: 8bc21f35-3614-4cda-9000-7bf7a5eba78d
+status: experimental
+description: Detects command-line execution of wmic.exe or PowerShell cmdlets configuring WMI event consumers, filters, or bindings, which can be abused for privilege escalation and persistence.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_wmic:
+        - Image|endswith: '\wmic.exe'
+        - OriginalFileName: 'wmic.exe'
+    selection_wmic_args:
+        CommandLine|contains:
+            - 'ActiveScriptEventConsumer'
+            - 'CommandLineEventConsumer'
+            - 'EventConsumer'
+            - 'EventFilter'
+            - 'FilterToConsumerBinding'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_args:
+        CommandLine|contains:
+            - 'Wmi'
+            - 'Cim'
+        CommandLine|contains:
+            - 'Consumer'
+            - 'Filter'
+            - 'Binding'
+    condition: (selection_wmic and selection_wmic_args) or (selection_powershell and selection_powershell_args)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate enterprise systems management software creating WMI event subscriptions during installation.
+level: high
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1546
+    - analytic.an0024
+    - detection.det0033

@@ -1,0 +1,53 @@
+title: VM and Sandbox Detection Artifact Queries (AN2094)
+id: 7bfcbfa7-e303-4eb4-b0d9-c5a8532f3501
+status: experimental
+description: Detects execution of commands querying VM-specific registry keys, services, or hardware strings used by malware to evade analysis sandboxes. Covers renamed binaries via OriginalFileName to resist trivial binary-rename evasion.
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_reg:
+        Image|endswith:
+            - '\reg.exe'
+    selection_reg_ofn:
+        OriginalFileName: 'reg.exe'
+    selection_reg_cli:
+        CommandLine|contains:
+            - 'VirtualBox'
+            - 'VMware'
+            - 'VBOX'
+            - 'QEMU'
+            - 'Hyper-V'
+            - 'Xen'
+    selection_wmic:
+        Image|endswith:
+            - '\wmic.exe'
+    selection_wmic_ofn:
+        OriginalFileName: 'wmic.exe'
+    selection_wmic_cli:
+        CommandLine|contains:
+            - 'VBOX'
+            - 'VMware'
+            - 'VirtualBox'
+            - 'biosseralnum'
+    filter_hyperv_admin:
+        ParentImage|endswith:
+            - '\vmconnect.exe'
+            - '\vmms.exe'
+    condition: (((selection_reg or selection_reg_ofn) and selection_reg_cli) or ((selection_wmic or selection_wmic_ofn) and selection_wmic_cli)) and not filter_hyperv_admin
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Legitimate virtualization management software querying its own artifacts.
+level: high
+tags:
+    - attack.defense_evasion
+    - attack.discovery
+    - attack.t1497
+    - analytic.an2094
+    - detection.det0951

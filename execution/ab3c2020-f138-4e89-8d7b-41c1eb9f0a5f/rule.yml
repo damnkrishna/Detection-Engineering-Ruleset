@@ -1,0 +1,48 @@
+title: Exploitation for Client Execution - Suspicious Child Process (AN0797)
+id: 55cda918-2f8f-4290-b5b4-c066c8194bb3
+status: experimental
+description: Detects a cause-and-effect chain where a client app (Office, PDF reader, browser) spawns an unexpected child process, indicating successful exploitation.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\winword.exe'
+            - '\excel.exe'
+            - '\powerpnt.exe'
+            - '\AcroRd32.exe'
+            - '\iexplore.exe'
+            - '\chrome.exe'
+            - '\foxitreader.exe'
+    selection_child:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+    condition: selection_parent and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate Office macros invoking shells for system administration tasks.
+    - PDF readers opening embedded links that legitimately launch helper apps.
+level: critical
+tags:
+    - attack.execution
+    - attack.t1203
+    - analytic.an0797
+    - detection.det0287

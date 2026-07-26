@@ -1,0 +1,22 @@
+title: 'AN0880 - Office Application Startup: Office Test'
+id: 5b0caad9-1c6c-475d-9d1f-b25a38ecefb4
+status: experimental
+description: 'Detects the creation or modification of the Microsoft Office Test registry key, a known persistence mechanism used to load arbitrary DLLs.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: registry_set
+detection:
+  selection_registry:
+    TargetObject|contains: '\Software\Microsoft\Office Test\Special\Perf'
+  condition: selection_registry
+fields:
+  - EventID
+  - TargetObject
+  - Image
+  - Details
+level: high
+tags:
+  - attack.persistence
+  - attack.t1137.002
+  - analytic.an0880

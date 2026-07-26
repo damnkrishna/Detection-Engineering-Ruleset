@@ -1,0 +1,63 @@
+title: Application Shim Database Installation (AN0051)
+id: 46abfd66-0943-4876-93ed-6bdba0e2b34f
+status: experimental
+description: Detects the execution of sdbinst.exe used to install custom application shim databases (.sdb), which can be abused for persistence and privilege escalation.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        - Image|endswith: '\sdbinst.exe'
+        - OriginalFileName: 'sdbinst.exe'
+    condition: selection
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legacy enterprise applications running compatibility compatibility shims.
+level: high
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1546.011
+    - analytic.an0051
+    - detection.det0017
+---
+title: Application Shim Database File Creation (AN0051-B)
+id: b338b9da-2b32-42b1-bae8-50d5b57296ec
+status: experimental
+description: Detects creation or modification of custom shim database (.sdb) files in the AppPatch directory.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_path:
+        TargetFilename|contains:
+            - '\Windows\AppPatch\'
+            - '\AppPatch\Custom\'
+    selection_ext:
+        TargetFilename|endswith: '.sdb'
+    condition: selection_path and selection_ext
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Installation of compatibility databases by legitimate applications.
+level: high
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1546.011
+    - analytic.an0051
+    - detection.det0017

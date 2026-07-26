@@ -1,0 +1,138 @@
+{
+  "ruleId": "CR0109_T1568_T1218",
+  "ruleName": "Dynamic DNS Domain Request followed by certutil Download",
+  "ruleFormat": "IR_v1",
+  "ruleType": "THRESHOLD",
+  "ruleOrigin": "custom",
+  "description": "Detects DNS request for DDNS domains followed by certutil.exe file download on the host within 15 minutes.",
+  "enabled": true,
+  "version": 1,
+  "correlationKey": "entity_key",
+  "eventSources": [
+    "zeek",
+    "windows_sysmon"
+  ],
+  "window": {
+    "type": "sliding",
+    "minSpanSeconds": 0,
+    "durationSeconds": 900
+  },
+  "output": {
+    "tags": [
+      "atomic-red-team",
+      "bzar"
+    ],
+    "message": "Dynamic DNS domain lookup and certutil download execution detected",
+    "severity": "MEDIUM",
+    "entityField": "host.name",
+    "mitreTactics": [
+      "TA0011",
+      "TA0002"
+    ],
+    "includeFields": [],
+    "riskScoreDelta": 3,
+    "mitreTechniques": [
+      "T1568",
+      "T1218.007"
+    ]
+  },
+  "stages": [
+    {
+      "stageIndex": 0,
+      "match": {
+        "groups": [
+          {
+            "groups": [],
+            "operator": "OR",
+            "conditions": [
+              {
+                "field": "signature_name",
+                "value": "Dynamic DNS query",
+                "values": [],
+                "operator": "contains"
+              },
+              {
+                "field": "signature_name",
+                "value": "DDNS resolution",
+                "values": [],
+                "operator": "contains"
+              }
+            ]
+          }
+        ],
+        "operator": "AND",
+        "conditions": []
+      },
+      "minGapMs": 0,
+      "aggregate": {
+        "field": null,
+        "groupBy": [],
+        "function": "count",
+        "threshold": 1,
+        "distinctField": null
+      },
+      "eventSources": [
+        "zeek"
+      ],
+      "withinSeconds": 0,
+      "minOccurrences": 0,
+      "correlation_key": "host.name",
+      "minDistinctCount": 0,
+      "requireDistinctField": null,
+      "excludeSignatureContains": []
+    },
+    {
+      "stageIndex": 1,
+      "match": {
+        "groups": [
+          {
+            "groups": [],
+            "operator": "AND",
+            "conditions": [
+              {
+                "field": "process_name",
+                "value": "certutil.exe",
+                "values": [],
+                "operator": "equals"
+              },
+              {
+                "field": "command_line",
+                "value": "urlcache",
+                "values": [],
+                "operator": "contains"
+              }
+            ]
+          }
+        ],
+        "operator": "AND",
+        "conditions": []
+      },
+      "minGapMs": 0,
+      "aggregate": {
+        "field": null,
+        "groupBy": [],
+        "function": "count",
+        "threshold": 1,
+        "distinctField": null
+      },
+      "eventSources": [
+        "windows_sysmon"
+      ],
+      "withinSeconds": 900,
+      "minOccurrences": 0,
+      "correlation_key": "host.name",
+      "minDistinctCount": 0,
+      "requireDistinctField": null,
+      "excludeSignatureContains": []
+    }
+  ],
+  "suppression": {
+    "groupBy": [
+      "host.name"
+    ],
+    "durationSeconds": 300
+  },
+  "maxGapSeconds": 0,
+  "behavioralConstraints": null,
+  "maxConcurrentInstances": 0
+}

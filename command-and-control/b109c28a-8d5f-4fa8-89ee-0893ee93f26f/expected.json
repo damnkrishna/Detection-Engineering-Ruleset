@@ -1,0 +1,23 @@
+{
+  "rule_id": "b109c28a-8d5f-4fa8-89ee-0893ee93f26f",
+  "rule_name": "Suspicious Non-Network System Utility Execution (AN0109-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,41 @@
+title: AutoHotKey or AutoIT Interpreter Execution (AN0942-A)
+id: 94387ccc-eb73-4b68-8e2d-7259206c7d81
+status: experimental
+description: Detects command-line execution of AutoHotKey or AutoIT script engines.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\autohotkey.exe'
+            - '\autoit3.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'AutoHotkey.exe'
+            - 'AutoIt3.exe'
+    selection_cli:
+        CommandLine|contains:
+            - '.ahk'
+            - '.au3'
+            - ' /ErrorStdOut '
+            - ' /AutoIt3ExecuteScript '
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_orig) and selection_cli and not filter_installer
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Administrative automation tools or custom keystroke-mapping helpers.
+level: medium
+tags:
+    - attack.execution
+    - attack.t1059.010
+    - analytic.an0942
+    - detection.det0332

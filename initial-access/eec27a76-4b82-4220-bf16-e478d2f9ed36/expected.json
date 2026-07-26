@@ -1,0 +1,23 @@
+{
+  "rule_id": "eec27a76-4b82-4220-bf16-e478d2f9ed36",
+  "rule_name": "Exploit Public-Facing Application - Suspicious Child Process of Web Server (AN0219-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

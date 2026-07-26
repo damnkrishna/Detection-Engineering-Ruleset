@@ -1,0 +1,45 @@
+title: Device Driver Enumeration (AN2092)
+id: ba29d1f6-8ed6-4a59-94b8-b202f91dbe3d
+status: experimental
+description: Detects command-line utilities enumerating installed device drivers, used to identify security software or kernel exploitation targets. Covers renamed binaries via OriginalFileName to resist trivial binary-rename evasion.
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_driverquery:
+        Image|endswith:
+            - '\driverquery.exe'
+    selection_driverquery_ofn:
+        OriginalFileName: 'driverquery.exe'
+    selection_sc:
+        Image|endswith:
+            - '\sc.exe'
+    selection_sc_ofn:
+        OriginalFileName: 'sc.exe'
+    selection_sc_cli:
+        CommandLine|contains:
+            - ' query type= driver'
+            - ' query type=driver'
+    selection_wmic:
+        Image|endswith:
+            - '\wmic.exe'
+    selection_wmic_ofn:
+        OriginalFileName: 'wmic.exe'
+    selection_wmic_cli:
+        CommandLine|contains: 'sysdriver'
+    condition: selection_driverquery or selection_driverquery_ofn or ((selection_sc or selection_sc_ofn) and selection_sc_cli) or ((selection_wmic or selection_wmic_ofn) and selection_wmic_cli)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Administrators auditing driver health or diagnosing hardware compatibility issues.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1652
+    - analytic.an2092
+    - detection.det0949

@@ -1,0 +1,64 @@
+{
+  "id": "SCATTERED_SPIDER_PATTERN",
+  "description": "Auth anomaly + MFA fatigue + RMM tool persistence (Splunk: Scattered Spider story)",
+  "correlationKey": "username",
+  "scoreMultiplier": 4.0,
+  "windowMinutes": 120,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "auth_anomaly",
+      "tactics": [
+        "TA0001",
+        "TA0006"
+      ],
+      "techniques": [
+        "T1078",
+        "T1621",
+        "T1556"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "mfa",
+        "multi-factor",
+        "authentication",
+        "4625",
+        "4624",
+        "new device",
+        "unusual login",
+        "impossible travel",
+        "okta",
+        "azure ad",
+        "failed mfa",
+        "push fatigue"
+      ]
+    },
+    {
+      "label": "persistence_tools",
+      "tactics": [
+        "TA0003",
+        "TA0011"
+      ],
+      "techniques": [
+        "T1219",
+        "T1078",
+        "T1098"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "anydesk",
+        "teamviewer",
+        "screenconnect",
+        "splashtop",
+        "remote",
+        "rdp",
+        "new account",
+        "added to group",
+        "7045",
+        "new service"
+      ]
+    }
+  ]
+}

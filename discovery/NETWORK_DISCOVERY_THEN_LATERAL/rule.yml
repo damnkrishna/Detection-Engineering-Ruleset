@@ -1,0 +1,55 @@
+{
+  "id": "NETWORK_DISCOVERY_THEN_LATERAL",
+  "description": "Internal enumeration followed by lateral movement (Splunk: AD Discovery story)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 2.5,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "NIDS",
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "discovery",
+      "tactics": [
+        "TA0007"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "net view",
+        "net group",
+        "nltest",
+        "ping sweep",
+        "arp scan",
+        "ldap query",
+        "dsquery",
+        "bloodhound",
+        "sharphound",
+        "adrecon",
+        "powerview",
+        "get-netcomputer",
+        "get-netuser"
+      ]
+    },
+    {
+      "label": "lateral",
+      "tactics": [
+        "TA0008"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "lateral",
+        "pass-the-hash",
+        "psexec",
+        "wmi",
+        "dcom",
+        "rdp",
+        "smb",
+        "logon type 3",
+        "4624",
+        "4648",
+        "remote"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+title: Registry Value Set for UAC Bypass (AN1094-B)
+id: a6541e31-767a-4a40-b86d-a128a5ff7da0
+status: experimental
+description: Detects direct registry value modifications targeting auto-elevation override values such as isolatedCommand, DelegateExecute, or shell\open\command.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry:
+        TargetObject|contains:
+            - '\shell\open\command'
+            - '\isolatedCommand'
+            - '\DelegateExecute'
+    condition: selection_registry
+fields:
+    - TargetObject
+    - Image
+    - User
+    - Details
+falsepositives:
+    - Standard software installations registering custom handlers.
+level: high
+tags:
+    - attack.privilege-escalation
+    - attack.defense-evasion
+    - attack.t1548.002
+    - analytic.an1094
+    - detection.det0388

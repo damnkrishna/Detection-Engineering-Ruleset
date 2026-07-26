@@ -1,0 +1,37 @@
+title: High Connection Burst to Database Server Port (AN1165-B)
+id: 36999099-c5a4-4ac1-b2ee-c1ef37af4ad8
+status: experimental
+description: Detects connection events targeting SQL or database ports. Pair with SIEM aggregation.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_ports:
+        DestinationPort:
+            - 1433
+            - 3306
+            - 5432
+            - 1521
+    filter_db_engines:
+        # Exclude connections made directly by database engines or drivers
+        Image|endswith:
+            - '\sqlserver.exe'
+            - '\mysqld.exe'
+            - '\postgres.exe'
+            - '\oracle.exe'
+    condition: selection_ports and not filter_db_engines
+fields:
+    - Image
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Application server database pooling clients or custom reporting scripts.
+level: low
+tags:
+    - attack.impact
+    - attack.t1499.003
+    - analytic.an1165
+    - detection.det0415

@@ -1,0 +1,29 @@
+title: System Owner and User Discovery via PowerShell Script Block (AN0254-B)
+id: ad23b43a-948b-425b-823c-f99c593971c7
+status: experimental
+description: Detects PowerShell script blocks querying local or Active Directory identity details via cmdlets or .NET classes.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Get-LocalUser'
+            - 'Get-ADUser'
+            - 'WindowsIdentity'
+            - 'Win32_ComputerSystem'
+            - 'Win32_UserAccount'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administration scripts querying local or domain accounts.
+level: low
+tags:
+    - attack.discovery
+    - attack.t1033
+    - analytic.an0254
+    - detection.det0093

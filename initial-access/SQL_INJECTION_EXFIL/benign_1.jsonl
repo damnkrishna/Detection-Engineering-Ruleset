@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"C:\\Windows\\System32 data exfil","hostname":"SEC-WKS-644","agent_ip":"10.42.35.11","severity_id":3,"event_uid":"golden|SQL_INJECTION_EXFIL|1|7601","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:00:01.000Z","signature_name":"ET MALWARE Observed Suspicious Outbound Connection SQL injection","hostname":"SEC-WKS-644","agent_ip":"10.42.35.11","severity_id":3,"event_uid":"golden|SQL_INJECTION_EXFIL|0|7600","proto":"tcp","src_port":"50412","dst_port":"443"}

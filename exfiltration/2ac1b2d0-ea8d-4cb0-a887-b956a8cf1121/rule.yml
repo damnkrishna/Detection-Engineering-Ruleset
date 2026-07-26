@@ -1,0 +1,27 @@
+title: Bluetooth Device Connection or Configuration (AN0212-B)
+id: f883c856-c60e-49ef-97f3-d2b2fb6ace97
+status: experimental
+description: Detects registry modifications under the Bluetooth port driver keys (BTHPORT), indicating connection or configuration of alternative Bluetooth communication channels for exfiltration.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_bth:
+        TargetObject|contains:
+            - '\System\CurrentControlSet\Services\BTHPORT\'
+    condition: selection_bth
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Legitimate pairing of Bluetooth mice, keyboards, or administrative devices.
+level: low
+tags:
+    - attack.exfiltration
+    - attack.t1011
+    - analytic.an0212
+    - detection.det0077

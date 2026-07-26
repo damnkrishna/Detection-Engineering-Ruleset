@@ -1,0 +1,74 @@
+title: File Wiping or Volume Shadow Copy Deletion via CLI (AN0411-A)
+id: d2c5f10c-0cd6-4f4d-9bbf-db18212fb69e
+status: experimental
+description: Detects command-line execution of tools used for data destruction, such as sdelete, cipher /w, or commands deleting Volume Shadow Copies (vssadmin, wmic).
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_shadow:
+        CommandLine|contains:
+            - 'delete shadows'
+            - 'shadowcopy delete'
+            - 'delete catalog'
+            - 'resize shadowstorage'
+    selection_wipers:
+        - Image|endswith:
+            - '\sdelete.exe'
+        - CommandLine|contains:
+            - 'cipher.exe /w'
+            - 'cipher /w'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_shadow or selection_wipers) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative scripts purging old backup catalogs or system shadow storages during system upgrades.
+level: high
+tags:
+    - attack.impact
+    - attack.t1485
+    - analytic.an0411
+    - detection.det0146
+---
+title: File Wiping or Volume Shadow Copy Deletion via PowerShell Script Block (AN0411-B)
+id: 755ca4c1-1f80-4e31-815b-22cdf3b6cae6
+status: experimental
+description: Detects PowerShell script block logs containing commands attempting to delete, disable, or resize Volume Shadow Copies.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Win32_ShadowCopy'
+            - 'delete shadows'
+            - 'shadowcopy delete'
+            - 'vssadmin'
+            - 'sdelete'
+            - 'cipher'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative scripting for backup management.
+level: high
+tags:
+    - attack.impact
+    - attack.t1485
+    - analytic.an0411
+    - detection.det0146

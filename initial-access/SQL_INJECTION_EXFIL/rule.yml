@@ -1,0 +1,46 @@
+{
+  "id": "SQL_INJECTION_EXFIL",
+  "description": "SQL injection followed by data exfiltration (Splunk: Web Application Attack story)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.0,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "NIDS"
+  ],
+  "stages": [
+    {
+      "label": "sqli",
+      "tactics": [
+        "TA0001"
+      ],
+      "signatureContains": [
+        "SQL injection",
+        "UNION SELECT",
+        "OR 1=1",
+        "blind SQL",
+        "sqlmap",
+        "error-based",
+        "time-based",
+        "boolean-based",
+        "stacked queries"
+      ],
+      "optional": false
+    },
+    {
+      "label": "exfil",
+      "tactics": [
+        "TA0010"
+      ],
+      "signatureContains": [
+        "large response",
+        "data exfil",
+        "SELECT",
+        "database dump",
+        "outfile",
+        "load_file",
+        "information_schema"
+      ],
+      "optional": false
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "rule_id": "brute-force-then-success-001",
+  "rule_name": "Brute Force Followed By Successful Login",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-hids",
+  "event_source": "wazuh",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 7
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 7
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 7
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 7
+  }
+}

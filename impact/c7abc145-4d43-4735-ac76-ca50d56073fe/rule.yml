@@ -1,0 +1,48 @@
+title: Stored Office Document Modification by Scripting Host via CLI (AN0555-B)
+id: cffad627-3853-49a4-b145-ab6d383c5feb
+status: experimental
+description: Detects command-line processes of scripting hosts referencing common office document extensions in their parameters, indicating script-based file modifications.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_process:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'Cmd.Exe'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'mshta.exe'
+    selection_extensions:
+        CommandLine|contains:
+            - '.docx'
+            - '.xlsx'
+            - '.pptx'
+            - '.pdf'
+            - '.odt'
+            - '.ods'
+    condition: selection_process and selection_extensions
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Legitimate administration scripts generating or compiling files.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1565.001
+    - analytic.an0555
+    - detection.det0555

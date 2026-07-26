@@ -1,0 +1,36 @@
+title: Lateral Movement - NTLM Pass the Hash Detection (AN1144)
+id: 2d1dc473-780d-4219-ae6c-734aefad6aab
+status: experimental
+description: Detects successful NTLM network logons (Logon Type 3) with a Key Length of 0, indicating alternate credential material (password hash) was used to authenticate.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_logon:
+        EventID: 4624
+        LogonType: 3 # Network Logon
+        LmPackageName|startswith: 'NTLM'
+        KeyLength: 0
+    filter_local:
+        IpAddress:
+            - '127.0.0.1'
+            - '::1'
+    condition: selection_logon and not filter_local
+fields:
+    - EventID
+    - LogonType
+    - IpAddress
+    - TargetDomainName
+    - TargetUserName
+    - KeyLength
+    - LmPackageName
+falsepositives:
+    - Certain legacy local service accounts or specific third-party applications using non-standard NTLM authentication calls.
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1550.002
+    - analytic.an1144
+    - detection.det0409

@@ -1,0 +1,39 @@
+title: Anomalous Administrative Account Logon (AN1543)
+id: a3351984-90f9-4a10-9f90-b6d9a9585363
+status: experimental
+description: Detects successful remote network or RDP logons by highly privileged administrative accounts, which may indicate account hijacking or lateral movement.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_event:
+        EventID: 4624
+    selection_logon_type:
+        LogonType:
+            - 3 # Network
+            - 10 # Remote Interactive
+    selection_admin_accounts:
+        TargetUserName|contains:
+            - 'admin_'
+            - 'administrator'
+            - 'adm_'
+            - 'root'
+    condition: selection_event and selection_logon_type and selection_admin_accounts
+fields:
+    - EventID
+    - LogonType
+    - TargetDomainName
+    - TargetUserName
+    - IpAddress
+falsepositives:
+    - Legitimate remote administration by IT personnel using approved administrator accounts.
+level: high
+tags:
+    - attack.initial-access
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1078
+    - analytic.an1543
+    - detection.det0380

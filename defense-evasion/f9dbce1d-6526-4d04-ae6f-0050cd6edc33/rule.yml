@@ -1,0 +1,42 @@
+title: Disable or Modify Tools - Kill Security Process (AN1369)
+id: aec6977c-5107-4f0a-a2ae-61910546d9c1
+status: experimental
+description: Detects command-line execution attempting to stop services or kill processes associated with security tools (AV, EDR, Sysmon).
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_tool:
+        Image|endswith:
+            - '\taskkill.exe'
+            - '\net.exe'
+            - '\net1.exe'
+            - '\sc.exe'
+    selection_target:
+        CommandLine|contains:
+            - 'WinDefend'
+            - 'MsMpEng'
+            - 'Sysmon'
+            - 'Sentinel'
+            - 'CrowdStrike'
+    condition: selection_tool and selection_target
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - System administrators uninstalling or upgrading endpoint security software.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1685
+    - analytic.an1369
+    - detection.det0497

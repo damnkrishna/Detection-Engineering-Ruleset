@@ -1,0 +1,33 @@
+title: Hook Evasion via Non-Standard System DLL Load (AN1465-A)
+id: c4920a4b-a8e8-4961-bf12-1e8be2e0e108
+status: experimental
+description: Detects processes loading critical system libraries from non-standard directories to bypass API hooking engines.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection_dll:
+        ImageLoaded|endswith:
+            - '\ntdll.dll'
+            - '\kernel32.dll'
+            - '\kernelbase.dll'
+    filter_standard_paths:
+        ImageLoaded|startswith:
+            - 'C:\Windows\System32\'
+            - 'C:\Windows\SysWOW64\'
+            - 'C:\Windows\WinSxS\'
+    condition: selection_dll and not filter_standard_paths
+fields:
+    - Image
+    - ImageLoaded
+    - User
+falsepositives:
+    - Custom diagnostic tools packaged with local runtime dll engines (rare for ntdll/kernel32).
+level: critical
+tags:
+    - attack.execution
+    - attack.t1106
+    - analytic.an1465
+    - detection.det0529

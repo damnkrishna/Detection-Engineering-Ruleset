@@ -1,0 +1,47 @@
+title: Rapid Web Path Discovery from Single Source (AN2069)
+id: b28a08f3-a6f7-47c8-81b4-f74b67551e29
+status: experimental
+description: "Detects when a single source IP performs scan queries on sensitive paths returning 403 Forbidden status codes. Note: SIEM-side aggregation (count(src_ip) by src_ip > 5 in 1m) is required before this generates actionable alerts to avoid noise."
+
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: webserver
+    product: windows
+detection:
+    selection:
+        http_request_path|re:
+            - '^\/.git\/.*'
+            - '^\/.env$'
+            - '^\/wp-admin\/.*'
+            - '^\/.aws(?:/|$)'
+            - '^\/\.htaccess$'
+            - '^\/backup(?:/|$)'
+            - '^\/config(?:/|$)'
+            - '^\/phpinfo\.php$'
+            - '^\/admin(?:/|$)'
+            - '^\/\.well-known\/.*'
+            - '^\/wp-config\.php$'
+            - '^\/server-status$'
+            - '^\/\.DS_Store$'
+        http_status: 403
+    filter_crawler:
+        user_agent|contains:
+            - 'Googlebot'
+            - 'Bingbot'
+    filter_auth:
+        http_auth_user: '-'
+    condition: selection and not filter_crawler and filter_auth
+fields:
+    - src_ip
+    - http_request_path
+    - http_status
+    - user_agent
+falsepositives:
+    - Authorized automated vulnerability scanners or penetration testing tools.
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1594
+    - analytic.an2069
+    - detection.det0926

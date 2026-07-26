@@ -1,0 +1,53 @@
+title: Suspicious Wiping/Encryption File Extensions (AN0602-B)
+id: e208caa9-a836-47f3-8201-4ce62fda161c
+status: experimental
+description: Detects the drop or modification of files with known ransomware extensions.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_encrypted:
+        TargetFilename|endswith:
+            - '.locky'
+            - '.crypto'
+            - '.locked'
+            - '.ryuk'
+            - '.wannacry'
+            - '.onion'
+            - '.crypted'
+            - '.encryp'
+            - '.crypt'
+            - '.darkside'
+            - '.revil'
+            - '.lockbit'
+            - '.hive'
+            - '.clop'
+            - '.babuk'
+            - '.conti'
+            - '.blackcat'
+            - '.blackbasta'
+            - '.royal'
+            - '.avaddon'
+            - '.makop'
+            - '.phobos'
+    filter_sys:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\tiworker.exe'
+            - '\setup.exe'
+            - '\update.exe'
+    condition: selection_encrypted and not filter_sys
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Diagnostic tools or backup agents writing log files with these specific extensions.
+level: high
+tags:
+    - attack.impact
+    - attack.t1486
+    - analytic.an0602
+    - detection.det0215

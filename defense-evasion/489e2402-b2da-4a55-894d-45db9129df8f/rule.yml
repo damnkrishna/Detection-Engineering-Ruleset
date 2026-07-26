@@ -1,0 +1,36 @@
+title: Code Signing Policy Modification - Bcdedit DSE Disable (AN1446)
+id: a247b82d-97a0-454b-b565-cbf635164f85
+status: experimental
+description: Detects command-line execution of bcdedit.exe attempting to disable Driver Signature Enforcement or enable test signing.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_img:
+        Image|endswith: '\bcdedit.exe'
+    selection_cmd:
+        CommandLine|contains:
+            - 'loadoptions DDISABLE_INTEGRITY_CHECKS'
+            - 'testsigning on'
+            - 'nointegritychecks on'
+    condition: selection_img and selection_cmd
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Kernel developers testing custom unsigned drivers on non-production development machines.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1553.006
+    - analytic.an1446
+    - detection.det0523

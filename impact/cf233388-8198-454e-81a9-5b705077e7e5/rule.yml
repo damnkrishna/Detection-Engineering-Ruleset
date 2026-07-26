@@ -1,0 +1,43 @@
+title: High Thread Spawning Utilities Execution (AN1012-B)
+id: 749b07b0-c818-439b-87d6-cf138d52d2ae
+status: experimental
+description: Detects process creation of utility tools launched to spawn massive thread counts or CPU consumption loops.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\stress-ng.exe'
+            - '\cpustres.exe'
+            - '\heavyload.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'stress-ng.exe'
+            - 'cpustres.exe'
+            - 'heavyload.exe'
+    selection_cli:
+        CommandLine|contains:
+            - '--max-threads'
+            - ' -threads '
+            - ' --thread-count'
+            - ' --loop-cores'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_orig) and selection_cli and not filter_installer
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Administrators running system baseline stress tests or hardware configuration benchmarks.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1499.001
+    - analytic.an1012
+    - detection.det0356

@@ -1,0 +1,55 @@
+title: Software Supply Chain - Installer Spawning Suspicious Child Process (AN0862-A)
+id: f40fa9a6-d548-4c95-8263-21a173044ac1
+status: experimental
+description: Detects software installer or updater processes (like msiexec, setup, install, update) spawning command-line interpreters or networking tools, which could indicate a compromised software supply chain.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+            - '\install.exe'
+            - '\update.exe'
+            - '\updater.exe'
+    selection_child:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\curl.exe'
+            - '\certutil.exe'
+            - '\bitsadmin.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'mshta.exe'
+            - 'curl.exe'
+            - 'certutil.exe'
+            - 'bitsadmin.exe'
+    condition: selection_parent and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate software installers running configuration shell commands, register DLL actions, or post-install cleanup batch files.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1195.002
+    - analytic.an0862
+    - detection.det0309

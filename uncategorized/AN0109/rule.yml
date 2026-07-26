@@ -1,0 +1,86 @@
+title: DNS Connection from Non-Network System Utility (AN0109-A)
+id: d4161aec-f48e-4a0f-abec-f218c1e66565
+status: experimental
+description: Detects network connections targeting standard DNS port 53 initiated by Windows system utilities that typically perform no network communications, indicating potential process injection or tunneling.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_process:
+        Image|endswith:
+            - '\calc.exe'
+            - '\notepad.exe'
+            - '\mspaint.exe'
+            - '\regedit.exe'
+            - '\systeminfo.exe'
+            - '\tasklist.exe'
+            - '\chkdsk.exe'
+    selection_port:
+        DestinationPort: 53
+    condition: selection_process and selection_port
+fields:
+    - Image
+    - CommandLine
+    - User
+    - DestinationIp
+    - DestinationPort
+    - Initiated
+    - SourceIp
+falsepositives:
+    - Extremely rare. Standard system applications like calc or notepad do not make DNS queries or open port 53.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1568
+    - analytic.an0109
+    - detection.det0039
+---
+title: Suspicious Non-Network System Utility Execution (AN0109-B)
+id: 9fd5e876-ca77-49c1-a3f5-06b81ba0c86c
+status: experimental
+description: Detects execution of standard system applications (like calc.exe, notepad.exe, mspaint.exe) when spawned by unusual shell or script parent processes, indicating potential staging for injection.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_process:
+        Image|endswith:
+            - '\calc.exe'
+            - '\notepad.exe'
+            - '\mspaint.exe'
+            - '\regedit.exe'
+            - '\systeminfo.exe'
+            - '\tasklist.exe'
+            - '\chkdsk.exe'
+    selection_parent:
+        ParentImage|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\nginx.exe'
+            - '\httpd.exe'
+            - '\w3wp.exe'
+    condition: selection_process and selection_parent
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Administrative scripts executing system check tools legitimately.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1568
+    - analytic.an0109
+    - detection.det0039

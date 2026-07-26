@@ -1,0 +1,44 @@
+title: Unauthorized Raw Disk Partition Access (AN0827-B)
+id: d241d9ea-5687-49f8-806a-770fdc9bbba6
+status: experimental
+description: Detects Sysmon Event ID 9 logs capturing raw access to the disk device by non-standard system processes.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: raw_access_read
+    product: windows
+detection:
+    selection_raw:
+        Device|contains:
+            - '\PhysicalDrive'
+            - '\Harddisk'
+    filter_system:
+        # Exclude standard Windows system utilities and virtualization agents
+        Image|endswith:
+            - '\system32\svchost.exe'
+            - '\system32\csrss.exe'
+            - '\system32\lsass.exe'
+            - '\system32\defrag.exe'
+            - '\system32\chkdsk.exe'
+            - '\system32\WmiPrvSE.exe'
+            - '\vmnat.exe'
+            - '\vmtoolsd.exe'
+    filter_legitimate:
+        # Exclude known enterprise backup agents
+        Image|endswith:
+            - '\veeam.exe'
+            - '\backup.exe'
+            - '\acronis.exe'
+    condition: selection_raw and not (filter_system or filter_legitimate)
+fields:
+    - Device
+    - Image
+    - User
+falsepositives:
+    - Authorized backup agents or antivirus endpoint agents scanning raw sectors.
+level: high
+tags:
+    - attack.impact
+    - attack.t1561.002
+    - analytic.an0827
+    - detection.det0297

@@ -1,0 +1,23 @@
+{
+  "rule_id": "cbdf2e03-a178-4db9-8b9a-7c9802cf6914",
+  "rule_name": "AutoHotKey or AutoIT Interpreter Execution (AN0942-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

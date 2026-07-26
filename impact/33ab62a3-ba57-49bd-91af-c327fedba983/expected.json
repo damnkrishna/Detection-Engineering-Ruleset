@@ -1,0 +1,23 @@
+{
+  "rule_id": "33ab62a3-ba57-49bd-91af-c327fedba983",
+  "rule_name": "Disk Wiping and Partition Destruction Utilities via PowerShell Script Block (AN0384-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

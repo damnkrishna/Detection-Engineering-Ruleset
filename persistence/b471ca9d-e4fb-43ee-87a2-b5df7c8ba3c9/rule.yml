@@ -1,0 +1,26 @@
+title: Domain Account Creation Event ID 4720 (AN0006-B)
+id: 960cd5c7-03fd-49fd-931d-9ec8aeb0d1d9
+status: experimental
+description: Detects Windows Security Event ID 4720 indicating a new user account was created, providing a fallback when CLI commands are bypassed or obfuscated.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_event:
+        EventID: 4720
+    condition: selection_event
+fields:
+    - EventID
+    - TargetUserName
+    - SubjectUserName
+    - SubjectDomainName
+falsepositives:
+    - Legitimate account provisioning services or IT admin operations.
+level: high
+tags:
+    - attack.persistence
+    - attack.t1136.002
+    - analytic.an0006
+    - detection.det0003

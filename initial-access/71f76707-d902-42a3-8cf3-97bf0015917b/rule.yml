@@ -1,0 +1,38 @@
+title: Anomalous Administrative Account Network Connection (AN1543-B)
+id: 48f305a8-7b78-40ed-a99d-ea8098355655
+status: experimental
+description: Detects outbound network connections over remote admin ports (445, 3389, 5985) by shell processes, suggesting administrative account lateral movement activity.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_ports:
+        DestinationPort:
+            - 445
+            - 3389
+            - 5985
+            - 5986
+    selection_process:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    condition: selection_ports and selection_process
+fields:
+    - Image
+    - SourceIp
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Standard admin scripts performing remote management.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1078
+    - analytic.an1543
+    - detection.det0380

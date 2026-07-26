@@ -1,0 +1,48 @@
+title: High Frequency SMTP Tool Execution (AN1008-A)
+id: a40dbeda-abd6-495c-81e7-67438e87f2a7
+status: experimental
+description: Detects command-line execution of mail tools or scripting wrappers attempting to generate high-frequency email traffic.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\swaks.exe'
+            - '\sendmail.exe'
+            - '\postfix.exe'
+            - '\blat.exe'
+            - '\mailsend.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'swaks.exe'
+            - 'sendmail.exe'
+            - 'postfix.exe'
+            - 'blat.exe'
+            - 'mailsend.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'Send-MailMessage'
+            - ' -smtp '
+            - ' -mailfrom '
+            - ' -to '
+            - ' -server '
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_orig) and selection_cli and not filter_installer
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Administrative notifications or monitoring alerts launched by automated scripts.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1667
+    - analytic.an1008
+    - detection.det0355

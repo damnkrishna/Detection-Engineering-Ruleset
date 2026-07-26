@@ -1,0 +1,44 @@
+title: System Service Creation or Modification (AN0778)
+id: 837110b2-176c-4bb3-9a3f-f5cc9fa91d00
+status: experimental
+description: Monitor for abnormal creation or modification of Windows services (e.g., via sc.exe) that load non-standard executables.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_sc:
+        Image|endswith: '\sc.exe'
+    selection_action:
+        CommandLine|contains:
+            - ' create '
+            - ' config '
+    selection_suspicious_paths:
+        CommandLine|contains:
+            - 'binPath='
+            - '.bat'
+            - '.ps1'
+            - '\Temp\'
+            - '\Users\Public\'
+            - 'C:\ProgramData\'
+    condition: selection_sc and selection_action and selection_suspicious_paths
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Third-party software installers creating legitimate services in non-standard directories.
+    - System administrators deploying temporary scripts as services.
+level: high
+tags:
+    - attack.execution
+    - attack.t1569
+    - analytic.an0778
+    - detection.det0279

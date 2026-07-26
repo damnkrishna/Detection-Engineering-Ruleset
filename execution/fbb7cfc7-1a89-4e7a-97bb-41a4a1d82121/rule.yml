@@ -1,0 +1,44 @@
+title: User Execution - Malicious Link Clicking Behavioral Chain (AN0178)
+id: 1f4f6f9a-9c20-4094-ad61-6abf65a821b2
+status: experimental
+description: Detects a behavioral chain where a user-facing application (browser, email client) spawns suspicious shell utilities, indicating a clicked malicious link resulting in code execution.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\chrome.exe'
+            - '\firefox.exe'
+            - '\msedge.exe'
+            - '\outlook.exe'
+            - '\iexplore.exe'
+    selection_child:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\rundll32.exe'
+    condition: selection_parent and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Web browsers launching legitimate helper applications or protocol handlers that utilize cmd.exe or PowerShell.
+level: high
+tags:
+    - attack.execution
+    - attack.t1204.001
+    - analytic.an0178
+    - detection.det0066

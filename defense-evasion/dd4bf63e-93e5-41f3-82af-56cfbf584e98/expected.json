@@ -1,0 +1,23 @@
+{
+  "rule_id": "dd4bf63e-93e5-41f3-82af-56cfbf584e98",
+  "rule_name": "Subvert Trust Controls - Mark-of-the-Web Bypass via Container Mount (AN0712)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

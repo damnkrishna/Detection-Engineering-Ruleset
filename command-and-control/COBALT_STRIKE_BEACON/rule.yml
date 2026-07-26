@@ -1,0 +1,54 @@
+{
+  "id": "COBALT_STRIKE_BEACON",
+  "description": "Cobalt Strike beacon signature or post-exploitation framework indicator (Splunk: Cobalt Strike story)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 4.5,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "NIDS",
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "cs_indicator",
+      "tactics": [
+        "TA0011",
+        "TA0002"
+      ],
+      "techniques": [
+        "T1071",
+        "T1055",
+        "T1059"
+      ],
+      "signatureContains": [
+        "cobalt strike",
+        "cobaltstrike",
+        "beacon.dll",
+        "CS beacon",
+        "named pipe",
+        "pipe:\\\\",
+        "powershell -enc",
+        "powershell -e ",
+        "IEX",
+        "invoke-expression",
+        "rundll32",
+        "regsvr32",
+        "mshta",
+        "wscript",
+        "cscript",
+        "Metasploit",
+        "meterpreter",
+        "shellcode",
+        "sliver",
+        "havoc",
+        "brute ratel",
+        "nighthawk",
+        "JARM",
+        "malleable c2",
+        "sleeptime",
+        "checkin interval"
+      ],
+      "optional": false
+    }
+  ]
+}

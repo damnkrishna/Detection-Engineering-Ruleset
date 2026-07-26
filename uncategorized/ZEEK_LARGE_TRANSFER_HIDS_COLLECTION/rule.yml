@@ -1,0 +1,61 @@
+{
+  "id": "ZEEK_LARGE_TRANSFER_HIDS_COLLECTION",
+  "description": "Cross-sensor: HIDS detects file collection activity + Zeek detects large outbound flow from same host \u2014 data exfiltration confirmed by two independent sources",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 4.0,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "HIDS",
+    "ZEEK"
+  ],
+  "stages": [
+    {
+      "label": "hids_collection",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0009"
+          ]
+        },
+        {
+          "field": "sensor",
+          "op": "IN",
+          "values": [
+            "HIDS"
+          ]
+        }
+      ],
+      "optional": false
+    },
+    {
+      "label": "zeek_large_outbound",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0010"
+          ]
+        },
+        {
+          "field": "sensor",
+          "op": "IN",
+          "values": [
+            "ZEEK"
+          ]
+        }
+      ],
+      "signatureContains": [
+        "large connection",
+        "high bytes out",
+        "long duration",
+        "anomalous transfer",
+        "upload spike"
+      ],
+      "optional": false,
+      "maxGapSeconds": 1800
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+title: Permissions Modification via Script Block (AN0834-B)
+id: 140cb55a-4cba-46de-a5a1-3665bc5ed4d7
+status: experimental
+description: Detects executing PowerShell script blocks containing cmdlets that alter file or directory permissions (DACLs).
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection:
+        ScriptBlockText|contains:
+            - 'Set-Acl'
+            - 'Grant-Acl'
+            - 'Revoke-Acl'
+    condition: selection
+fields:
+    - ScriptBlockText
+    - User
+falsepositives:
+    - Administrative scripts managing ACL policies.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.privilege-escalation
+    - attack.t1222.001
+    - analytic.an0834
+    - detection.det0299

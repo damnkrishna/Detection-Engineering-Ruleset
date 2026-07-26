@@ -1,0 +1,36 @@
+title: Suspicious COM Execution Registration (AN1357-B)
+id: 95727678-ea19-4e2f-9a97-1acd58240973
+status: experimental
+description: Detects command-line execution of regsvr32.exe or mshta.exe executing COM scripts.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\regsvr32.exe'
+            - '\mshta.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'regsvr32.exe'
+            - 'mshta.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'scrobj.dll'
+            - 'http'
+            - '/i:'
+    condition: (selection_images or selection_orig) and selection_cli
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Internal business applications registering trusted COM objects during deployment.
+level: high
+tags:
+    - attack.execution
+    - attack.t1559
+    - analytic.an1357
+    - detection.det0493

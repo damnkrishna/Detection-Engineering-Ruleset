@@ -1,0 +1,30 @@
+title: Dead Drop Web Service via PowerShell Script Block (AN0158-B)
+id: aac5a9a1-6770-47c0-8ab3-7d9084f25172
+status: experimental
+description: Detects PowerShell script blocks referencing dead drop resolver domains (e.g., github.com, pastebin.com, reddit.com) to resolve C2 endpoints.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'github.com'
+            - 'raw.githubusercontent.com'
+            - 'pastebin.com'
+            - 'reddit.com'
+            - 'twitter.com'
+            - 'instagram.com'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Administrative scripts updating local config or software from GitHub.
+level: medium
+tags:
+    - attack.command-and-control
+    - attack.t1102.001
+    - analytic.an0158
+    - detection.det0058

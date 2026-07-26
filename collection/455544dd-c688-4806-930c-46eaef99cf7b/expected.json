@@ -1,0 +1,23 @@
+{
+  "rule_id": "455544dd-c688-4806-930c-46eaef99cf7b",
+  "rule_name": "Collection - Email Inbox Forwarding Rule Creation (AN1589)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

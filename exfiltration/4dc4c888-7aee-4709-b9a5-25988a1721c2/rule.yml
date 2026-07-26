@@ -1,0 +1,60 @@
+title: Exfiltration - Data Upload to Public Web Service (AN1511)
+id: 769fa21d-0f05-4a67-bc9c-d2864b38f45f
+status: experimental
+description: Detects command-line interpreters or file transfer tools initiating network connections or sending HTTP requests to known pastebin or temporary file-sharing web services, which may indicate data exfiltration.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3/Event ID 1
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\curl.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    selection_domains_host:
+        DestinationHostname|contains:
+            - 'pastebin.com'
+            - 'paste.ee'
+            - 'hastebin.com'
+            - 'file.io'
+            - 'gofile.io'
+            - 'sendspace.com'
+            - 'anonfiles.com'
+            - 'transfer.sh'
+            - 'mega.nz'
+            - 'temp.sh'
+    selection_domains_cmd:
+        CommandLine|contains:
+            - 'pastebin'
+            - 'file.io'
+            - 'gofile'
+            - 'transfer.sh'
+            - ' -F ' # curl form-data upload flag
+            - ' -d ' # curl post data flag
+            - 'UploadFile'
+            - 'PostAsync'
+    condition: selection_process and (selection_domains_host or selection_domains_cmd)
+fields:
+    - Image
+    - CommandLine
+    - User
+    - LogonId
+    - Initiated
+    - SourceIp
+    - DestinationIp
+    - DestinationPort
+falsepositives:
+    - Developers using curl or PowerShell to share debugging logs or build outputs on public paste bins.
+    - Automated system status monitoring scripts configured to post status details to external developer dashboards.
+level: high
+tags:
+    - attack.exfiltration
+    - attack.t1567
+    - analytic.an1511
+    - detection.det0548

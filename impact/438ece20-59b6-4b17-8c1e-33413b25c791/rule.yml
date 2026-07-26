@@ -1,0 +1,35 @@
+title: Denial of Service Custom Executables (AN1434-B)
+id: 9024d542-7beb-4434-a66e-256a8b2fa9d8
+status: experimental
+description: Detects execution of known compiled denial-of-service binaries.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\slowloris.exe'
+            - '\goldeneye.exe'
+            - '\rudy.exe'
+            - '\hulk.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'slowloris.exe'
+            - 'goldeneye.exe'
+            - 'rudy.exe'
+            - 'hulk.exe'
+    condition: selection_images or selection_orig
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Security teams testing web server tolerance under controlled scenarios.
+level: high
+tags:
+    - attack.impact
+    - attack.t1498
+    - analytic.an1434
+    - detection.det0518

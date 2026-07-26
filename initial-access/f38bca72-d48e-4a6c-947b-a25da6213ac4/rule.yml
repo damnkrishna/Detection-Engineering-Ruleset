@@ -1,0 +1,38 @@
+title: Default Account Remote Logon (AN1283)
+id: 26b33b3b-1d39-4455-968b-63f5e87aa9a1
+status: experimental
+description: Detects successful remote logons using default built-in accounts (like Administrator or Guest), which can be abused by adversaries for initial access or privilege escalation.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_event:
+        EventID: 4624
+    selection_logon_type:
+        LogonType:
+            - 3 # Network
+            - 10 # Remote Interactive
+    selection_default_accounts:
+        TargetUserName:
+            - 'Administrator'
+            - 'Guest'
+            - 'DefaultAccount'
+    condition: selection_event and selection_logon_type and selection_default_accounts
+fields:
+    - EventID
+    - LogonType
+    - TargetDomainName
+    - TargetUserName
+    - IpAddress
+falsepositives:
+    - Standard IT operations using default accounts during initial system configuration or migration tasks.
+level: high
+tags:
+    - attack.initial-access
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1078.001
+    - analytic.an1283
+    - detection.det0350

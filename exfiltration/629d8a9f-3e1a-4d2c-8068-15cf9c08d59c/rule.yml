@@ -1,0 +1,35 @@
+title: Automated Staging Directory Archive Creation (AN1113-B)
+id: 903e17fa-45b6-4a1f-95e7-2568421fb415
+status: experimental
+description: Detects the creation or writing of compressed archive files inside user-writable temp folders, suggesting automated file aggregation.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\ProgramData\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.zip'
+            - '.7z'
+            - '.rar'
+            - '.tar'
+            - '.tgz'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Legitimate installation routines unpacking local archives.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1020
+    - analytic.an1113
+    - detection.det0397

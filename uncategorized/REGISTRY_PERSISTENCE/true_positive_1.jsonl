@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"Windows audit failure event CurrentVersion\\Run","hostname":"HR-WKS-376","agent_ip":"10.42.67.71","severity_id":3,"event_uid":"golden|REGISTRY_PERSISTENCE|0|906500","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:05:00.000Z","tactic":"TA0002","hostname":"HR-WKS-376","agent_ip":"10.42.67.71","severity_id":3,"event_uid":"golden|REGISTRY_PERSISTENCE|1|906501","proto":"tcp","src_port":"50412","dst_port":"443"}

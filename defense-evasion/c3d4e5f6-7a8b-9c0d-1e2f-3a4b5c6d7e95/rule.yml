@@ -1,0 +1,46 @@
+title: Anomalous Handle Access to System Process for Exploitation or Stealth (AN2117)
+id: fef6022f-9b29-4b4d-86a6-9b5e4efd51f4
+status: experimental
+description: "Detects anomalous handle access requests (Sysmon Event ID 10) targeting critical system processes (like lsass.exe, svchost.exe, or explorer.exe) with high-risk access permissions (such as PROCESS_ALL_ACCESS or VM Write/Operation rights), indicating potential process injection or hollowing for stealth."
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: process_access
+    product: windows
+detection:
+    selection_target:
+        TargetImage|endswith:
+            - '\lsass.exe'
+            - '\svchost.exe'
+            - '\explorer.exe'
+            - '\winlogon.exe'
+            - '\csrss.exe'
+    selection_access:
+        # VM_WRITE (0x0020), VM_OPERATION (0x0008), or PROCESS_ALL_ACCESS (0x1F0FFF)
+        GrantedAccess:
+            - '0x1F0FFF'
+            - '0x1f0fff'
+            - '0x1010'
+            - '0x1410'
+            - '0x1438'
+            - '0x143a'
+    filter_legitimate_source:
+        SourceImage|endswith:
+            - '\taskmgr.exe'
+            - '\resmon.exe'
+            - '\processhacker.exe'
+            - '\msiexec.exe'
+    condition: selection_target and selection_access and not filter_legitimate_source
+fields:
+    - SourceImage
+    - TargetImage
+    - GrantedAccess
+    - SourceUser
+falsepositives:
+    - Legitimate debugging tools, system monitors, or security agents accessing system processes to collect diagnostic telemetry.
+level: high
+tags:
+    - attack.defense_evasion
+    - attack.t1211
+    - analytic.an2117
+    - detection.det0974

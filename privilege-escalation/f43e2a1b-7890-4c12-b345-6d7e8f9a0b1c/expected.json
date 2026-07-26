@@ -1,0 +1,23 @@
+{
+  "rule_id": "f43e2a1b-7890-4c12-b345-6d7e8f9a0b1c",
+  "rule_name": "Suspicious Remote Thread Creation (PE Injection) (AN0297)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,36 @@
+title: Automated Collection Staged File Creation (AN0531-B)
+id: 202bcf4a-0c3a-48f7-bd67-233b0deecaf3
+status: experimental
+description: Detects creation or drop of sensitive documents in user temp or staging directories, suggesting automated script collection.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\ProgramData\'
+            - 'C:\Temp\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.docx'
+            - '.xlsx'
+            - '.pdf'
+            - '.pst'
+            - '.kdbx'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Standard software installers unpacking dynamic assets or user applications saving document cache files.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1119
+    - analytic.an0531
+    - detection.det0186

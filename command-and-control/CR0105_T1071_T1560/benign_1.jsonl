@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"technique_id=T1059,technique_name=Command and Scripting Interpreter","hostname":"HR-WKS-761","agent_ip":"10.42.52.40","severity_id":3,"event_uid":"golden|CR0105_T1071_T1560|0|781300","proto":"tcp","src_port":"50412","dst_port":"443","src_ip":"10.42.52.40","dst_ip":"198.51.100.71"}

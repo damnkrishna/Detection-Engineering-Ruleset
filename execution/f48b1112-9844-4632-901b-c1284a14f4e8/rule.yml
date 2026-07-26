@@ -1,0 +1,48 @@
+title: Suspicious Execution via Malicious Installer/Package Manager (AN0699)
+id: 565daba7-ac28-4335-9bab-0afed4a934ed
+status: experimental
+description: Detects the execution of pip, npm, or MSI installers followed by suspicious child processes (script interpreters) or writes to temporary user directories.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\pip.exe'
+            - '\npm.cmd'
+            - '\msiexec.exe'
+    selection_child:
+        Image|endswith:
+            - '\python.exe'
+            - '\node.exe'
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\rundll32.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'install'
+            - 'setup.py'
+            - '/q'
+            - '/i'
+    condition: selection_parent and selection_child and selection_args
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate software developers installing known packages.
+    - Automated CI/CD pipelines deploying software.
+level: high
+tags:
+    - attack.execution
+    - attack.t1204.005
+    - analytic.an0699
+    - detection.det0252

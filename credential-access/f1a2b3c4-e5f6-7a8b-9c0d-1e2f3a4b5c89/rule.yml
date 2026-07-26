@@ -1,0 +1,51 @@
+title: Social Engineering Script-Based Credential Dialog Prompt (AN2128)
+id: ecde4179-65ec-464e-965c-3c474c2984ac
+status: experimental
+description: "Detects process command line arguments indicating the spawning of credential dialog boxes or login forms (such as PowerShell Get-Credential or MSHTA HTML forms) used in post-exploitation to trick users into typing administrative passwords."
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\mshta.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    selection_ofn:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.exe'
+            - 'mshta.exe'
+            - 'wscript.exe'
+            - 'cscript.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'Get-Credential'
+            - 'PromptForCredential'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    filter_admin_context:
+        ParentImage|endswith:
+            - '\powershell_ise.exe'
+            - '\vscode\Code.exe'
+            - '\mmc.exe'
+    condition: (selection_images or selection_ofn) and selection_cli and not (filter_installer or filter_admin_context)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Legitimate administrative scripts that prompt the user to input credentials for running remote server tasks.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1684
+    - analytic.an2128
+    - detection.det0985

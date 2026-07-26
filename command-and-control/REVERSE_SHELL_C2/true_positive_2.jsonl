@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","signature_name":"C:\\Windows\\System32 bash -i","hostname":"HR-WKS-821","agent_ip":"10.42.112.15","severity_id":3,"event_uid":"golden|REVERSE_SHELL_C2|0|458800","proto":"tcp","src_port":"50412","dst_port":"443","src_ip":"10.42.112.15","dst_ip":"198.51.100.131"}
+{"timestamp":"2026-03-02T10:05:00.000Z","signature_name":"C:\\Users\\j.mercer\\AppData\\Local\\Temp c&c","hostname":"HR-WKS-821","agent_ip":"10.42.112.15","severity_id":3,"event_uid":"golden|REVERSE_SHELL_C2|1|458801","proto":"tcp","src_port":"50412","dst_port":"443"}

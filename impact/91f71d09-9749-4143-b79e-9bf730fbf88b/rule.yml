@@ -1,0 +1,56 @@
+title: MitM and Redirection Tool Execution (AN0702-A)
+id: 84cf487b-cc52-4bbb-b244-44a261ef2f15
+status: experimental
+description: Detects command-line execution of man-in-the-middle, ARP spoofing, or packet redirect tools.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\ettercap.exe'
+            - '\bettercap.exe'
+            - '\mitmproxy.exe'
+            - '\mitmdump.exe'
+            - '\cain.exe'
+            - '\arpspoof.exe'
+        OriginalFileName:
+            - 'ettercap.exe'
+            - 'bettercap.exe'
+            - 'mitmproxy.exe'
+            - 'mitmdump.exe'
+            - 'cain.exe'
+            - 'arpspoof.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'ettercap -'
+            - 'bettercap -'
+            - 'mitmproxy -'
+            - 'arpspoof -'
+    filter_admin:
+        ParentImage|endswith:
+            - '\powershell.exe'
+            - '\cmd.exe'
+        User|contains:
+            # Removed loose 'network' keyword which matched 'NT AUTHORITY\NETWORK SERVICE'
+            - 'admin'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_cli) and not (filter_installers or filter_admin)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Network engineers running authorized security reviews or diagnostics.
+level: high
+tags:
+    - attack.impact
+    - attack.t1565.002
+    - analytic.an0702
+    - detection.det0254

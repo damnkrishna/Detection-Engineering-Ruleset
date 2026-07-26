@@ -1,0 +1,26 @@
+title: Windows Resource Exhaustion Diagnosis Event (AN1012-A)
+id: b4404c4d-061b-4036-8c94-42b0a6bf1e11
+status: experimental
+description: Detects Windows Diagnostic-Performance or System Event ID 2004 logs capturing critical virtual memory exhaustion. This rule should be aggregated in the SIEM layer to count loop patterns.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: windows
+    service: system
+detection:
+    selection_exhaustion:
+        EventID: 2004
+        Source: 'Microsoft-Windows-Resource-Exhaustion-Detector'
+    condition: selection_exhaustion
+fields:
+    - EventID
+    - Description
+    - Source
+falsepositives:
+    - Heavy compilation jobs, database index rebuilds, or legitimate hypervisor processes over-allocating RAM.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1499.001
+    - analytic.an1012
+    - detection.det0356

@@ -1,0 +1,87 @@
+title: Exclusive Control via Service Termination or Self-Patching (AN0045)
+id: a3014d19-9720-47d6-ab4c-43137fde1d05
+status: experimental
+description: Detects adversarial establishment of exclusive control by stopping or patching vulnerable services (using sc stop, net stop, or taskkill) to prevent competitor access to the compromised host.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_sc_stop:
+        - Image|endswith: '\sc.exe'
+        - OriginalFileName: 'sc.exe'
+    selection_sc_args:
+        CommandLine|contains:
+            - ' stop '
+            - ' config '
+            - ' failure '
+            - ' disable '
+    selection_net_stop:
+        - Image|endswith: '\net.exe'
+        - OriginalFileName: 'net.exe'
+    selection_net_args:
+        CommandLine|contains: ' stop '
+    selection_taskkill:
+        - Image|endswith: '\taskkill.exe'
+        - OriginalFileName: 'taskkill.exe'
+    selection_taskkill_force:
+        CommandLine|contains:
+            - ' /f '
+            - ' /F '
+            - ' /im '
+    selection_suspicious_parent:
+        ParentImage|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: ((selection_sc_stop and selection_sc_args) or (selection_net_stop and selection_net_args) or (selection_taskkill and selection_taskkill_force)) and selection_suspicious_parent and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - IT administrators stopping services for maintenance or updates.
+level: medium
+tags:
+    - attack.persistence
+    - attack.t1668
+    - analytic.an0045
+    - detection.det0015
+---
+title: Exclusive Control Service State Change (AN0045-B)
+id: dd6eb9b5-90d0-4881-9a21-d10d7782eefa
+status: experimental
+description: Detects service state changes to stopped in the System logs, representing the outcome of service termination for exclusive control.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    product: windows
+    service: system
+detection:
+    selection_event:
+        EventID: 7036
+    condition: selection_event
+fields:
+    - EventID
+    - Param1
+    - Param2
+falsepositives:
+    - Legitimate service stops during administrative updates or system shutdown.
+level: medium
+tags:
+    - attack.persistence
+    - attack.t1668
+    - analytic.an0045
+    - detection.det0015

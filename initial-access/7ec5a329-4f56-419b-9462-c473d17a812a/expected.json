@@ -1,0 +1,23 @@
+{
+  "rule_id": "7ec5a329-4f56-419b-9462-c473d17a812a",
+  "rule_name": "Software Supply Chain - Installer Spawning Suspicious Child Process (AN0862-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

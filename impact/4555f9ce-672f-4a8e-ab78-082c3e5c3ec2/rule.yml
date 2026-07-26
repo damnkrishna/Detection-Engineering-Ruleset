@@ -1,0 +1,44 @@
+title: Code Injection into Transaction Applications (AN1097-A)
+id: 21a5accb-ff8e-41b6-904a-24aec6d193ae
+status: experimental
+description: Detects processes requesting high-privilege write access handles targeting transaction or database processes.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_access
+    product: windows
+detection:
+    selection_target:
+        TargetImage|endswith:
+            - '\pos.exe'
+            - '\retail.exe'
+            - '\sap.exe'
+            - '\sqlserver.exe'
+            - '\postgres.exe'
+    selection_access:
+        # Requesting write or full VM control access handles
+        GrantedAccess:
+            - '0x1F0FFF'
+            - '0x1010'
+            - '0x1410'
+    filter_sys:
+        SourceImage|endswith:
+            - '\system32\svchost.exe'
+            - '\system32\lsass.exe'
+            - '\system32\csrss.exe'
+            - '\system32\winlogon.exe'
+            - '\MsMpEng.exe'
+    condition: selection_target and selection_access and not filter_sys
+fields:
+    - SourceImage
+    - TargetImage
+    - GrantedAccess
+    - User
+falsepositives:
+    - Administrative diagnostics or application monitoring engines capturing query profiles.
+level: high
+tags:
+    - attack.impact
+    - attack.t1565.003
+    - analytic.an1097
+    - detection.det0391

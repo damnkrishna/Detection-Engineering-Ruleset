@@ -1,0 +1,28 @@
+title: Golden Ticket Forging Tool Execution via PowerShell Script Block (AN0405-B)
+id: 82bb92ac-e57e-4bc1-baec-3bf627b97386
+status: experimental
+description: Detects PowerShell script block logs containing keywords related to Kerberos Golden Ticket forging or injection.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'kerberos::golden'
+            - 'golden'
+            - '/krbtgt:'
+            - '/ptt'
+            - 'New-GoldenTicket'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Authorized penetration testing.
+level: critical
+tags:
+    - attack.credential-access
+    - attack.t1558.001
+    - analytic.an0405
+    - detection.det0144

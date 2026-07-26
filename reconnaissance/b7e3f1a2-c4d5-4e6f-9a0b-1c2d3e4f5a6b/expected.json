@@ -1,0 +1,23 @@
+{
+  "rule_id": "b7e3f1a2-c4d5-4e6f-9a0b-1c2d3e4f5a6b",
+  "rule_name": "Anomalous HTTP Error Rate from Single Source (AN2069-Error-Spike)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

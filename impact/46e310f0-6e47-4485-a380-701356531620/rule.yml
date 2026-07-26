@@ -1,0 +1,50 @@
+title: Cryptomining Utility Process Execution (AN0741-A)
+id: 6db837f9-3d57-48a4-98f1-ef9f440194e2
+status: experimental
+description: Detects command-line execution of cryptomining binaries like xmrig, cgminer, or minerd, or arguments specifying mining wallets and pools.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\xmrig.exe'
+            - '\minerd.exe'
+            - '\cgminer.exe'
+            - '\ccminer.exe'
+            - '\nicehash.exe'
+        OriginalFileName:
+            - 'xmrig.exe'
+            - 'minerd.exe'
+            - 'cgminer.exe'
+            - 'ccminer.exe'
+            - 'nicehash.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'stratum+tcp://'
+            - 'stratum+ssl://'
+            - '--stratum'
+            - 'stratum+udp'
+            - '--nicehash'
+            - '--algo rx/'
+            - '--donate-level='
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_cli) and not filter_installers
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Authorized distributed computing projects or sandboxed test mining configurations.
+level: high
+tags:
+    - attack.impact
+    - attack.t1496
+    - analytic.an0741
+    - detection.det0267

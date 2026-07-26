@@ -1,0 +1,33 @@
+title: Lateral Movement - Service Installation of Suspicious Service Executable (AN1468-B)
+id: 06763a69-4d21-4352-a7e2-38f752db32cd
+status: experimental
+description: Detects the installation of a suspicious system service pointing to temporary folders or known lateral movement tools (like PsExec) by monitoring System Event ID 7045.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    service: system
+    product: windows
+detection:
+    selection_eid:
+        EventID: 7045
+    selection_cmd:
+        - ImagePath|contains:
+            - '\PSEXESVC.exe'
+            - '\paexec.exe'
+            - '\Windows\Temp\'
+            - '\Windows\psexesvc'
+    condition: selection_eid and selection_cmd
+fields:
+    - EventID
+    - ServiceName
+    - ImagePath
+    - ServiceType
+    - StartType
+falsepositives:
+    - Legitimate administrative utilities installed as system services under temporary paths (highly rare).
+level: critical
+tags:
+    - attack.lateral-movement
+    - attack.t1021.002
+    - analytic.an1468
+    - detection.det0530

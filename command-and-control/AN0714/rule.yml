@@ -1,0 +1,50 @@
+title: Unauthorized Remote Management and Monitoring Software Execution (AN0714-A)
+id: a0be9403-a023-42c6-a79e-33b551ac9621
+status: experimental
+description: Detects the execution of known Remote Management and Monitoring (RMM) or Remote Desktop software (e.g., AnyDesk, TeamViewer, ScreenConnect) on unauthorized endpoints, indicating potential remote access hijacks.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_rmm:
+        - Image|endswith:
+            - '\AnyDesk.exe'
+            - '\TeamViewer.exe'
+            - '\TeamViewer_Desktop.exe'
+            - '\ScreenConnect.Client.exe'
+            - '\ScreenConnect.ClientService.exe'
+            - '\tvnserver.exe'
+            - '\winvnc.exe'
+        - OriginalFileName:
+            - 'AnyDesk.exe'
+            - 'TeamViewer.exe'
+            - 'TeamViewer_Desktop.exe'
+            - 'ScreenConnect.Client.exe'
+            - 'ScreenConnect.ClientService.exe'
+            - 'tvnserver.exe'
+            - 'winvnc.exe'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_rmm and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Authorized IT helpdesk technicians using RMM software for user support and system administration.
+level: medium
+tags:
+    - attack.command-and-control
+    - attack.t1219
+    - analytic.an0714
+    - detection.det0259

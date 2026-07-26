@@ -1,0 +1,26 @@
+title: 'AN0251 - Generic Software Extensions'
+id: 0868fd45-1876-4097-9f26-b434e9a9502a
+status: experimental
+description: 'Detects the execution of command-line tools attempting to install software extensions or plugins, which could be abused for persistence.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_images:
+    Image|endswith:
+      - '\cmd.exe'
+      - '\powershell.exe'
+  selection_cmd:
+    CommandLine|contains: 'install-extension'
+  condition: selection_images and selection_cmd
+fields:
+  - EventID
+  - Image
+  - CommandLine
+  - ParentImage
+level: medium
+tags:
+  - attack.persistence
+  - attack.t1176
+  - analytic.an0251

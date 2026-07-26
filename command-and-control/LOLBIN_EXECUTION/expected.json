@@ -1,0 +1,23 @@
+{
+  "rule_id": "LOLBIN_EXECUTION",
+  "rule_name": "Living-off-the-land binary abused for malicious activity then C2/persistence",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-hids",
+  "event_source": "wazuh",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 2
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 2
+  }
+}

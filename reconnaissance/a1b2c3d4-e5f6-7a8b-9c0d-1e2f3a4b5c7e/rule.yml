@@ -1,0 +1,34 @@
+title: Outbound Secret Leakage to GenAI Services via Decrypted SSL (AN2075-Decrypted-Leaking)
+id: 8509eac6-fc0e-4d93-8fd2-bbb9a98830ab
+status: experimental
+description: Scan decrypted outbound proxy payloads for sensitive credentials or keys being sent to public generative AI endpoints.
+logsource:
+    category: web_proxy
+    product: proxy
+detection:
+    selection_ai_domains:
+        destination_domain|contains:
+            - 'openai.com'
+            - 'chatgpt.com'
+            - 'claude.ai'
+            - 'gemini.google.com'
+            - 'cohere.com'
+            - 'poe.com'
+    selection_decrypted_payload:
+        request_body|re: # Tuning candidate: refine regular expressions to minimize false positives from source code libraries or system paths
+            - '(?i)BEGIN (RSA|EC|PRIVATE) KEY'
+            - '(?i)password\s*=\s*.*'
+            - '(?i)api_key\s*=\s*.*'
+            - '(?i)client_secret\s*=\s*.*'
+    condition: selection_ai_domains and selection_decrypted_payload
+fields:
+    - src_ip
+    - destination_domain
+    - user
+    - request_body
+falsepositives:
+    - Code debugging or development research by authorized engineering groups.
+level: high
+tags:
+    - attack.reconnaissance
+    - attack.t1682

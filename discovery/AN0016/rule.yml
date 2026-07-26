@@ -1,0 +1,60 @@
+title: Domain Trust Discovery via nltest and PowerShell (AN0016-A)
+id: aadab1df-1363-433a-b1e9-ea7fb2882bea
+status: experimental
+description: Detects adversarial execution of nltest.exe, dsquery.exe, or PowerShell AD cmdlets used to enumerate Active Directory domain trust relationships.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_nltest:
+        - Image|endswith: '\nltest.exe'
+        - OriginalFileName: 'nltest.exe'
+    selection_nltest_args:
+        CommandLine|contains:
+            - '/domain_trusts'
+            - '/trusted_domains'
+            - '/all_trusts'
+    selection_dsquery:
+        - Image|endswith: '\dsquery.exe'
+        - OriginalFileName: 'dsquery.exe'
+    selection_dsquery_args:
+        CommandLine|contains: 'trustedDomain'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_args:
+        CommandLine|contains:
+            - 'Get-ADTrust'
+            - 'Get-NetDomainTrust'
+            - 'Get-DomainTrust'
+            - 'DSEnumerateDomainTrusts'
+            - 'NetEnumerateTrustedDomains'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: ((selection_nltest and selection_nltest_args) or (selection_dsquery and selection_dsquery_args) or (selection_powershell and selection_powershell_args)) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Domain administrators running trust enumeration during Active Directory health assessments or federation setup tasks.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1482
+    - analytic.an0016
+    - detection.det0007

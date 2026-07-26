@@ -1,0 +1,38 @@
+title: PowerShell Reflective Code Loading API Call (AN2122)
+id: 77f9ba84-48e9-4315-b67e-1e4e4603e543
+status: experimental
+description: "Detects PowerShell execution invoking APIs used for reflective code loading (such as [System.Reflection.Assembly]::Load, Marshal.Copy, or GetDelegateForFunctionPointer) to execute payloads in memory without writing files to disk."
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    product: windows
+    service: powershell
+detection:
+    selection_high_signal:
+        ScriptBlockText|contains:
+            - 'GetDelegateForFunctionPointer'
+            - 'VirtualAlloc'
+    selection_medium_signal:
+        ScriptBlockText|contains:
+            - 'System.Reflection.Assembly'
+            - 'Reflection.Assembly'
+            - '[Assembly]::Load'
+            - 'Marshal.Copy'
+    selection_obfuscation:
+        # Base64 allocations or memory streams typical of assembly loads
+        ScriptBlockText|contains|all:
+            - '[System.Convert]::FromBase64String'
+            - 'IO.MemoryStream'
+    condition: selection_high_signal or (selection_medium_signal and selection_obfuscation)
+fields:
+    - ScriptBlockText
+    - User
+    - ComputerName
+falsepositives:
+    - Specialized administrative scripts, deployment tools, or security agents that dynamically load modules in memory during startup or module import.
+level: high
+tags:
+    - attack.defense_evasion
+    - attack.t1620
+    - analytic.an2122
+    - detection.det0979

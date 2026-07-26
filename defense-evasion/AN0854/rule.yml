@@ -1,0 +1,59 @@
+title: Command-Line Group Policy Modification (AN0854)
+id: e5497198-c0ed-465b-bbf8-30c3cd4daaea
+status: experimental
+description: Detects command-line execution of utilities (like secedit.exe, lgpo.exe) or PowerShell cmdlets used to modify Group Policy Objects (GPOs), domain policies, or local security policies.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_utilities:
+        - Image|endswith:
+            - '\secedit.exe'
+            - '\lgpo.exe'
+        - OriginalFileName:
+            - 'secedit.exe'
+            - 'lgpo.exe'
+    selection_secedit_args:
+        CommandLine|contains:
+            - '/configure'
+            - '/import'
+    selection_lgpo:
+        - Image|endswith: '\lgpo.exe'
+        - OriginalFileName: 'lgpo.exe'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_cmdlets:
+        CommandLine|contains:
+            - 'New-GPO'
+            - 'Set-GPO'
+            - 'Set-GPRegistryValue'
+            - 'New-GPLink'
+            - 'Import-GPO'
+            - 'New-GPOImmediateTask'
+    condition: (selection_utilities and (selection_secedit_args or selection_lgpo)) or (selection_powershell and selection_powershell_cmdlets)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrator configuration of local security policies or domain-level GPOs during standard system provisioning.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.privilege-escalation
+    - attack.t1484.001
+    - analytic.an0854
+    - detection.det0305

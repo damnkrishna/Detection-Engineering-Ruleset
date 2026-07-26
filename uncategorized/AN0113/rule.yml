@@ -1,0 +1,131 @@
+title: Persistence Artifact Removal for Anti-Forensics (AN0113-A)
+id: 13284a96-dced-4897-adda-dbb8276b9237
+status: experimental
+description: Detects adversary activity removing persistence artifacts such as scheduled tasks, services, or registry run keys using sc delete, schtasks /delete, or reg delete — indicative of anti-forensic cleanup.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_sc_delete:
+        - Image|endswith: '\sc.exe'
+        - OriginalFileName: 'sc.exe'
+    selection_sc_args:
+        CommandLine|contains: ' delete '
+    selection_schtasks_delete:
+        - Image|endswith: '\schtasks.exe'
+        - OriginalFileName: 'schtasks.exe'
+    selection_schtasks_args:
+        CommandLine|contains: ' /delete '
+    selection_reg_delete:
+        - Image|endswith: '\reg.exe'
+        - OriginalFileName: 'reg.exe'
+    selection_reg_args:
+        CommandLine|contains:
+            - ' delete '
+            - '\Run'
+            - '\RunOnce'
+            - '\Services'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_args:
+        CommandLine|contains:
+            - 'Unregister-ScheduledTask'
+            - 'Remove-Item.*Run'
+            - 'sc.exe delete'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: ((selection_sc_delete and selection_sc_args) or (selection_schtasks_delete and selection_schtasks_args) or (selection_reg_delete and selection_reg_args) or (selection_powershell and selection_powershell_args)) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Software uninstallers that clean up scheduled tasks or services as part of legitimate removal operations.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1070.009
+    - analytic.an0113
+    - detection.det0040
+---
+title: Registry Persistence Key Deletion (AN0113-B)
+id: 8b0dd54a-cc56-46c6-83bb-af7da048d75b
+status: experimental
+description: Detects deletion of registry values under standard persistence paths (Run, RunOnce, Services) which indicates cleanup of malicious persistence mechanisms.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 12/13
+detection:
+    selection_path:
+        TargetObject|contains:
+            - '\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\'
+            - '\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce\'
+            - '\System\CurrentControlSet\Services\'
+    selection_delete:
+        EventType: 'DeleteValue'
+    filter_system:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_path and selection_delete and not filter_system
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - Legitimate application uninstallers cleaning up their startup registry keys or services.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1070.009
+    - analytic.an0113
+    - detection.det0040
+---
+title: Scheduled Task Deletion via Security Logs (AN0113-C)
+id: fd526409-61ae-4e5f-b16f-d4a4adf17191
+status: experimental
+description: Detects the deletion of scheduled tasks by monitoring Windows Security Event ID 4699, which is common during post-exploit cleanup activities.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    service: security
+    product: windows
+    # Relies on Windows Security Event ID 4699
+detection:
+    selection_eid:
+        EventID: 4699
+    filter_system:
+        SubjectUserName|endswith: '$'
+    condition: selection_eid and not filter_system
+fields:
+    - EventID
+    - TaskName
+    - SubjectUserName
+    - SubjectUserSid
+falsepositives:
+    - Legitimate software uninstallation deleting its scheduled tasks.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1070.009
+    - analytic.an0113
+    - detection.det0040

@@ -1,0 +1,30 @@
+title: WMI Event Subscription Event Registration (AN0024-B)
+id: 5e3af6dd-3757-4b94-bcae-5a2a6de72206
+status: experimental
+description: Detects WMI event subscription activity (Event IDs 19, 20, 21) indicating the direct configuration of WMI filters, consumers, or bindings.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: wmi_event
+    product: windows
+detection:
+    selection_wmi:
+        EventID:
+            - 19
+            - 20
+            - 21
+    condition: selection_wmi
+fields:
+    - EventID
+    - Operation
+    - ConsumerName
+    - FilterName
+falsepositives:
+    - Standard software installs or system updates configuring authorized WMI event consumers.
+level: high
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1546
+    - analytic.an0024
+    - detection.det0033

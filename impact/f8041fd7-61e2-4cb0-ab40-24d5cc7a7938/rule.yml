@@ -1,0 +1,42 @@
+title: High Connection Burst to Web Server Port (AN1165-A)
+id: 6e6e6c6d-86cc-4137-b014-03938e5f0dda
+status: experimental
+description: Detects process connections targeting web ports. Pair with SIEM-side volume checks to detect flood attempts.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_ports:
+        DestinationPort:
+            - 80
+            - 443
+            - 8080
+            - 8443
+    filter_browsers:
+        Image|endswith:
+            - '\chrome.exe'
+            - '\firefox.exe'
+            - '\msedge.exe'
+    filter_webservers:
+        # Exclude loopbacks or proxy traffic from webservers
+        Image|endswith:
+            - '\w3wp.exe'
+            - '\nginx.exe'
+            - '\httpd.exe'
+            - '\tomcat.exe'
+    condition: selection_ports and not (filter_browsers or filter_webservers)
+fields:
+    - Image
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Administrative update engines or development tools communicating with web services.
+level: low
+tags:
+    - attack.impact
+    - attack.t1499.003
+    - analytic.an1165
+    - detection.det0415

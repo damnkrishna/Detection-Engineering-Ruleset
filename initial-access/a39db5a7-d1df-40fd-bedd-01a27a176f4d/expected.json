@@ -1,0 +1,23 @@
+{
+  "rule_id": "a39db5a7-d1df-40fd-bedd-01a27a176f4d",
+  "rule_name": "Software Supply Chain - Installer Writing Suspicious File (AN0862-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

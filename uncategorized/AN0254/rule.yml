@@ -1,0 +1,93 @@
+title: System Owner and User Discovery via Built-in Utilities (AN0254-A)
+id: 643273c9-be67-42c0-a46d-9a5ef83a5a09
+status: experimental
+description: Detects adversarial execution of built-in user enumeration tools (whoami, quser, query user, net user) or PowerShell cmdlets used to discover local and domain user accounts.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_whoami:
+        - Image|endswith: '\whoami.exe'
+        - OriginalFileName: 'whoami.exe'
+    selection_quser:
+        - Image|endswith:
+            - '\quser.exe'
+            - '\query.exe'
+        - OriginalFileName:
+            - 'quser.exe'
+            - 'query.exe'
+    selection_net:
+        - Image|endswith: '\net.exe'
+        - OriginalFileName: 'net.exe'
+    selection_net_args:
+        CommandLine|contains:
+            - ' user'
+            - ' localgroup'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_args:
+        CommandLine|contains:
+            - 'Get-LocalUser'
+            - 'Get-ADUser'
+            - 'Win32_ComputerSystem'
+            - 'Win32_UserAccount'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_whoami or selection_quser or (selection_net and selection_net_args) or (selection_powershell and selection_powershell_args)) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - IT administrators executing user discovery commands for asset inventory or helpdesk support activities.
+level: low
+tags:
+    - attack.discovery
+    - attack.t1033
+    - analytic.an0254
+    - detection.det0093
+---
+title: System Owner and User Discovery via PowerShell Script Block (AN0254-B)
+id: ad23b43a-948b-425b-823c-f99c593971c7
+status: experimental
+description: Detects PowerShell script blocks querying local or Active Directory identity details via cmdlets or .NET classes.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Get-LocalUser'
+            - 'Get-ADUser'
+            - 'WindowsIdentity'
+            - 'Win32_ComputerSystem'
+            - 'Win32_UserAccount'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administration scripts querying local or domain accounts.
+level: low
+tags:
+    - attack.discovery
+    - attack.t1033
+    - analytic.an0254
+    - detection.det0093

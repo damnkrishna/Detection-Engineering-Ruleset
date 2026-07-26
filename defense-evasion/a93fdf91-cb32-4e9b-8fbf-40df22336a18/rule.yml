@@ -1,0 +1,41 @@
+title: Alternate Data Stream (ADS) File Creation (AN0091-B)
+id: 28f1115f-02af-4bbf-b2ec-e80b9579cee0
+status: experimental
+description: Detects the creation of Alternate Data Streams (ADS) containing executable files or scripts, which can be used by adversaries to hide malicious payloads.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: file_event
+    product: windows
+    # Relies on Sysmon Event ID 11
+detection:
+    selection_ads:
+        TargetFilename|contains:
+            - '.exe:'
+            - '.dll:'
+            - '.bat:'
+            - '.cmd:'
+            - '.vbs:'
+            - '.vbe:'
+            - '.js:'
+            - '.jse:'
+            - '.ps1:'
+            - '.lnk:'
+            - '.sct:'
+            - '.hta:'
+            - ':$DATA'
+    filter_zone:
+        TargetFilename|contains: ':Zone.Identifier'
+    condition: selection_ads and not filter_zone
+fields:
+    - Image
+    - TargetFilename
+    - User
+falsepositives:
+    - Legitimate software installers or applications using ADS for database storage or metadata (excluding Zone.Identifier).
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1564.001
+    - analytic.an0091
+    - detection.det0032

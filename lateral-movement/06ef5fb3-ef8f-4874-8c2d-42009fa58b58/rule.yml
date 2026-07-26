@@ -1,0 +1,33 @@
+title: Windows Service Service Account PowerShell Execution (AN0327-B)
+id: f6c9a0d1-6402-4e64-a067-8ca4ad8a70c6
+status: experimental
+description: Detects PowerShell script block execution running under system service account contexts (SYSTEM, Network Service, Local Service), indicating potential exploitation.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_user:
+        User|contains:
+            - 'NT AUTHORITY\SYSTEM'
+            - 'NT AUTHORITY\NETWORK SERVICE'
+            - 'NT AUTHORITY\LOCAL SERVICE'
+            - 'SYSTEM'
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'PrintNightmare'
+            - 'spoolsv'
+            - 'lsass'
+    condition: selection_user and selection_keywords
+fields:
+    - ScriptBlockText
+    - User
+falsepositives:
+    - Standard administrative scripts executing as service accounts.
+level: critical
+tags:
+    - attack.lateral-movement
+    - attack.t1210
+    - analytic.an0327
+    - detection.det0118

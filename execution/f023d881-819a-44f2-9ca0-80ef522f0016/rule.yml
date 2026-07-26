@@ -1,0 +1,43 @@
+title: Suspicious Process Spawned by WMI Host (AN1031-A)
+id: 50fb0e27-7941-4081-8f10-aae746db8e36
+status: experimental
+description: Detects command-line shells or script hosts spawned as child processes of the WMI Provider Host, indicating WMI-based code execution.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parents:
+        ParentImage|endswith:
+            - '\wmiprvse.exe'
+            - '\scrcons.exe'
+    selection_images:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\rundll32.exe'
+    filter_agents:
+        Image|endswith:
+            - '\ccmexec.exe'
+            - '\lswagent.exe'
+            - '\taniumclient.exe'
+            - '\monitoringhost.exe'
+    condition: selection_parents and selection_images and not filter_agents
+fields:
+    - Image
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - IT management software (SCCM, LanSweeper, monitoring agents) executing standard queries or deploying packages.
+level: medium
+tags:
+    - attack.execution
+    - attack.t1047
+    - analytic.an1031
+    - detection.det0364

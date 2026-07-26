@@ -1,0 +1,23 @@
+{
+  "rule_id": "485fdf8f-9d6c-4b43-aeb2-a0083bb94ad6",
+  "rule_name": "Phishing - Suspicious Child Process Spawned by Mail Client (AN0188-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

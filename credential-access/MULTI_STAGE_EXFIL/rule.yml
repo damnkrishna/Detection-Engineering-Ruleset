@@ -1,0 +1,117 @@
+{
+  "id": "MULTI_STAGE_EXFIL",
+  "description": "Credential access \u2192 collection \u2192 staging (optional) \u2192 exfiltration (Splunk: Cloud/Multi-stage Exfil story)",
+  "correlationKey": "entity_key",
+  "scoreMultiplier": 4.0,
+  "windowMinutes": 240,
+  "sensorFilter": [
+    "NIDS",
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "cred",
+      "tactics": [
+        "TA0006"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "credential",
+        "mimikatz",
+        "lsass",
+        "kerberos",
+        "ntlm",
+        "hash",
+        "ticket",
+        "dcsync",
+        "dump",
+        "4648",
+        "4771",
+        "4769"
+      ]
+    },
+    {
+      "label": "lateral_pivot",
+      "tactics": [
+        "TA0008"
+      ],
+      "optional": true,
+      "maxGapSeconds": 3600,
+      "signatureEquals": [
+        "lateral",
+        "pass-the-hash",
+        "psexec",
+        "wmi",
+        "rdp",
+        "smb",
+        "4624",
+        "4648",
+        "remote"
+      ]
+    },
+    {
+      "label": "collection",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0009"
+          ]
+        }
+      ],
+      "optional": false
+    },
+    {
+      "label": "staging",
+      "optional": true,
+      "maxGapSeconds": 3600,
+      "signatureEquals": [
+        "7z",
+        "WinRAR",
+        "zip",
+        "tar",
+        "compress",
+        "archive",
+        "robocopy",
+        "Compress-Archive",
+        "staging directory",
+        "onedrive",
+        "sharepoint",
+        "dropbox",
+        "googledrive",
+        "box.com",
+        "cloud sync",
+        "cloud staging"
+      ]
+    },
+    {
+      "label": "exfil",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0010"
+          ]
+        }
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "exfil",
+        "upload",
+        "transfer",
+        "ftp",
+        "sftp",
+        "dns tunnel",
+        "large outbound",
+        "data out",
+        "cloud upload",
+        "onedrive upload",
+        "pastebin",
+        "mega",
+        "dropbox upload"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+title: 'AN1235 - Create Account: Local Account'
+id: 20c65cd0-1bcc-4845-ba0e-a4079c1bd45a
+status: experimental
+description: 'Detects the creation of a local user account via net.exe or Security Event 4720, indicating potential persistence.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  service: security
+detection:
+  selection_event:
+    EventID: 4720
+  selection_cmd:
+    EventID: 4688
+    Image|endswith: '\net.exe'
+    CommandLine|contains|all:
+      - ' user '
+      - ' /add'
+  condition: selection_event or selection_cmd
+fields:
+  - EventID
+  - TargetUserName
+  - SubjectUserName
+  - Image
+  - CommandLine
+level: high
+tags:
+  - attack.persistence
+  - attack.t1136.001
+  - analytic.an1235

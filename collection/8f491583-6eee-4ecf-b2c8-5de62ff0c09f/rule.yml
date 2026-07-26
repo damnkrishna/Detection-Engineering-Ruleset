@@ -1,0 +1,52 @@
+title: Collection - Programmatic or Excessive Information Repository Access (AN1160)
+id: edc38878-37e0-4de0-a9c9-ab56ec980919
+status: experimental
+description: Detects command-line utilities, PowerShell commands, or database clients targeting SharePoint, Confluence, or SQL databases to gather sensitive repository data.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1 / Security Event ID 4688
+detection:
+    selection_db_clients:
+        - Image|endswith:
+            - '\sqlcmd.exe'
+            - '\osql.exe'
+            - '\mysql.exe'
+            - '\psql.exe'
+        - OriginalFileName:
+            - 'sqlcmd.exe'
+            - 'osql.exe'
+            - 'mysql.exe'
+            - 'psql.exe'
+    selection_repo_keywords:
+        CommandLine|contains:
+            - 'sharepoint'
+            - 'confluence'
+            - 'spweb'
+            - 'spsite'
+            - 'spfolder'
+            - 'spfile'
+            - 'Invoke-Sqlcmd'
+            - 'Invoke-RestMethod'
+            - 'Invoke-WebRequest'
+    condition: selection_db_clients or selection_repo_keywords
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - administrators running routine maintenance scripts.
+    - Automated system backup or synchronization tasks connecting to databases/SharePoint.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1213
+    - analytic.an1160
+    - detection.det0413

@@ -1,0 +1,49 @@
+title: User Execution - Malicious File Opened (AN0819)
+id: 60992d85-e2d7-4272-ac44-9718acebda58
+status: experimental
+description: Detects a handler application (archiver, Office, PDF reader) spawning a new or unusual child process, indicating execution of a malicious file.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\winrar.exe'
+            - '\7zFM.exe'
+            - '\winzip64.exe'
+            - '\explorer.exe'
+            - '\winword.exe'
+            - '\excel.exe'
+            - '\AcroRd32.exe'
+    selection_child:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\regsvr32.exe'
+            - '\rundll32.exe'
+            - '\msiexec.exe'
+    condition: selection_parent and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Users legitimately extracting installer scripts from archives and running them.
+    - Approved enterprise macros running administrative commands.
+level: high
+tags:
+    - attack.execution
+    - attack.t1204.002
+    - analytic.an0819
+    - detection.det0294

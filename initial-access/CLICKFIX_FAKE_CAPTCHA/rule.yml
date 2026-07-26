@@ -1,0 +1,52 @@
+{
+  "id": "CLICKFIX_FAKE_CAPTCHA",
+  "description": "Fake CAPTCHA / ClickFix social engineering \u2192 clipboard execution \u2192 malware download (Splunk 2025 story)",
+  "correlationKey": "entity_key",
+  "scoreMultiplier": 3.5,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "NIDS",
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "lure_access",
+      "tactics": [
+        "TA0001"
+      ],
+      "signatureContains": [
+        "captcha",
+        "clickfix",
+        "fake verification",
+        "mshta",
+        "run dialog",
+        "clipboard",
+        "paste and run",
+        "social engineering"
+      ],
+      "optional": false
+    },
+    {
+      "label": "execution_download",
+      "tactics": [
+        "TA0002"
+      ],
+      "techniques": [
+        "T1059",
+        "T1105"
+      ],
+      "signatureContains": [
+        "powershell",
+        "cmd",
+        "mshta",
+        "wscript",
+        "download",
+        "certutil",
+        "bitsadmin",
+        "iex",
+        "invoke-expression"
+      ],
+      "optional": false
+    }
+  ]
+}

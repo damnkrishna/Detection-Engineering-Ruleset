@@ -1,0 +1,23 @@
+{
+  "rule_id": "WEB_SHELL_DEPLOY",
+  "rule_name": "Web server exploitation then web shell deployed and executed (Splunk: Web Shell story)",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-nids",
+  "event_source": "suricata",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 2
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 2
+  }
+}

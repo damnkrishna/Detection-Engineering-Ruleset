@@ -1,0 +1,33 @@
+title: Rogue Domain Controller - Kerberos DRS SPN Request by Non-DC Host (AN0770)
+id: 98710e45-0e03-49a2-8312-b28a6f45aca6
+status: experimental
+description: Detects Kerberos service ticket requests (Event ID 4769) for the Directory Replication Service (DRS) SPN class GUID by computer accounts not belonging to the Domain Controllers group.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    product: windows
+    service: security
+    # Requires Kerberos Service Ticket auditing enabled on DCs
+detection:
+    selection_event:
+        EventID: 4769
+    selection_spn:
+ # Directory Replication Service SPN GUID
+        ServiceName|contains: 'E3514235-4B06-11D1-AB04-00C04FC2DCD2'
+    filter_dc:
+ # Exclude legitimate Domain Controller computer accounts (usually end in $)
+ # This can be baselined to match only approved DC computer account names
+        TargetUserName|endswith: '$'
+    condition: selection_event and selection_spn and not filter_dc
+fields:
+    - EventID
+    - ServiceName
+    - TargetUserName
+falsepositives:
+    - Legitimate Exchange server directory service sync tasks or AD backup software.
+level: critical
+tags:
+    - attack.defense-evasion
+    - attack.t1207
+    - analytic.an0770
+    - detection.det0276

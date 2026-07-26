@@ -1,0 +1,27 @@
+title: Command Execution in RDP Session via PowerShell Script (AN0931-B)
+id: 6440133a-47f2-4ec4-b89e-abdf6d41687f
+status: experimental
+description: Detects PowerShell script block execution containing command shells or admin utilities commonly run inside interactive sessions (like RDP).
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'mstsc.exe'
+            - 'qwinsta'
+            - 'query session'
+            - 'tscon'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate IT remote management tasks.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1021.001
+    - analytic.an0931
+    - detection.det0327

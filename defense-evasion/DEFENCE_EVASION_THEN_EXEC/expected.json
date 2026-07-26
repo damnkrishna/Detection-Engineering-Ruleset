@@ -1,0 +1,23 @@
+{
+  "rule_id": "DEFENCE_EVASION_THEN_EXEC",
+  "rule_name": "AV/EDR tampering or log clearing before malicious execution (Splunk: Defence Evasion story)",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-hids",
+  "event_source": "wazuh",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 2
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 2
+  }
+}

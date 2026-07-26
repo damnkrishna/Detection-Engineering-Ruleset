@@ -1,0 +1,30 @@
+title: Environment PATH Variable Modification via Registry (AN0009-B)
+id: 2afafbc7-d9ff-4525-a021-ad71671eb8ba
+status: experimental
+description: Detects modifications to the environment Path registry values under system or user environment paths, indicating potential path interception attempts.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_path:
+        TargetObject|contains:
+            - '\System\CurrentControlSet\Control\Session Manager\Environment\Path'
+            - '\Environment\Path'
+    condition: selection_path
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Centralized software installation scripts updating system environment variables.
+level: medium
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1574.007
+    - analytic.an0009
+    - detection.det0004

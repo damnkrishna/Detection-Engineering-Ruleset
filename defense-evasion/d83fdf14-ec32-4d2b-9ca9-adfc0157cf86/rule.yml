@@ -1,0 +1,36 @@
+title: Registry Persistence Key Deletion (AN0113-B)
+id: 8b0dd54a-cc56-46c6-83bb-af7da048d75b
+status: experimental
+description: Detects deletion of registry values under standard persistence paths (Run, RunOnce, Services) which indicates cleanup of malicious persistence mechanisms.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 12/13
+detection:
+    selection_path:
+        TargetObject|contains:
+            - '\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\'
+            - '\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce\'
+            - '\System\CurrentControlSet\Services\'
+    selection_delete:
+        EventType: 'DeleteValue'
+    filter_system:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_path and selection_delete and not filter_system
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - Legitimate application uninstallers cleaning up their startup registry keys or services.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1070.009
+    - analytic.an0113
+    - detection.det0040

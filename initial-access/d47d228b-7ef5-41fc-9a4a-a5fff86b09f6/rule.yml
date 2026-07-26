@@ -1,0 +1,45 @@
+title: Spearphishing Attachment - Dangerous File Written by Mail Client (AN0655-A)
+id: 99a464b3-8cea-4c32-be3a-7a8419cf816d
+status: experimental
+description: Detects email client processes (e.g., outlook.exe, thunderbird.exe) writing files with dangerous or executable extensions (e.g., .exe, .lnk, .vbs, .hta, .iso, .img, .bat) to the file system.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\outlook.exe'
+            - '\thunderbird.exe'
+            - '\foxmail.exe'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.exe'
+            - '.lnk'
+            - '.vbs'
+            - '.vbe'
+            - '.js'
+            - '.jse'
+            - '.hta'
+            - '.iso'
+            - '.img'
+            - '.bat'
+            - '.cmd'
+            - '.scr'
+            - '.wsf'
+            - '.chm'
+    condition: selection_process and selection_extensions
+fields:
+    - Image
+    - TargetFilename
+    - User
+    - LogonId
+falsepositives:
+    - Users saving legitimate business files or software installers received via corporate emails.
+level: high
+tags:
+    - attack.initial-access
+    - attack.t1566.001
+    - analytic.an0655
+    - detection.det0236

@@ -1,0 +1,62 @@
+{
+  "id": "LOLBIN_CHAIN_MULTI_HOP",
+  "description": "Multi-hop LOLBin proxy chain: script interpreter (mshta/wscript) spawns signed-binary proxy (regsvr32/rundll32/InstallUtil) which spawns shell or C2 \u2014 T1218 proxy chaining for AppLocker/WDAC bypass",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 4.0,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "interpreter_launch",
+      "techniques": [
+        "T1218"
+      ],
+      "signatureContains": [
+        "mshta.exe",
+        "wscript.exe",
+        "cscript.exe",
+        "hta file",
+        "script host",
+        "vbscript",
+        "jscript"
+      ],
+      "optional": false
+    },
+    {
+      "label": "signed_proxy",
+      "techniques": [
+        "T1218"
+      ],
+      "signatureContains": [
+        "regsvr32.exe",
+        "rundll32.exe",
+        "InstallUtil.exe",
+        "regasm.exe",
+        "regsvcs.exe",
+        "MSBuild.exe",
+        "dnscmd.exe",
+        "signed binary proxy"
+      ],
+      "optional": false,
+      "maxGapSeconds": 120
+    },
+    {
+      "label": "shell_or_c2",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0002",
+            "TA0003",
+            "TA0011"
+          ]
+        }
+      ],
+      "optional": false,
+      "maxGapSeconds": 300
+    }
+  ]
+}

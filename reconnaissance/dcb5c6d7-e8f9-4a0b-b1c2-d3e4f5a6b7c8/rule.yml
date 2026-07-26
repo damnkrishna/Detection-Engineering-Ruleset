@@ -1,0 +1,29 @@
+title: PowerShell System Information Gathering via WMI/CIM (AN2067-PowerShell)
+id: 892556cd-dfe0-49c7-8514-c91117c3f600
+status: experimental
+description: Detects PowerShell script block logs executing WMI or CIM queries targeting system specifications classes.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: windows
+    service: powershell
+detection:
+    selection_cmdlet:
+        ScriptBlockText|contains:
+            - 'Get-WmiObject'
+            - 'Get-CimInstance'
+            - 'gwmi'
+            - 'gcim'
+    selection_classes:
+        ScriptBlockText|contains:
+            - 'Win32_OperatingSystem'
+            - 'Win32_ComputerSystem'
+            - 'Win32_BIOS'
+            - 'Win32_Processor'
+    condition: selection_cmdlet and selection_classes
+falsepositives:
+    - Legitimate administrative system auditing or inventory scripts.
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1592

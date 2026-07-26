@@ -1,0 +1,43 @@
+title: Scripting Process Outbound DNS or NTP Connection Burst (AN1140-A)
+id: 477f02b4-5217-493d-bca8-b9c156614c83
+status: experimental
+description: Detects scripting interpreters initiating connection bursts to DNS or NTP ports. Pair with SIEM-side volume aggregation.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\python.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    selection_ports:
+        DestinationPort:
+            - 53
+            - 123
+    filter_internal:
+        # Exclude internal servers and local resolvers
+        DestinationIp|startswith:
+            - '127.'
+            - '10.'
+            - '192.168.'
+            - '172.16.'
+    condition: selection_images and selection_ports and not filter_internal
+fields:
+    - Image
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Legitimate administration scripts checking time servers or resolving APIs.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1498.002
+    - analytic.an1140
+    - detection.det0408

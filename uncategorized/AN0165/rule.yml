@@ -1,0 +1,146 @@
+title: Ingress Tool Transfer via CLI (AN0165-A)
+id: 5582cab9-6beb-4350-93bd-3c30186bb094
+status: experimental
+description: Detects command-line execution of tools (like certutil, bitsadmin, curl, or powershell) performing ingress tool transfers from external locations.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_certutil:
+        - Image|endswith: '\certutil.exe'
+        - OriginalFileName: 'certutil.exe'
+    selection_certutil_args:
+        CommandLine|contains:
+            - 'urlcache'
+            - 'split'
+    selection_bitsadmin:
+        - Image|endswith: '\bitsadmin.exe'
+        - OriginalFileName: 'bitsadmin.exe'
+    selection_bitsadmin_args:
+        CommandLine|contains:
+            - 'transfer'
+            - 'download'
+    selection_curl:
+        - Image|endswith:
+            - '\curl.exe'
+            - '\wget.exe'
+        - OriginalFileName:
+            - 'curl.exe'
+            - 'wget.exe'
+    selection_curl_args:
+        CommandLine|contains:
+            - 'http://'
+            - 'https://'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_args:
+        CommandLine|contains:
+            - 'DownloadFile'
+            - 'DownloadString'
+            - 'Invoke-WebRequest'
+            - 'iwr'
+            - 'wget'
+            - 'curl'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: ((selection_certutil and selection_certutil_args) or (selection_bitsadmin and selection_bitsadmin_args) or (selection_curl and selection_curl_args) or (selection_powershell and selection_powershell_args)) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administration scripts downloading program updates or installing software dependencies.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1105
+    - analytic.an0165
+    - detection.det0060
+---
+title: Ingress Tool Transfer via PowerShell Script Block (AN0165-B)
+id: 800c3a8a-050b-4232-81c5-47fd2c2c5f85
+status: experimental
+description: Detects PowerShell script blocks invoking file download methods or cmdlets (DownloadFile, DownloadString, Invoke-WebRequest) to download external files.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'DownloadFile'
+            - 'DownloadString'
+            - 'Invoke-WebRequest'
+            - 'Net.WebClient'
+            - 'Start-BitsTransfer'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative or provisioning scripts downloading tools/updates.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1105
+    - analytic.an0165
+    - detection.det0060
+---
+title: Ingress Tool Transfer Network Connection (AN0165-C)
+id: 4127cce9-13b5-4023-a50a-af16d634f4ca
+status: experimental
+description: Detects outbound network connections initiated by common command line download tools (certutil, bitsadmin, curl, wget, PowerShell) to remote web ports, indicating active ingress downloads.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_process:
+        Image|endswith:
+            - '\certutil.exe'
+            - '\bitsadmin.exe'
+            - '\curl.exe'
+            - '\wget.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_ports:
+        DestinationPort:
+            - 80
+            - 443
+            - 8080
+    condition: selection_process and selection_ports
+fields:
+    - Image
+    - CommandLine
+    - User
+    - DestinationHostname
+    - DestinationIp
+    - DestinationPort
+    - Initiated
+    - SourceIp
+falsepositives:
+    - Legitimate administrative operations downloading files from internal/external servers.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1105
+    - analytic.an0165
+    - detection.det0060

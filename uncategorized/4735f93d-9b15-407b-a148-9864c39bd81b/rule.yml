@@ -1,0 +1,45 @@
+title: Reversible Encryption Enabled via Active Directory Attribute modification (AN1621-B)
+id: 269f8c55-865e-4009-866a-aa1b71ea2528
+status: experimental
+description: Detects Active Directory attribute modification (Event ID 5136) where userAccountControl has reversible encryption enabled.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_event:
+        EventID: 5136
+    selection_attribute:
+        AttributeLDAPDisplayName: 'userAccountControl'
+    selection_uac_flags:
+        # Check standard combined UserAccountControl values that have the reversible encryption bit (128 / 0x80) enabled
+        AttributeValue:
+            - '640'
+            - '672'
+            - '66176'
+            - '66208'
+            - '2176'
+            - '4224'
+            - '8320'
+            - '0x280'
+            - '0x2A0'
+            - '0x10280'
+            - '0x102A0'
+            - '0x880'
+            - '0x1080'
+            - '0x2080'
+    condition: selection_event and selection_attribute and selection_uac_flags
+fields:
+    - ObjectDN
+    - AttributeLDAPDisplayName
+    - AttributeValue
+    - SubjectUserName
+falsepositives:
+    - Approved change management actions configuring legacy accounts.
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1556.005
+    - analytic.an1621
+    - detection.det0589

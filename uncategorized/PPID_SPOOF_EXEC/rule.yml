@@ -1,0 +1,47 @@
+{
+  "id": "PPID_SPOOF_EXEC",
+  "description": "Process spawned with spoofed parent PID to masquerade as legitimate child \u2014 EDR/behavioral bypass used by Cobalt Strike, custom loaders, and PPID injection tooling (T1134.004)",
+  "correlationKey": "entity_key",
+  "scoreMultiplier": 4.0,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "ppid_anomaly",
+      "techniques": [
+        "T1134.004"
+      ],
+      "signatureContains": [
+        "ppid spoofing",
+        "parent process mismatch",
+        "unexpected parent",
+        "unusual parent process",
+        "spoofed parent",
+        "process reparenting",
+        "CreateProcess PPID",
+        "invalid parent chain",
+        "parent process anomaly"
+      ],
+      "optional": false
+    },
+    {
+      "label": "malicious_followup",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0002",
+            "TA0003",
+            "TA0011",
+            "TA0004"
+          ]
+        }
+      ],
+      "optional": false,
+      "maxGapSeconds": 300
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+title: Elevated Execution from Weak Permissions Installer Directory (AN0108)
+id: c3923250-ce22-4156-9773-ad086e471451
+status: experimental
+description: Detects when processes are launched under elevated contexts (High or System Integrity) from user-writable installer or temporary directories, indicating potential exploitation of installer path permission weaknesses.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_paths:
+        Image|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+            - '\AppData\Roaming\'
+            - '\Downloads\'
+    selection_integrity:
+        IntegrityLevel:
+            - 'High'
+            - 'System'
+    filter_known_installers:
+        - CommandLine|contains:
+            - 'nativeimages'
+            - 'PackageStaging'
+        - Image|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+            - '\install.exe'
+    condition: selection_paths and selection_integrity and not filter_known_installers
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative software installers executing unpacking operations and running child configuration scripts with elevated privileges in local temp folders.
+level: high
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1574.005
+    - analytic.an0108
+    - detection.det0038

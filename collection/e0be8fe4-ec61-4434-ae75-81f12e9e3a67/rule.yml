@@ -1,0 +1,57 @@
+title: Collection - Local Email Database Access and Collection (AN1309)
+id: 6b2d91f3-30c9-4cf4-9489-fb415a4a8c74
+status: experimental
+description: Detects command-line utilities or scripting engines (cmd, powershell, xcopy, robocopy, 7z) referencing Outlook .pst or .ost files, suggesting local email harvesting.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_utilities:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\xcopy.exe'
+            - '\robocopy.exe'
+            - '\7z.exe'
+            - '\tar.exe'
+        - OriginalFileName:
+            - 'cmd.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'xcopy.exe'
+            - 'robocopy.exe'
+            - '7z.exe'
+            - 'tar.exe'
+    selection_email_extensions:
+        CommandLine|contains:
+            - '.pst'
+            - '.ost'
+    filter_outlook:
+ # Exclude official outlook operations
+        Image|endswith:
+            - '\OFFICE15\OUTLOOK.EXE'
+            - '\OFFICE16\OUTLOOK.EXE'
+            - '\outlook.exe'
+    condition: selection_utilities and selection_email_extensions and not filter_outlook
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - backup scripts copying user Outlook data during migrations or system upgrades.
+    - Local desktop search indexers or antivirus software scanning local mail folders.
+level: high
+tags:
+    - attack.collection
+    - attack.t1114
+    - analytic.an1309
+    - detection.det0476

@@ -1,0 +1,48 @@
+title: Keylogger Utility Process Execution (AN0243-A)
+id: d2a10867-62a8-45cc-b74e-76e9b1cf6eaa
+status: experimental
+description: Detects the execution of command-line keylogging binaries or tools.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\keylogger.exe'
+            - '\klg.exe'
+            - '\logkeys.exe'
+            - '\ardamax.exe'
+            - '\refog.exe'
+        OriginalFileName:
+            - 'keylogger.exe'
+            - 'klg.exe'
+            - 'logkeys.exe'
+            - 'ardamax.exe'
+            - 'refog.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'keylog'
+            - 'keystroke'
+            - 'hookkey'
+            - 'logkey'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_cli) and not filter_installers
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Administrative diagnostics or keyboard remapping utilities installed by users.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1056.001
+    - analytic.an0243
+    - detection.det0089

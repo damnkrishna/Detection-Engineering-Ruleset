@@ -1,0 +1,23 @@
+{
+  "rule_id": "LOLBIN_CHAIN_MULTI_HOP",
+  "rule_name": "Multi-hop LOLBin proxy chain: script interpreter (mshta/wscript) spawns signed-binary proxy (regsvr32/rundll32/InstallUtil) which spawns shell or C2 — T1218 proxy chaining for AppLocker/WDAC bypass",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-hids",
+  "event_source": "wazuh",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 3
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 3
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 3
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 3
+  }
+}

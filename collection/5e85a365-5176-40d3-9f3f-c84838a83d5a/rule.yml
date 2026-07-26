@@ -1,0 +1,41 @@
+title: GUI Input Capture via PowerShell Script Block (AN1440-A)
+id: ecc43c55-41d6-4cbe-9314-17e76f2ce07e
+status: experimental
+description: Detects PowerShell script block logging containing API calls or cmdlets that prompt users for credentials via GUI popups with suspicious context.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: windows
+    category: ps_script
+detection:
+    selection_cmdlets:
+        ScriptBlockText|contains:
+            - 'Get-Credential'
+            - 'PromptForCredential'
+            - 'CredUIPromptForCredentials'
+    selection_visualbasic:
+        ScriptBlockText|contains:
+            - '[Microsoft.VisualBasic.Interaction]::InputBox'
+            - 'Interaction.InputBox'
+    selection_spoof_context:
+        ScriptBlockText|contains:
+            - 'Password'
+            - 'Outlook'
+            - 'Office365'
+            - 'Verify your Microsoft'
+            - 'Security Update'
+            - 'Verify your identity'
+            - 'Login'
+            - 'Enter your credentials'
+    condition: (selection_cmdlets or selection_visualbasic) and selection_spoof_context
+fields:
+    - ScriptBlockText
+    - User
+falsepositives:
+    - Authorized administrative scripts requesting user or service account credentials for execution context changes.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1056.002
+    - analytic.an1440
+    - detection.det0521

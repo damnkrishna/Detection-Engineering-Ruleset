@@ -1,0 +1,25 @@
+title: 'AN0085 - Office Application Startup: Outlook Forms'
+id: b451a80b-4868-4907-b5ac-fb8c02d02c4c
+status: experimental
+description: 'Detects suspicious registry modifications targeting Outlook Forms, which may indicate an adversary establishing persistence via malicious VBScript within custom Outlook forms.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: registry_set
+detection:
+  selection_forms:
+    TargetObject|contains: '\Software\Microsoft\Office\Outlook\Addins'
+    EventType: 'SetValue'
+  selection_regions:
+    TargetObject|contains: '\FormRegions\'
+  condition: selection_forms or selection_regions
+fields:
+  - EventID
+  - TargetObject
+  - Image
+  - Details
+level: high
+tags:
+  - attack.persistence
+  - attack.t1137.003
+  - analytic.an0085

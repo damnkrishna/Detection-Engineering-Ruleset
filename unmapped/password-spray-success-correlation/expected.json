@@ -1,0 +1,23 @@
+{
+  "rule_id": "password-spray-success-correlation",
+  "rule_name": "Password Spray Followed By Account Compromise",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-hids",
+  "event_source": "wazuh",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 12
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 12
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 12
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 12
+  }
+}

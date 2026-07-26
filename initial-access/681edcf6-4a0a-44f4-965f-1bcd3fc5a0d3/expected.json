@@ -1,0 +1,23 @@
+{
+  "rule_id": "681edcf6-4a0a-44f4-965f-1bcd3fc5a0d3",
+  "rule_name": "Supply Chain Compromise - Installer Executing Anomalous Shell (AN1480-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

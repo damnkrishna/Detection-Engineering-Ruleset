@@ -1,0 +1,23 @@
+{
+  "rule_id": "d82fdf23-6c8a-4bbf-92d6-05dfa8e97a3f",
+  "rule_name": "Electron ASAR File Modification (AN0071-C)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

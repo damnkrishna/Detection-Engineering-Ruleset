@@ -1,0 +1,41 @@
+title: LSASS Process Access on Domain Controller (AN0757-A)
+id: fdf66e40-f7cc-4b63-b28a-90f7c29ff5cc
+status: experimental
+description: Detects process access to lsass.exe on Domain Controllers, indicating potential memory dumping or patching.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_access
+    product: windows
+detection:
+    selection_target:
+        TargetImage|endswith: '\lsass.exe'
+    selection_access:
+        # Requesting high access rights including VirtualMemoryWrite or VirtualMemoryOperation
+        GrantedAccess:
+            - '0x1F3FFF'
+            - '0x1F0FFF'
+            - '0x1010'
+            - '0x1410'
+            - '0x1438'
+    filter_legitimate:
+        SourceImage|endswith:
+            - '\services.exe'
+            - '\wininit.exe'
+            - '\csrss.exe'
+            - '\MsMpEng.exe'
+            - '\winlogon.exe'
+    condition: selection_target and selection_access and not filter_legitimate
+fields:
+    - SourceImage
+    - TargetImage
+    - GrantedAccess
+    - User
+falsepositives:
+    - Normal system initialization or troubleshooting by domain administrators using authorized diagnostic tools.
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1556.001
+    - analytic.an0757
+    - detection.det0271

@@ -1,0 +1,42 @@
+title: VNC Network Connection on Default Port (AN0504-B)
+id: 37e5298a-28b2-433d-bd6f-48c53380ae55
+status: experimental
+description: Detects outbound or inbound network connections on VNC default port 5900 or originating from known VNC processes (T1021.005).
+author: Krishna Gupta
+date: 2026-06-12
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_vnc_port:
+        DestinationPort: 5900
+    selection_vnc_process:
+        - Image|endswith:
+            - '\winvnc.exe'
+            - '\tvnserver.exe'
+            - '\vncviewer.exe'
+            - '\uvnc_service.exe'
+            - '\vncserver.exe'
+            - '\xvnc.exe'
+    filter_legitimate:
+        Image|contains:
+            - '\Program Files\RealVNC\'
+            - '\Program Files\TightVNC\'
+            - '\Program Files\UltraVNC\'
+    condition: (selection_vnc_port or selection_vnc_process) and not filter_legitimate
+fields:
+    - Image
+    - SourceIp
+    - DestinationIp
+    - DestinationPort
+    - User
+    - Initiated
+falsepositives:
+    - Sanctioned IT remote support sessions via VNC
+    - Network scanners probing port 5900 in authorized security assessments
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1021.005
+    - analytic.an0504
+    - detection.det0178

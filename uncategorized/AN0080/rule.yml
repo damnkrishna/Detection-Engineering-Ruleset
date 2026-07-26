@@ -1,0 +1,80 @@
+title: Execution of Bandwidth Hijacking or Proxyjacking Software via CLI (AN0080-A)
+id: d8880896-5654-40cf-b13e-a4b9751bf59a
+status: experimental
+description: Detects command-line execution of known proxyjacking, bandwidth sharing, or botnet scanning software, which is used for bandwidth hijacking and resource abuse.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_rmm:
+        - Image|endswith:
+            - '\honeygain.exe'
+            - '\packetstream.exe'
+            - '\peer2profit.exe'
+            - '\earnapp.exe'
+            - '\iproyal.exe'
+            - '\masscan.exe'
+        - OriginalFileName:
+            - 'honeygain.exe'
+            - 'packetstream.exe'
+            - 'peer2profit.exe'
+            - 'earnapp.exe'
+            - 'iproyal.exe'
+            - 'masscan.exe'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_rmm and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Highly unlikely in enterprise environments. Standard employees should not be running bandwidth-sharing applications.
+level: high
+tags:
+    - attack.impact
+    - attack.t1496.002
+    - analytic.an0080
+    - detection.det0028
+---
+title: Execution of Bandwidth Hijacking or Proxyjacking Software via Network Connection (AN0080-B)
+id: a0c81e25-9867-4ada-8c28-9bcb2d789a04
+status: experimental
+description: Detects network connections initiated by known proxyjacking, bandwidth sharing, or botnet scanning software, indicating resource abuse.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\honeygain.exe'
+            - '\packetstream.exe'
+            - '\peer2profit.exe'
+            - '\earnapp.exe'
+            - '\iproyal.exe'
+            - '\masscan.exe'
+    condition: selection_process
+fields:
+    - Image
+    - User
+    - DestinationIp
+    - DestinationPort
+falsepositives:
+    - Highly unlikely in enterprise environments.
+level: high
+tags:
+    - attack.impact
+    - attack.t1496.002
+    - analytic.an0080
+    - detection.det0028

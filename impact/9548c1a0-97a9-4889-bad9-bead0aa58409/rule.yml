@@ -1,0 +1,40 @@
+title: Transaction Database File Manipulation (AN1361-B)
+id: 61af82bd-f469-431b-8f90-e47f071797d5
+status: experimental
+description: Detects direct file writes or modifications to POS database files by interpreters or non-db binaries.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\pos_db\'
+            - '\retail_sales\'
+            - '\checkout_data\'
+    selection_exts:
+        TargetFilename|endswith:
+            - '.mdf'
+            - '.ldf'
+            - '.db'
+            - '.sqlite'
+    filter_db_processes:
+        Image|endswith:
+            - '\sqlserver.exe'
+            - '\mysqld.exe'
+            - '\postgres.exe'
+            - '\pos_service.exe'
+    condition: selection_paths and selection_exts and not filter_db_processes
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Standard checkout terminal patches or software migrations updating db structures.
+level: high
+tags:
+    - attack.impact
+    - attack.t1657
+    - analytic.an1361
+    - detection.det0495

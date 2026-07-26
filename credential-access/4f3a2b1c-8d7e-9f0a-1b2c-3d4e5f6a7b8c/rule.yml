@@ -1,0 +1,59 @@
+title: Suspicious AD FS Database Query for SAML Certificate Extraction via CLI (AN0420-A)
+id: 6d8f3a8d-32c1-4259-b695-3a25b0aa1a0d
+status: experimental
+description: Detects command-line execution attempting to query the Windows Internal Database (WID) to extract AD FS configuration and token-signing certificates, a precursor to Golden SAML token forging.
+author: Krishna Gupta
+date: 2026-06-12
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_sqlcmd_image:
+        Image|endswith: '\sqlcmd.exe'
+    selection_sqlcmd_original:
+        OriginalFileName: 'SQLCMD.EXE'
+    selection_pipe:
+        CommandLine|contains:
+            - 'np:\\.\pipe\microsoft##ssee\tsql\query'
+            - 'np:\\.\pipe\WID\tsql\query'
+    selection_db:
+        CommandLine|contains:
+            - 'AdfsConfiguration'
+            - 'IdentityServerPolicy'
+    selection_adfs_tools:
+        CommandLine|contains:
+            - 'ADFSpoof'
+            - 'Export-AdfsCertificate'
+    selection_shells_image:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+    selection_shells_original:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'Cmd.Exe'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (( (selection_sqlcmd_image or selection_sqlcmd_original) and selection_pipe and selection_db ) or ( (selection_shells_image or selection_shells_original) and selection_adfs_tools )) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Rare AD FS backup or migration scripts executed by identity administrators.
+level: critical
+tags:
+    - attack.credential-access
+    - attack.defense-evasion
+    - attack.t1606.002
+    - analytic.an0420
+    - detection.det0148

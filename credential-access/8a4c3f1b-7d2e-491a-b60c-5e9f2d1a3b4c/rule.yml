@@ -1,0 +1,52 @@
+title: AS-REP Roasting Tool Execution via CLI (AN0316-A)
+id: a388f76c-4af0-4a39-9e82-83543f9d717e
+status: experimental
+description: Detects command-line parameters associated with AS-REP Roasting attacks, targeting accounts with Kerberos pre-authentication disabled to extract crackable hashes.
+author: Krishna Gupta
+date: 2026-06-12
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_rubeus_cmd:
+        CommandLine|contains:
+            - 'asreproast'
+    selection_powerview:
+        CommandLine|contains:
+            - 'PreauthNotRequired'
+    selection_impacket:
+        CommandLine|contains:
+            - 'GetNPUsers'
+    selection_shells_image:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+    selection_shells_original:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'Cmd.Exe'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_rubeus_cmd or ( (selection_shells_image or selection_shells_original) and (selection_powerview or selection_impacket) )) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Internal security teams conducting routine Active Directory misconfiguration audits.
+    - Automated IAM tools querying for vulnerable account flags.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1558.004
+    - analytic.an0316
+    - detection.det0113

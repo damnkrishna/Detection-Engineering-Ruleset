@@ -1,0 +1,34 @@
+title: Network Provider DLL File Creation (AN1598-B)
+id: 48dabe0b-24ee-4177-b717-28f7bcfed7e8
+status: experimental
+description: Detects file creation of DLLs in System32 by non-installer processes.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - 'C:\Windows\System32\'
+            - 'C:\Windows\SysWOW64\'
+    selection_dll:
+        TargetFilename|endswith: '.dll'
+    filter_installers:
+        Image|endswith:
+            - '\trustedinstaller.exe'
+            - '\msiexec.exe'
+            - '\tiworker.exe'
+    condition: selection_paths and selection_dll and not filter_installers
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Legitimate administrators updating network mounts or client software.
+level: medium
+tags:
+    - attack.defense-impairment
+    - attack.t1556.008
+    - analytic.an1598
+    - detection.det0580

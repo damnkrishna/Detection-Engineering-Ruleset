@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"C:\\Windows\\System32 setspn","hostname":"SEC-WKS-789","agent_ip":"10.42.180.75","severity_id":3,"event_uid":"golden|KERBEROASTING|1|675901","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:00:01.000Z","signature_name":"Windows audit failure event 4769","hostname":"SEC-WKS-789","agent_ip":"10.42.180.75","severity_id":3,"event_uid":"golden|KERBEROASTING|0|675900","proto":"tcp","src_port":"50412","dst_port":"443"}

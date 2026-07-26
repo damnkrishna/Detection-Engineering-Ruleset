@@ -1,0 +1,23 @@
+{
+  "rule_id": "f1c2d3e4-a5b6-4c7d-8e9f-0a1b2c3d4e65",
+  "rule_name": "Steganography or Data Obfuscation Utility Execution (AN2108)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "rule_id": "5d9f2b38-7c4e-4a91-b6d3-8e1a5f72c946",
+  "rule_name": "XSL Script Execution via WMIC or MSXSL (AN2102)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

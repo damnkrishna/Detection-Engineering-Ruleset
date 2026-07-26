@@ -1,0 +1,23 @@
+{
+  "rule_id": "f6c5baf9-4e78-45dd-ae44-edb7a9123942",
+  "rule_name": "Scripting Process Outbound DNS or NTP Connection Burst (AN1140-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

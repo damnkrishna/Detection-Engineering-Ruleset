@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","signature_name":"C:\\Windows\\System32 UF_DONT_REQUIRE_PREAUTH","hostname":"ENG-WKS-687","agent_ip":"10.42.178.28","severity_id":3,"event_uid":"golden|ASREP_ROASTING|0|770200","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T10:05:00.000Z","signature_name":"C:\\Users\\j.mercer\\AppData\\Local\\Temp preauth_type: 0","hostname":"ENG-WKS-687","agent_ip":"10.42.178.28","severity_id":3,"event_uid":"golden|ASREP_ROASTING|1|770201","proto":"tcp","src_port":"50412","dst_port":"443"}

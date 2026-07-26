@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","_raw":"Nov 14 09:15:00 fin-wks-014 sshd[4812]: Accepted password for j.mercer selection | count(resp_p) by orig_h > 15 in 60s","src_ip":"10.42.7.14","severity_id":3,"event_uid":"golden|c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f|0|603000","proto":"tcp","src_port":"50412","dst_port":"443"}

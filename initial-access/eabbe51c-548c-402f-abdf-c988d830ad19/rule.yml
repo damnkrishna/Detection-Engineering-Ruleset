@@ -1,0 +1,30 @@
+title: Hardware Supply Chain - Firmware Flashing Driver Load (AN1035-B)
+id: 9fc57076-61ae-432f-a388-2ea49d30fb48
+status: experimental
+description: Detects the loading of vulnerable or low-level firmware helper drivers commonly utilized by BIOS flash utilities.
+author: Antigravity
+date: 2026-06-16
+logsource:
+    category: driver_load
+    product: windows
+detection:
+    selection_drivers:
+        ImageLoaded|endswith:
+            - '\winring0.sys'
+            - '\winring0x64.sys'
+            - '\rwdrv.sys'
+            - '\amifldrv64.sys'
+            - '\amifldrv32.sys'
+    condition: selection_drivers
+fields:
+    - ImageLoaded
+    - Signature
+    - Hashes
+falsepositives:
+    - Authorized firmware updates or hardware utility programs.
+level: high
+tags:
+    - attack.initial-access
+    - attack.t1195.003
+    - analytic.an1035
+    - detection.det0368

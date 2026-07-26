@@ -1,0 +1,38 @@
+title: Unauthorized Remote Management and Monitoring Network Connection (AN0714-B)
+id: 86b0513a-9b0d-458f-b6cd-a0cdceec8e03
+status: experimental
+description: Detects outbound network connections initiated by known Remote Management and Monitoring (RMM) or Remote Desktop application binaries (e.g., AnyDesk, TeamViewer, ScreenConnect).
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_rmm:
+        Image|endswith:
+            - '\AnyDesk.exe'
+            - '\TeamViewer.exe'
+            - '\TeamViewer_Desktop.exe'
+            - '\ScreenConnect.Client.exe'
+            - '\ScreenConnect.ClientService.exe'
+            - '\tvnserver.exe'
+            - '\winvnc.exe'
+    condition: selection_rmm
+fields:
+    - Image
+    - CommandLine
+    - User
+    - DestinationHostname
+    - DestinationIp
+    - DestinationPort
+    - Initiated
+    - SourceIp
+falsepositives:
+    - Authorized IT helpdesk support activities initiating outbound RMM connections.
+level: medium
+tags:
+    - attack.command-and-control
+    - attack.t1219
+    - analytic.an0714
+    - detection.det0259

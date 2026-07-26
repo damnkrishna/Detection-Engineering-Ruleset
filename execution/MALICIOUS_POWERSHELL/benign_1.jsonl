@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","tactic":"TA0003","hostname":"ENG-WKS-777","agent_ip":"10.42.168.165","severity_id":3,"event_uid":"golden|MALICIOUS_POWERSHELL|1|856301","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:00:01.000Z","signature_name":"Windows audit failure event powershell","hostname":"ENG-WKS-777","agent_ip":"10.42.168.165","severity_id":3,"event_uid":"golden|MALICIOUS_POWERSHELL|0|856300","proto":"tcp","src_port":"50412","dst_port":"443","src_ip":"10.42.168.165","dst_ip":"198.51.100.187"}

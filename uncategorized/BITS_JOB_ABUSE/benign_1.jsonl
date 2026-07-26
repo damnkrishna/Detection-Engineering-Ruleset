@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","tactic":"TA0003","hostname":"HR-WKS-506","agent_ip":"10.42.97.157","severity_id":3,"event_uid":"golden|BITS_JOB_ABUSE|1|799401","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:00:01.000Z","signature_name":"Windows audit failure event bitsadmin /transfer","hostname":"HR-WKS-506","agent_ip":"10.42.97.157","severity_id":3,"event_uid":"golden|BITS_JOB_ABUSE|0|799400","proto":"tcp","src_port":"50412","dst_port":"443"}

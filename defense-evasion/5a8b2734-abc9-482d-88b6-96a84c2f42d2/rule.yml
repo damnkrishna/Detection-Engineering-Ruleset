@@ -1,0 +1,38 @@
+title: Disable or Modify Tools - Spoof Tool UI (AN0868)
+id: f0fc8d34-776a-42da-b7fb-bf35c6af8448
+status: experimental
+description: Detects inconsistencies between reported sensor health and actual process/service state, suggesting UI spoofing.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_ui:
+        Image|endswith:
+            - '\SecurityHealthSystray.exe'
+            - '\MSASCui.exe'
+    selection_cmd:
+        CommandLine|contains:
+            - 'spoof'
+            - 'hidden'
+            - 'disable'
+    condition: selection_ui and selection_cmd
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Administrative troubleshooting of security tool UI components.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1685.003
+    - analytic.an0868
+    - detection.det0311

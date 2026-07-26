@@ -1,0 +1,38 @@
+{
+  "id": "EXFIL_VIA_DNS",
+  "description": "Collection followed by DNS-based data exfiltration (Splunk: DNS Hijacking story)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.5,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "ZEEK",
+    "NIDS"
+  ],
+  "stages": [
+    {
+      "label": "collection",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0009"
+          ]
+        }
+      ],
+      "optional": true
+    },
+    {
+      "label": "dns_exfil",
+      "signatureContains": [
+        "dns_suspicious",
+        "dns tunnel",
+        "dns exfil",
+        "long subdomain",
+        "high entropy dns"
+      ],
+      "optional": false,
+      "minOccurrences": 2
+    }
+  ]
+}

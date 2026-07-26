@@ -1,0 +1,46 @@
+title: Suspicious Non-Network System Utility Execution (AN0109-B)
+id: 9fd5e876-ca77-49c1-a3f5-06b81ba0c86c
+status: experimental
+description: Detects execution of standard system applications (like calc.exe, notepad.exe, mspaint.exe) when spawned by unusual shell or script parent processes, indicating potential staging for injection.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_process:
+        Image|endswith:
+            - '\calc.exe'
+            - '\notepad.exe'
+            - '\mspaint.exe'
+            - '\regedit.exe'
+            - '\systeminfo.exe'
+            - '\tasklist.exe'
+            - '\chkdsk.exe'
+    selection_parent:
+        ParentImage|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\nginx.exe'
+            - '\httpd.exe'
+            - '\w3wp.exe'
+    condition: selection_process and selection_parent
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Administrative scripts executing system check tools legitimately.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1568
+    - analytic.an0109
+    - detection.det0039

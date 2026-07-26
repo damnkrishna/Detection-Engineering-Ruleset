@@ -1,0 +1,54 @@
+title: Local Data Staging via Bulk File Copy (AN0724)
+id: 1bc0933e-9db2-413c-9f8d-759056638875
+status: experimental
+description: Detects bulk file copy or move operations (xcopy, robocopy, PowerShell Copy-Item) targeting local staging directories (Temp, Public, AppData), indicating adversarial local data consolidation prior to exfiltration.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_xcopy:
+        - Image|endswith: '\xcopy.exe'
+        - OriginalFileName: 'xcopy.exe'
+    selection_robocopy:
+        - Image|endswith: '\robocopy.exe'
+        - OriginalFileName: 'robocopy.exe'
+    selection_staging_dest:
+        CommandLine|contains:
+            - '\Windows\Temp'
+            - '\AppData\Local\Temp'
+            - '\Users\Public'
+            - 'C:\Temp'
+            - '\ProgramData\'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_ps_copy:
+        CommandLine|contains:
+            - 'Copy-Item'
+            - 'Move-Item'
+            - 'cp '
+            - 'mv '
+    condition: ((selection_xcopy or selection_robocopy) and selection_staging_dest) or (selection_powershell and selection_ps_copy and selection_staging_dest)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Administrative or installation scripts bulk-copying files to temp directories.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1074.001
+    - analytic.an0724
+    - detection.det0261

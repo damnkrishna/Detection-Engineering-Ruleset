@@ -1,0 +1,48 @@
+{
+  "id": "WMI_SUBSCRIPTION_PERSIST",
+  "description": "WMI event subscription trifecta: event filter creation + consumer binding \u2014 fileless persistence surviving reboot without scheduled task or registry run key (T1546.003)",
+  "correlationKey": "entity_key",
+  "scoreMultiplier": 4.5,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "wmi_filter_create",
+      "techniques": [
+        "T1546.003"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "WMI event filter",
+        "__EventFilter",
+        "SET __EventFilter",
+        "Root\\subscription",
+        "wmic /namespace",
+        "5858",
+        "wmi subscription",
+        "event subscription create"
+      ]
+    },
+    {
+      "label": "wmi_consumer_bind",
+      "techniques": [
+        "T1546.003"
+      ],
+      "optional": false,
+      "maxGapSeconds": 600,
+      "signatureEquals": [
+        "CommandLineEventConsumer",
+        "ActiveScriptEventConsumer",
+        "__FilterToConsumerBinding",
+        "consumer binding",
+        "wmi consumer",
+        "5860",
+        "5861",
+        "event consumer create",
+        "subscription binding"
+      ]
+    }
+  ]
+}

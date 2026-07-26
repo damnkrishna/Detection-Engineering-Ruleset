@@ -1,0 +1,47 @@
+title: Volume Shadow Copy Deletion via Native Utilities (AN0602-C)
+id: 7d291d08-8ab4-46cd-b21d-f9cd623a42d7
+status: experimental
+description: Detects CLI usage of vssadmin, wbadmin, wmic, or bcdedit attempting to delete shadow copies or backup catalogs.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_commands:
+        Image|endswith:
+            - '\vssadmin.exe'
+            - '\wmic.exe'
+            - '\wbadmin.exe'
+            - '\bcdedit.exe'
+        OriginalFileName:
+            - 'vssadmin.exe'
+            - 'wmic.exe'
+            - 'wbadmin.exe'
+            - 'bcdedit.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'delete shadows'
+            - 'shadowcopy delete'
+            - 'delete catalog'
+            - 'recoveryenabled no'
+            - 'ignoreallfailures'
+    filter_legitimate:
+        # Excludes legit installers/backup tools regardless of whether they run as SYSTEM or admin service accounts
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\backup.exe'
+            - '\veeam.exe'
+    condition: selection_commands and selection_args and not filter_legitimate
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Legitimate system administration scripts or backup solutions (like Veeam) managing system space.
+level: critical
+tags:
+    - attack.impact
+    - attack.t1486
+    - analytic.an0602
+    - detection.det0215

@@ -1,0 +1,23 @@
+{
+  "rule_id": "ioc-dns-micropsia-marwapetersson",
+  "rule_name": "APT-C-23 MICROPSIA C2 Domain in DNS Lookup",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-nids",
+  "event_source": "suricata",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

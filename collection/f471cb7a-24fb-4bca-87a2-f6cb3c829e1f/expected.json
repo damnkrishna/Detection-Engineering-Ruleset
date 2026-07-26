@@ -1,0 +1,23 @@
+{
+  "rule_id": "f471cb7a-24fb-4bca-87a2-f6cb3c829e1f",
+  "rule_name": "Local Outlook Email Archive CLI Search (AN0130-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

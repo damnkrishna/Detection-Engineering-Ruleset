@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","tactic":"TA0009","source":"HIDS","hostname":"ENG-WKS-542","agent_ip":"10.42.33.115","severity_id":3,"event_uid":"golden|ZEEK_LARGE_TRANSFER_HIDS_COLLECTION|0|706700","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:05:00.000Z","tactic":"TA0010","source":"ZEEK","signature_name":"C:\\Windows\\System32 high bytes out","hostname":"ENG-WKS-542","agent_ip":"10.42.33.115","severity_id":3,"event_uid":"golden|ZEEK_LARGE_TRANSFER_HIDS_COLLECTION|1|706701","proto":"tcp","src_port":"50412","dst_port":"443"}

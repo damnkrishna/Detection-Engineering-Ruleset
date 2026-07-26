@@ -1,0 +1,30 @@
+title: Web Fuzzing Tool User-Agent Detection (AN2069-Fuzzing-Agents)
+id: c61dfa0e-9754-4974-b2e2-b6384cb7ebff
+status: experimental
+description: Detects HTTP requests containing User-Agents matching known web fuzzing and reconnaissance tools.
+logsource:
+    category: webserver
+    product: windows
+detection:
+    selection:
+        user_agent|contains:
+            - 'ffuf/'
+            - 'gobuster/'
+            - 'dirsearch'
+            - 'feroxbuster'
+            - 'wfuzz/'
+            - 'Nuclei'
+            - 'sqlmap/'
+            - 'nikto/'
+            - 'BurpCollaborator'
+            - 'DirBuster'
+            - 'OWASP ZAP'
+            - 'masscan'
+            - 'zgrab'
+            - 'python-httpx'
+            - 'rustscan'
+    condition: selection
+level: high
+tags:
+    - attack.reconnaissance
+    - attack.t1594

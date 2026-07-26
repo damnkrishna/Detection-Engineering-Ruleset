@@ -1,0 +1,42 @@
+title: Outbound Data Upload to Public GenAI Services (AN2075)
+id: 2a014111-e7d6-4f7b-8e93-ae75c5be1b83
+status: experimental
+description: Detects outbound POST requests with payloads exceeding 10KB to known public generative AI platforms indicating potential data uploads.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: web_proxy
+    product: proxy
+detection:
+    selection_ai_domains:
+        destination_domain|contains:
+            - 'openai.com'
+            - 'chatgpt.com'
+            - 'claude.ai'
+            - 'gemini.google.com'
+            - 'cohere.com'
+            - 'poe.com'
+    selection_method:
+        http_method: 'POST'
+    selection_bytes:
+        bytes_sent|gte: 10000  # Tuning candidate: adjust threshold pending real network traffic baseline (default 10KB)
+    filter_legitimate:
+        src_ip|cidr:
+            - '10.100.200.0/24'  # Approved internal ML subnet
+        user:
+            - 'svc-internal-copilot'  # Approved automation accounts
+    condition: selection_ai_domains and selection_method and selection_bytes and not filter_legitimate
+fields:
+    - src_ip
+    - destination_domain
+    - user
+    - bytes_sent
+    - http_method
+falsepositives:
+    - Legitimate large data uploads or queries from authorized internal developers.
+level: medium
+tags:
+    - attack.reconnaissance
+    - attack.t1682
+    - analytic.an2075
+    - detection.det0932

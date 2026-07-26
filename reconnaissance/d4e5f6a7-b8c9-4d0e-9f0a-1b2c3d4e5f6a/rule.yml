@@ -1,0 +1,23 @@
+title: Web Path Discovery in CDN Access Logs (AN2069-CDN-Logs)
+id: 121f258e-1b2f-491a-98f6-6ea861aeca84
+status: experimental
+description: "Detects web path discovery scans in CDN access logs (Cloudflare). Requires custom Cloudflare log ingestion pipeline and Sigma backend mapping. Note: SIEM-side aggregation (count(client_ip) by client_ip > 5 in 1m) is required before this generates actionable alerts."
+
+logsource:
+    product: cloudflare
+detection:
+    selection_paths:
+        request_uri|re:
+            - '^\/.git\/.*'
+            - '^\/.env$'
+            - '^\/wp-admin\/.*'
+            - '^\/.aws(?:/|$)'
+    selection_status:
+        status_code: 403
+    filter_auth:
+        http_auth_user: '-'
+    condition: selection_paths and selection_status and filter_auth
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1594

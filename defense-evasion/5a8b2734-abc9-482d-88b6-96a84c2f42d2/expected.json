@@ -1,0 +1,23 @@
+{
+  "rule_id": "5a8b2734-abc9-482d-88b6-96a84c2f42d2",
+  "rule_name": "Disable or Modify Tools - Spoof Tool UI (AN0868)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

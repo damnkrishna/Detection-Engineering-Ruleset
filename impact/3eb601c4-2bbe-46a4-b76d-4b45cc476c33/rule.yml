@@ -1,0 +1,39 @@
+title: Windows Service Unexpected Termination (AN0584-B)
+id: bc0b1f92-5bcb-443f-b1cf-33b1c749a601
+status: experimental
+description: Detects Service Control Manager Event ID 7034 logs showing unexpected termination of critical security or system services.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: windows
+    service: system
+detection:
+    selection_crash:
+        EventID: 7034
+    selection_critical_services:
+        Description|contains:
+            - 'System Monitor'
+            - 'Windows Defender'
+            - 'Print Spooler'
+            - 'Local Security Authority'
+            - 'WazuhSvc'
+            - 'CrowdStrike'
+            - 'SentinelAgent'
+    filter_updates:
+        # Exclude standard update services terminating during normal updates
+        Description|contains:
+            - 'Google Update'
+            - 'Windows Update'
+    condition: selection_crash and selection_critical_services and not filter_updates
+fields:
+    - EventID
+    - Description
+    - Source
+falsepositives:
+    - Unstable updates or software conflicts crashing system services under normal operational loads.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1499
+    - analytic.an0584
+    - detection.det0208

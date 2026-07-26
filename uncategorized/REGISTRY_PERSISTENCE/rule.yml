@@ -1,0 +1,43 @@
+{
+  "id": "REGISTRY_PERSISTENCE",
+  "description": "Registry run key modified for autostart persistence (Splunk: Windows Registry story)",
+  "correlationKey": "entity_key",
+  "scoreMultiplier": 2.5,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "reg_modify",
+      "techniques": [
+        "T1547",
+        "T1112"
+      ],
+      "optional": false,
+      "signatureEquals": [
+        "CurrentVersion\\Run",
+        "CurrentVersion\\RunOnce",
+        "registry modification",
+        "4657",
+        "reg add",
+        "regedit",
+        "RegSetValueEx",
+        "startup registry"
+      ]
+    },
+    {
+      "label": "execution",
+      "optional": false,
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0002"
+          ]
+        }
+      ]
+    }
+  ]
+}

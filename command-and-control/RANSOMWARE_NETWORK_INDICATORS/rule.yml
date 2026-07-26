@@ -1,0 +1,59 @@
+{
+  "id": "RANSOMWARE_NETWORK_INDICATORS",
+  "description": "Network-layer ransomware: C2/propagation signature followed by impact \u2014 detects without HIDS",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 4.5,
+  "windowMinutes": 120,
+  "sensorFilter": [
+    "NIDS"
+  ],
+  "stages": [
+    {
+      "label": "c2_or_propagation",
+      "tactics": [
+        "TA0011",
+        "TA0008"
+      ],
+      "signatureContains": [
+        "ransomware",
+        "wannacry",
+        "locky",
+        "ryuk",
+        "darkside",
+        "revil",
+        "conti",
+        "lockbit",
+        "blackcat",
+        "hive",
+        "blackmatter",
+        "maze",
+        "sodinokibi",
+        "cactus",
+        "chaos",
+        "clop",
+        "rhysida",
+        "blacksuit",
+        "akira",
+        "play",
+        "medusa"
+      ],
+      "optional": false
+    },
+    {
+      "label": "impact_or_exfil",
+      "tactics": [
+        "TA0040",
+        "TA0010"
+      ],
+      "signatureContains": [
+        "encrypt",
+        "ransom",
+        "impact",
+        "exfiltrat",
+        "shadow copy",
+        "backup"
+      ],
+      "optional": false
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+title: Suspicious Python Interpreter Execution (AN0172)
+id: 5d2207c0-a289-4a69-aa6f-c71d16d59abe
+status: experimental
+description: Detects Python execution via python.exe or py.exe with anomalous parent lineage (e.g., Office macros, LOLBAS) or execution from unusual directories.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_python:
+        Image|endswith:
+            - '\python.exe'
+            - '\pythonw.exe'
+            - '\py.exe'
+    selection_parent:
+        ParentImage|endswith:
+            - '\winword.exe'
+            - '\excel.exe'
+            - '\powerpnt.exe'
+            - '\mshta.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\cmd.exe'
+            - '\powershell.exe'
+    selection_path:
+        CommandLine|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - 'C:\ProgramData\'
+    condition: selection_python and (selection_parent or selection_path)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate developer scripts running from temp directories.
+    - Automated system administration scripts wrapped in batch files.
+level: high
+tags:
+    - attack.execution
+    - attack.t1059.006
+    - analytic.an0172
+    - detection.det0063

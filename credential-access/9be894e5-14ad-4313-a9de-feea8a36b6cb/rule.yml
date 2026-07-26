@@ -1,0 +1,30 @@
+title: Local Password Cracking Activity via PowerShell Script Block (AN0292-B)
+id: 982efca8-8b9a-4cc1-84f0-8931f720475c
+status: experimental
+description: Detects PowerShell script block logs containing keywords related to password cracking tools, techniques, or algorithms, indicating potential local brute-force attempts.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Invoke-John'
+            - 'Invoke-Hashcat'
+            - 'Hashcat'
+            - 'Get-NPUser'
+            - 'crack'
+            - 'wordlist'
+            - 'brute'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Authorized administrative testing, scripting training, or password strength audits.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1110.002
+    - analytic.an0292
+    - detection.det0105

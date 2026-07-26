@@ -1,0 +1,39 @@
+title: DNS TXT Query via CLI (AN0728-B)
+id: 40d64d05-dfe6-405f-b319-d6e87e024dfb
+status: experimental
+description: Detects command line execution of utilities querying DNS TXT records, indicating dynamic C2 calculation attempts.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_process:
+        - Image|endswith:
+            - '\nslookup.exe'
+            - '\dig.exe'
+            - '\host.exe'
+        - OriginalFileName:
+            - 'nslookup.exe'
+            - 'dig.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'txt'
+            - 'type=txt'
+            - '-query=txt'
+    condition: selection_process and selection_args
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - System administrators performing manual DNS checks or SPF queries.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1568.003
+    - analytic.an0728
+    - detection.det0262

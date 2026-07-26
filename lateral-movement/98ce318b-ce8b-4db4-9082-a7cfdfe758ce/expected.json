@@ -1,0 +1,23 @@
+{
+  "rule_id": "98ce318b-ce8b-4db4-9082-a7cfdfe758ce",
+  "rule_name": "Pass the Ticket Kerberos Authentication Activity (AN1000-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

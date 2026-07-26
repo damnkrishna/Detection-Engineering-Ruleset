@@ -1,0 +1,63 @@
+title: Exploit Public-Facing Application - Outbound Network Connection from Web Server (AN0219-B)
+id: 21567dee-a9e8-4a83-a518-cdcc08fe464b
+status: experimental
+description: Detects outbound network connections initiated by web server processes, suggesting potential reverse shell or payload download activity following exploitation.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_parent:
+        Image|endswith:
+            - '\w3wp.exe'
+            - '\tomcat.exe'
+            - '\tomcat7.exe'
+            - '\tomcat8.exe'
+            - '\tomcat9.exe'
+            - '\tomcat10.exe'
+            - '\httpd.exe'
+            - '\nginx.exe'
+            - '\java.exe'
+            - '\javaw.exe'
+    selection_network:
+        Initiated: 'true'
+    filter_local:
+        DestinationIp|startswith:
+            - '127.'
+            - '169.254.'
+            - '10.'
+            - '172.16.'
+            - '172.17.'
+            - '172.18.'
+            - '172.19.'
+            - '172.20.'
+            - '172.21.'
+            - '172.22.'
+            - '172.23.'
+            - '172.24.'
+            - '172.25.'
+            - '172.26.'
+            - '172.27.'
+            - '172.28.'
+            - '172.29.'
+            - '172.30.'
+            - '172.31.'
+            - '192.168.'
+            - 'fe80:'
+            - '::1'
+    condition: selection_parent and selection_network and not filter_local
+fields:
+    - Image
+    - CommandLine
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Web applications designed to contact external services, APIs, or database servers.
+level: high
+tags:
+    - attack.initial-access
+    - attack.t1190
+    - analytic.an0219
+    - detection.det0080

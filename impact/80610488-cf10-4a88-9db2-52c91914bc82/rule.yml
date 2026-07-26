@@ -1,0 +1,27 @@
+title: User Account Access Removal via PowerShell Script Block (AN0334-B)
+id: 27937c87-3a72-41f0-903f-d0aeb91df862
+status: experimental
+description: Detects PowerShell script block logs containing commands attempting to delete, disable, or deactivate user accounts.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Remove-LocalUser'
+            - 'Disable-LocalUser'
+            - 'Remove-ADUser'
+            - 'Disable-ADAccount'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative account management scripting.
+level: high
+tags:
+    - attack.impact
+    - attack.t1531
+    - analytic.an0334
+    - detection.det0334

@@ -1,0 +1,37 @@
+title: Staging Directory File Creation (AN0040-B)
+id: 684e47a7-0c34-40c0-acae-588d08febef9
+status: experimental
+description: Detects the creation of dynamic link archive files inside user temp or staging folders, indicating data staging for exfiltration.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\Windows\Temp\'
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\ProgramData\'
+            - 'C:\Temp\'
+    selection_archives:
+        TargetFilename|endswith:
+            - '.zip'
+            - '.7z'
+            - '.rar'
+            - '.tar'
+            - '.tgz'
+    condition: selection_paths and selection_archives
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Legitimate installers unpacking files or utility programs archiving log entries.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1074
+    - analytic.an0040
+    - detection.det0014

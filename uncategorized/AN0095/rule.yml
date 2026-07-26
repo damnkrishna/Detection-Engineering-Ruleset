@@ -1,0 +1,83 @@
+title: Process Discovery via Enumeration Utilities (AN0095-A)
+id: 86895489-7b63-4917-8129-8c67ad7c1dea
+status: experimental
+description: Detects adversarial execution of process enumeration tools (tasklist.exe, wmic process, Get-Process) used to discover running processes on a compromised host.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_tasklist:
+        - Image|endswith: '\tasklist.exe'
+        - OriginalFileName: 'tasklist.exe'
+    selection_wmic:
+        - Image|endswith: '\wmic.exe'
+        - OriginalFileName: 'wmic.exe'
+    selection_wmic_args:
+        CommandLine|contains:
+            - ' process'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_args:
+        CommandLine|contains:
+            - 'Get-Process'
+            - 'Get-WmiObject Win32_Process'
+            - 'Get-CimInstance Win32_Process'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_tasklist or (selection_wmic and selection_wmic_args) or (selection_powershell and selection_powershell_args)) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - System administrators running process inventories for health checks, or monitoring tools that periodically enumerate running services.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1057
+    - analytic.an0095
+    - detection.det0034
+---
+title: Process Discovery via PowerShell Script Block (AN0095-B)
+id: b7b82e7d-55ae-43d9-90cf-f54b5a359b4f
+status: experimental
+description: Detects PowerShell script blocks querying active processes using Win32 API or WMI cmdlets.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Get-Process'
+            - 'Win32_Process'
+            - 'System.Diagnostics.Process'
+            - 'Get-WmiObject -Class Win32_Process'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Authorized administrative or developer script tasks running process diagnostics.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1057
+    - analytic.an0095
+    - detection.det0034

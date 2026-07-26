@@ -1,0 +1,40 @@
+title: Electron ASAR File Modification (AN0071-C)
+id: d17cebe8-b67b-4fe5-a3cf-c4c1a9a526c1
+status: experimental
+description: Detects modifications or writes to Electron application resource archives (.asar files) by non-application updater processes, indicating potential backdoor persistence.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: file_event
+    product: windows
+    # Relies on Sysmon Event ID 11
+detection:
+    selection_path:
+        TargetFilename|contains:
+            - '\Microsoft\Teams\'
+            - '\Slack\'
+            - '\Microsoft VS Code\'
+            - '\Discord\'
+    selection_file:
+        TargetFilename|endswith: '\.asar'
+    filter_updater:
+        Image|endswith:
+            - '\Teams.exe'
+            - '\slack.exe'
+            - '\Code.exe'
+            - '\Discord.exe'
+            - '\Update.exe'
+            - '\Squirrel.exe'
+    condition: selection_path and selection_file and not filter_updater
+fields:
+    - Image
+    - TargetFilename
+    - User
+falsepositives:
+    - Manual application updates or administrative modifications by system management tools.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1218.015
+    - analytic.an0071
+    - detection.det0025

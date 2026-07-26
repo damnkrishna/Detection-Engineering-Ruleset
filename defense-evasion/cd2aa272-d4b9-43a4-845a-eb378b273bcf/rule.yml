@@ -1,0 +1,29 @@
+title: Prevent Command History Logging - Set-PSReadLineOption (AN1557)
+id: 45bcdc86-afc1-4ccf-ad1d-cddaaa6707e9
+status: experimental
+description: Detects PowerShell commands altering PSReadLine options to disable history saving, a common evasion technique.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104) or Command Line (Event ID 1)
+detection:
+    selection_cmd:
+        - CommandLine|contains|all:
+            - 'Set-PSReadLineOption'
+            - 'SaveNothing'
+        - ScriptBlockText|contains|all:
+            - 'Set-PSReadLineOption'
+            - 'SaveNothing'
+    condition: selection_cmd
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Privacy-conscious administrators or developers intentionally disabling history on jump boxes.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1690
+    - analytic.an1557
+    - detection.det0563

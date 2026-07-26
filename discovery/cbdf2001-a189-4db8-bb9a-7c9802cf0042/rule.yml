@@ -1,0 +1,42 @@
+title: System Network Configuration Enumeration (AN2078)
+id: 5200613f-a02b-4992-998f-40ca78807d43
+status: experimental
+description: Detects execution of ipconfig, arp, route, or nbtstat to gather network interface and routing information. Covers renamed binaries via OriginalFileName to resist trivial binary-rename evasion.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\ipconfig.exe'
+            - '\arp.exe'
+            - '\route.exe'
+            - '\nbtstat.exe'
+    selection_ofn:
+        OriginalFileName:
+            - 'ipconfig.exe'
+            - 'arp.exe'
+            - 'ROUTE.EXE'
+            - 'nbtstat.exe'
+    selection_cli:
+        CommandLine|contains:
+            - '/all'
+            - '-a'
+            - 'print'
+            - '-n'
+    condition: (selection_images or selection_ofn) and selection_cli
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - IT administrators troubleshooting network connectivity issues.
+level: low
+tags:
+    - attack.discovery
+    - attack.t1016
+    - analytic.an2078
+    - detection.det0935

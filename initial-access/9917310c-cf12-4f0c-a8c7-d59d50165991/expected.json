@@ -1,0 +1,23 @@
+{
+  "rule_id": "9917310c-cf12-4f0c-a8c7-d59d50165991",
+  "rule_name": "Wi-Fi Network Anomalies - Wireless Profile Query via Script Block (AN1476-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

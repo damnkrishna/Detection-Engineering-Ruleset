@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"ET MALWARE Observed Suspicious Outbound Connection MICROPSIA Variant CnC Domain in DNS Lookup","hostname":"OPS-WKS-528","agent_ip":"10.42.19.22","severity_id":3,"event_uid":"golden|ioc-dns-micropsia-marwapetersson|0|750500","proto":"tcp","src_port":"50412","dst_port":"443"}

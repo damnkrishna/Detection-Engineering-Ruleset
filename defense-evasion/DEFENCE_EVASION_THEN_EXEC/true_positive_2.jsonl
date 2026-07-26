@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","signature_name":"C:\\Windows\\System32 1102","hostname":"FIN-WKS-250","agent_ip":"10.42.41.12","severity_id":3,"event_uid":"golden|DEFENCE_EVASION_THEN_EXEC|0|146900","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T10:05:00.000Z","tactic":"TA0002","hostname":"FIN-WKS-250","agent_ip":"10.42.41.12","severity_id":3,"event_uid":"golden|DEFENCE_EVASION_THEN_EXEC|1|146901","proto":"tcp","src_port":"50412","dst_port":"443"}

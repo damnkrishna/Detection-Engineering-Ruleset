@@ -1,0 +1,23 @@
+{
+  "rule_id": "9be894e5-14ad-4313-a9de-feea8a36b6cb",
+  "rule_name": "Local Password Cracking Activity via PowerShell Script Block (AN0292-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

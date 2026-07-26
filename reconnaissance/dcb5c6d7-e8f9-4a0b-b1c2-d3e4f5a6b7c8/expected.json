@@ -1,0 +1,23 @@
+{
+  "rule_id": "dcb5c6d7-e8f9-4a0b-b1c2-d3e4f5a6b7c8",
+  "rule_name": "PowerShell System Information Gathering via WMI/CIM (AN2067-PowerShell)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

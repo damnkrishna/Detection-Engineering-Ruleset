@@ -1,0 +1,27 @@
+title: Password Policy Discovery via PowerShell Script Block (AN0455-B)
+id: 05130155-ae35-40c5-abd7-5b1ff032fc64
+status: experimental
+description: Detects PowerShell script blocks querying Active Directory fine-grained or default domain password policy settings.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Get-ADDefaultDomainPasswordPolicy'
+            - 'Get-ADFineGrainedPasswordPolicy'
+            - 'PasswordPolicy'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate AD auditing or policy administration scripts.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1201
+    - analytic.an0455
+    - detection.det0161

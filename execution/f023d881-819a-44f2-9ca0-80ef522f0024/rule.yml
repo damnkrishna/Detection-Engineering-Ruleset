@@ -1,0 +1,37 @@
+title: Anomalous Named Pipe Creation (AN1357-A)
+id: 5591851f-1981-402c-8b2d-3333c2e6673f
+status: experimental
+description: Detects Sysmon Event ID 17 named pipe creation events pointing to post-exploitation frameworks or anomalous prefixes.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: pipe_created
+    product: windows
+detection:
+    selection_pipes:
+        PipeName|contains:
+            - '\postex_'
+            - '\status_'
+            - '\msagent_'
+            - '\msse-'
+            - '\spooler_'
+            - '\lsass_'
+    filter_system:
+        # Exclude standard built-in spooler or LSASS calls
+        Image|endswith:
+            - '\system32\spoolsv.exe'
+            - '\system32\lsass.exe'
+            - '\system32\services.exe'
+    condition: selection_pipes and not filter_system
+fields:
+    - PipeName
+    - Image
+    - User
+falsepositives:
+    - Diagnostic packages mimicking standard pipe structures (rare).
+level: critical
+tags:
+    - attack.execution
+    - attack.t1559
+    - analytic.an1357
+    - detection.det0493

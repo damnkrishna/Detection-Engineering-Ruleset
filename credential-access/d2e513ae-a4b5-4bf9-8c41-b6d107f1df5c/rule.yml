@@ -1,0 +1,39 @@
+title: Suspicious SAM Registry Hive Export via File Event (AN0235-C)
+id: 78750f7f-c735-469d-b1ed-fa7b1925e6a1
+status: experimental
+description: Detects creation of files named sam, system, or security (or with those extensions) by non-system processes in temp directories.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_target:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - 'C:\Windows\Temp\'
+            - 'C:\Temp\'
+    selection_files:
+        TargetFilename|endswith:
+            - '\sam'
+            - '\system'
+            - '\security'
+            - '.hiv'
+            - '.hive'
+            - '.bak'
+    filter_system:
+        Image|startswith:
+            - 'C:\Windows\System32\'
+            - 'C:\Windows\SysWOW64\'
+    condition: selection_target and selection_files and not filter_system
+fields:
+    - Image
+    - TargetFilename
+falsepositives:
+    - Legitimate backup agents or system troubleshooting tools.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1003.002
+    - analytic.an0235
+    - detection.det0085

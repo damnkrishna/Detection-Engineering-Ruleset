@@ -1,0 +1,39 @@
+title: Remote System Discovery via Native Tools (AN2079)
+id: a63da009-8cc8-4cbe-9abf-3ed1d29fe3f1
+status: experimental
+description: Detects command-line utilities querying the domain for computer objects or domain controllers. Covers renamed binaries via OriginalFileName to resist trivial binary-rename evasion.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\nltest.exe'
+            - '\net.exe'
+            - '\net1.exe'
+    selection_ofn:
+        OriginalFileName:
+            - 'nltest.exe'
+            - 'net.exe'
+            - 'net1.exe'
+    selection_cli:
+        CommandLine|contains:
+            - '/dclist:'
+            - '/domain_trusts'
+            - ' view'
+    condition: (selection_images or selection_ofn) and selection_cli
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Domain administrators checking trust relationships or listing available shares.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1018
+    - analytic.an2079
+    - detection.det0936

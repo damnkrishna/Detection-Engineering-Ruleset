@@ -1,0 +1,58 @@
+title: Subvert Trust Controls - Mark-of-the-Web Bypass via Container Mount (AN0712)
+id: 78576bc5-970c-41be-a19e-167631f14ca6
+status: experimental
+description: Detects processes executing from drive paths that are typically created when mounting container or disk image files (like .iso, .vhd), suggesting an attempt to bypass Mark-of-the-Web (MOTW).
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_drive:
+ # Mounted container files often allocate drive letters starting from D: to Z:
+ # and execute script engines or executable payloads.
+        CommandLine|contains:
+            - 'D:\'
+            - 'E:\'
+            - 'F:\'
+            - 'G:\'
+            - 'H:\'
+    selection_payloads:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\mshta.exe'
+        - OriginalFileName:
+            - 'cmd.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'rundll32.exe'
+            - 'regsvr32.exe'
+            - 'mshta.exe'
+    condition: selection_drive and selection_payloads
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - User installing legitimate software from a mounted physical/virtual CD/DVD.
+    - IT administrators deploying software from network-attached ISO images.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1553.005
+    - analytic.an0712
+    - detection.det0257

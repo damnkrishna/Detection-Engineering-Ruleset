@@ -1,0 +1,23 @@
+{
+  "rule_id": "8b9fbae7-439b-4238-9bdc-60f065c94b8f",
+  "rule_name": "External Remote Services - Successful Remote Logon Event (AN1004-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

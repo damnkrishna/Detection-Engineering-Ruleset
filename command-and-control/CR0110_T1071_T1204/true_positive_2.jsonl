@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T10:00:00.000Z","signature_name":"C:\\Windows\\System32 IMAP traffic detected","hostname":"ENG-WKS-767","agent_ip":"10.42.158.119","severity_id":3,"event_uid":"golden|CR0110_T1071_T1204|0|296000","proto":"tcp","src_port":"50412","dst_port":"443","src_ip":"10.42.158.119","dst_ip":"198.51.100.177"}

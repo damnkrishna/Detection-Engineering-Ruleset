@@ -1,0 +1,35 @@
+title: WMIC CommandLine Process Creation Invitation (AN1031-B)
+id: fd7f0bc9-cdf0-4fb6-bcf7-7a8bf5ce984b
+status: experimental
+description: Detects command-line execution of wmic.exe initiating process creations or altering shadow copies.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\wmic.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'wmic.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'process call create'
+            - 'shadowcopy delete'
+            - 'useraccount'
+            - 'sysenvironment'
+    condition: (selection_images or selection_orig) and selection_cli
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Administrative automation scripts gathering asset intelligence.
+level: medium
+tags:
+    - attack.execution
+    - attack.t1047
+    - analytic.an1031
+    - detection.det0364

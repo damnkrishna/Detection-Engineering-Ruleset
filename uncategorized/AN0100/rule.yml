@@ -1,0 +1,81 @@
+title: Bidirectional C2 Communication via Web Service API (AN0100-A)
+id: bf2ffa23-77b4-4ec3-9305-ec1f2cbf1b63
+status: experimental
+description: Detects command-line interpreters or scripting hosts initiating network connections to common web service API domains (e.g., Telegram, Slack, Dropbox) used for bidirectional C2 communication.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\rundll32.exe'
+            - '\mshta.exe'
+            - '\regsvr32.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    selection_domains:
+        DestinationHostname|contains:
+            - 'api.telegram.org'
+            - 'api.slack.com'
+            - 'slack.com'
+            - 'dropboxapi.com'
+            - 'discordapp.com'
+            - 'discord.com'
+            - 'api.box.com'
+    condition: selection_process and selection_domains
+fields:
+    - Image
+    - CommandLine
+    - User
+    - DestinationHostname
+    - DestinationIp
+    - DestinationPort
+    - Initiated
+    - SourceIp
+    - SourcePort
+falsepositives:
+    - Legitimate administrative IT scripts using automation channels (such as Slack alerting bots or Box backup utilities).
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1102.002
+    - analytic.an0100
+    - detection.det0035
+---
+title: Bidirectional C2 via PowerShell Script Block (AN0100-B)
+id: 9e6ed395-80c9-44ed-9074-7446e25fc156
+status: experimental
+description: Detects PowerShell script blocks invoking web request methods targeting common web service API domains (Telegram, Slack, Dropbox, Discord, Box) used for Command and Control.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'api.telegram.org'
+            - 'api.slack.com'
+            - 'slack.com'
+            - 'dropboxapi.com'
+            - 'discordapp.com'
+            - 'discord.com'
+            - 'api.box.com'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative or developer integration scripts communicating with authorized SaaS platforms.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1102.002
+    - analytic.an0100
+    - detection.det0035

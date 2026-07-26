@@ -1,0 +1,35 @@
+title: Hosts File Tampering or Static DNS Routing Modification (AN0702-B)
+id: 72fe2aa0-8528-4876-b2ea-9e2047de128b
+status: experimental
+description: Detects modification of the Windows hosts file or registry configuration defining local system DNS servers.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_hosts:
+        TargetFilename|endswith:
+            - '\drivers\etc\hosts'
+    filter_system:
+        Image|endswith:
+            - '\system32\svchost.exe'
+            - '\system32\notepad.exe'
+    filter_gpo:
+        Image|endswith:
+            - '\gpupdate.exe'
+        ParentImage|endswith:
+            - '\svchost.exe'
+    condition: selection_hosts and not (filter_system or filter_gpo)
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Administrators using Notepad to update local name resolution profiles during migration.
+level: high
+tags:
+    - attack.impact
+    - attack.t1565.002
+    - analytic.an0702
+    - detection.det0254

@@ -1,0 +1,31 @@
+title: Backup Software Discovery via PowerShell Script Block (AN0240-B)
+id: 02cbcc0e-078f-4de4-bc41-12580f65e3df
+status: experimental
+description: Detects PowerShell script blocks querying backup services, namespaces, or cmdlets (Get-WmiObject, wbadmin, WindowsServerBackup) to discover backup details.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Veeam'
+            - 'Acronis'
+            - 'BackupExec'
+            - 'ShadowProtect'
+            - 'WindowsServerBackup'
+            - 'wbadmin'
+            - 'Get-WmiObject -Class Win32_Service'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative backup status scripts.
+level: high
+tags:
+    - attack.discovery
+    - attack.t1518.002
+    - analytic.an0240
+    - detection.det0088

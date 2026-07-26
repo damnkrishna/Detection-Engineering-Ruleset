@@ -1,0 +1,120 @@
+title: Suspicious Browser Credential Store Access via CLI (AN0105-A)
+id: 9ee6f755-9f7b-4fa0-bb0e-45c3793845f0
+status: experimental
+description: Detects command-line operations attempting to copy, compress, or access web browser credential and cookie databases, indicating potential credential theft.
+author: Krishna Gupta
+date: 2026-06-12
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_tools_image:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\xcopy.exe'
+            - '\robocopy.exe'
+            - '\tar.exe'
+            - '\7z.exe'
+    selection_tools_original:
+        OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'xcopy.exe'
+            - 'robocopy.exe'
+            - 'tar.exe'
+            - '7z.exe'
+    selection_chrome_login:
+        CommandLine|contains|all:
+            - '\Google\Chrome\User Data\'
+            - '\Login Data'
+    selection_chrome_cookies:
+        CommandLine|contains|all:
+            - '\Google\Chrome\User Data\'
+            - '\Network\Cookies'
+    selection_edge_login:
+        CommandLine|contains|all:
+            - '\Microsoft\Edge\User Data\'
+            - '\Login Data'
+    selection_edge_cookies:
+        CommandLine|contains|all:
+            - '\Microsoft\Edge\User Data\'
+            - '\Network\Cookies'
+    selection_firefox:
+        CommandLine|contains:
+            - '\Mozilla\Firefox\Profiles\'
+    selection_files:
+        CommandLine|contains:
+            - 'logins.json'
+            - 'key4.db'
+            - 'key3.db'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_tools_image or selection_tools_original) and (selection_chrome_login or selection_chrome_cookies or selection_edge_login or selection_edge_cookies or selection_firefox or selection_files) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate browser profile migrations or backup scripts by administrators.
+    - Endpoint management tools performing user state migrations.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1555.003
+    - analytic.an0105
+    - detection.det0037
+---
+title: Suspicious Browser Credential Store Access via File Event (AN0105-B)
+id: fccb5ec4-efc4-4cc7-a4a0-30da2663a4fc
+status: experimental
+description: Detects non-browser processes writing, accessing, or creating web browser credential and cookie databases, indicating potential credential theft.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\Google\Chrome\User Data\'
+            - '\Microsoft\Edge\User Data\'
+            - '\Mozilla\Firefox\Profiles\'
+            - '\Opera Software\Opera Stable\'
+            - '\BraveSoftware\Brave-Browser\User Data\'
+    selection_files:
+        TargetFilename|endswith:
+            - '\Login Data'
+            - '\Cookies'
+            - '\Web Data'
+            - 'places.sqlite'
+            - 'key4.db'
+            - 'logins.json'
+    filter_browsers:
+        Image|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\firefox.exe'
+            - '\brave.exe'
+            - '\opera.exe'
+    condition: (selection_paths or selection_files) and not filter_browsers
+fields:
+    - Image
+    - TargetFilename
+falsepositives:
+    - Backup software or legitimate password managers accessing browser databases.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1555.003
+    - analytic.an0105
+    - detection.det0037

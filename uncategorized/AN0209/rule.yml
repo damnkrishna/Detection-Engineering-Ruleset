@@ -1,0 +1,82 @@
+title: Suspicious Visual Basic Script Execution (AN0209)
+id: 9e53ddd5-7f92-4bd1-bfd3-9eb81bb91a91
+status: experimental
+description: Detects suspicious execution of wscript.exe or cscript.exe spawned by Microsoft Office applications or executing VBScripts from user-writable directories.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_images:
+        - Image|endswith:
+            - '\wscript.exe'
+            - '\cscript.exe'
+        - OriginalFileName:
+            - 'wscript.exe'
+            - 'cscript.exe'
+    selection_office_parents:
+        ParentImage|endswith:
+            - '\winword.exe'
+            - '\excel.exe'
+            - '\powerpnt.exe'
+            - '\outlook.exe'
+    selection_temp_paths:
+        CommandLine|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+            - '\AppData\Roaming\'
+    condition: selection_images and (selection_office_parents or selection_temp_paths)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Administrative logon scripts or internal deployment tools executing VBScripts.
+    - Specialized local applications executing macro tasks during update processes.
+level: high
+tags:
+    - attack.execution
+    - attack.t1059.005
+    - analytic.an0209
+    - detection.det0076
+---
+title: Visual Basic Script File Drop in Temp Directories (AN0209-B)
+id: acfd3837-537c-4211-ac91-ac6d7cbecc06
+status: experimental
+description: Detects the creation of Visual Basic script files (.vbs, .vbe) inside user-writable temp folders, indicating staging for execution.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.vbs'
+            - '.vbe'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Software installer routines unpacking helper scripts.
+level: medium
+tags:
+    - attack.execution
+    - attack.t1059.005
+    - analytic.an0209
+    - detection.det0076

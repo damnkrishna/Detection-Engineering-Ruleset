@@ -1,0 +1,49 @@
+title: CommandLine Browser Data Access (AN0037-B)
+id: c7c2cde0-aca5-4770-a920-382daf715b59
+status: experimental
+description: Detects command-line utilities (like copy, xcopy, robocopy, powershell, type) attempting to read or copy files from local browser profile artifact directories (Google Chrome, Microsoft Edge, Mozilla Firefox), which indicates browser data harvesting.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_utilities:
+        - Image|endswith:
+            - '\xcopy.exe'
+            - '\robocopy.exe'
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'xcopy.exe'
+            - 'robocopy.exe'
+            - 'cmd.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_paths:
+        CommandLine|contains:
+            - '\Google\Chrome\User Data\'
+            - '\Microsoft\Edge\User Data\'
+            - '\Mozilla\Firefox\Profiles\'
+            - 'Login Data'
+            - 'Cookies'
+            - 'Web Data'
+            - 'key4.db'
+            - 'logins.json'
+    condition: selection_utilities and selection_paths
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Legitimate administrator backup scripts or tools backing up user profiles.
+level: high
+tags:
+    - attack.discovery
+    - attack.t1217
+    - analytic.an0037
+    - detection.det0013

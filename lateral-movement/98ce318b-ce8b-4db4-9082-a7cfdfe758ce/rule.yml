@@ -1,0 +1,32 @@
+title: Pass the Ticket Kerberos Authentication Activity (AN1000-B)
+id: c188490d-4160-4272-b958-ce55c4b790f2
+status: experimental
+description: Detects Kerberos Ticket Granting Ticket (TGT) or Service Ticket (TGS) requests using legacy RC4 encryption (0x17/23), suggesting alternate authentication material usage.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_kerberos:
+        EventID:
+            - 4768 # TGT Request
+            - 4769 # TGS Request
+        TicketEncryptionType:
+            - '0x17' # RC4-HMAC
+            - '23'
+    condition: selection_kerberos
+fields:
+    - EventID
+    - TicketEncryptionType
+    - TargetUserName
+    - TargetDomainName
+    - IpAddress
+falsepositives:
+    - Legacy operating systems or legacy application servers in the domain that do not support AES Kerberos encryption and fallback to RC4.
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1550.003
+    - analytic.an1000
+    - detection.det0352

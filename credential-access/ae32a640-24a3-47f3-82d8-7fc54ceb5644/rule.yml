@@ -1,0 +1,28 @@
+title: AS-REP Roasting Tool Execution via PowerShell Script Block (AN0316-B)
+id: d4233920-c10d-4c35-9c62-9afc028148ad
+status: experimental
+description: Detects PowerShell script block logs containing keywords related to AS-REP Roasting attacks or querying AD accounts without pre-authentication required.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Get-ASREPRoast'
+            - 'Get-DomainUser'
+            - 'PreauthNotRequired'
+            - 'asreproast'
+            - 'GetNPUsers'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative audits of AD configurations.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1558.004
+    - analytic.an0316
+    - detection.det0113

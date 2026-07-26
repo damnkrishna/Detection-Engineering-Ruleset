@@ -1,0 +1,46 @@
+title: CLI Copy to Removable Drive (AN0342-B)
+id: c97ba87e-0b35-4a29-a08d-5366f73120a4
+status: experimental
+description: Detects command-line utilities copying files or folders to typical removable storage drive letters (D:, E:, F:, etc.).
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_binaries_image:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\robocopy.exe'
+            - '\xcopy.exe'
+    selection_binaries_original:
+        OriginalFileName:
+            - 'cmd.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'robocopy.exe'
+            - 'xcopy.exe'
+    selection_args:
+        CommandLine|contains:
+            - ' D:\'
+            - ' E:\'
+            - ' F:\'
+            - ' G:\'
+            - ' H:\'
+            - ' I:\'
+    condition: (selection_binaries_image or selection_binaries_original) and selection_args
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Users or administrators performing local manual file backups.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1052
+    - analytic.an0342
+    - detection.det0123

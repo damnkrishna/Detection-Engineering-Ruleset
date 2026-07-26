@@ -1,0 +1,32 @@
+title: Execution of Bandwidth Hijacking or Proxyjacking Software via Network Connection (AN0080-B)
+id: a0c81e25-9867-4ada-8c28-9bcb2d789a04
+status: experimental
+description: Detects network connections initiated by known proxyjacking, bandwidth sharing, or botnet scanning software, indicating resource abuse.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\honeygain.exe'
+            - '\packetstream.exe'
+            - '\peer2profit.exe'
+            - '\earnapp.exe'
+            - '\iproyal.exe'
+            - '\masscan.exe'
+    condition: selection_process
+fields:
+    - Image
+    - User
+    - DestinationIp
+    - DestinationPort
+falsepositives:
+    - Highly unlikely in enterprise environments.
+level: high
+tags:
+    - attack.impact
+    - attack.t1496.002
+    - analytic.an0080
+    - detection.det0028

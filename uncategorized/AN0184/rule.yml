@@ -1,0 +1,89 @@
+title: Malicious IIS Module or ISAPI Filter Installation (AN0184)
+id: df774cdf-79af-42ce-a853-5722860d99ef
+status: experimental
+description: Detects adversarial installation of malicious IIS components (native modules, ISAPI filters/extensions) via appcmd.exe or PowerShell web configuration cmdlets.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_appcmd:
+        - Image|endswith: '\appcmd.exe'
+        - OriginalFileName: 'appcmd.exe'
+    selection_appcmd_install:
+        CommandLine|contains:
+            - ' install '
+            - ' add '
+            - 'module'
+            - 'isapi'
+            - 'filter'
+            - 'handler'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_ps_iis:
+        CommandLine|contains:
+            - 'New-WebConfiguration'
+            - 'Add-WebConfiguration'
+            - 'isapi'
+            - 'GlobalModules'
+            - 'system.webServer/modules'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: ((selection_appcmd and selection_appcmd_install) or (selection_powershell and selection_ps_iis)) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate IIS module installation by administrators during upgrades.
+level: high
+tags:
+    - attack.persistence
+    - attack.t1505.004
+    - analytic.an0184
+    - detection.det0068
+---
+title: Malicious IIS Component File Drop (AN0184-B)
+id: 5e9b3eb2-7a53-435a-9d83-fda88b158212
+status: experimental
+description: Detects drops of new DLL or config files to IIS system directories, representing the dropping phase of a malicious IIS native module or filter.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\System32\inetsrv\'
+            - '\inetsrv\config\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.dll'
+            - '.config'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Software updates or deployment scripts updating IIS configuration files.
+level: high
+tags:
+    - attack.persistence
+    - attack.t1505.004
+    - analytic.an0184
+    - detection.det0068

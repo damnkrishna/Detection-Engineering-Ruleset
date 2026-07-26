@@ -1,0 +1,42 @@
+title: Network Provider DLL Registry Modification (AN1598-A)
+id: 3851594c-ccda-4e52-9541-4bc0550c7e1c
+status: experimental
+description: Detects registry modifications to the ProviderOrder or ProviderPath keys under NetworkProvider services.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_provider_path:
+        TargetObject|contains:
+            - 'System\CurrentControlSet\Services\'
+        TargetObject|endswith:
+            - '\NetworkProvider\ProviderPath'
+    selection_provider_order:
+        TargetObject|endswith:
+            - 'System\CurrentControlSet\Control\NetworkProvider\Order\ProviderOrder'
+    filter_standard_order:
+        TargetObject|endswith: 'System\CurrentControlSet\Control\NetworkProvider\Order\ProviderOrder'
+        Details:
+            - 'LanmanWorkstation,RDPNP,webclient'
+            - 'LanmanWorkstation,RDPNP'
+    filter_standard_paths:
+        TargetObject|endswith: 'NetworkProvider\ProviderPath'
+        Details:
+            - 'C:\Windows\System32\ntlanman.dll'
+            - 'C:\Windows\System32\rdpnp.dll'
+            - 'C:\Windows\System32\davclnt.dll'
+    condition: (selection_provider_path and not filter_standard_paths) or (selection_provider_order and not filter_standard_order)
+fields:
+    - TargetObject
+    - Details
+    - User
+falsepositives:
+    - Installation of legitimate network providers (e.g. third-party VPN clients, cloud storage mounts, or virtualization tools like VMware/VirtualBox).
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1556.008
+    - analytic.an1598
+    - detection.det0580

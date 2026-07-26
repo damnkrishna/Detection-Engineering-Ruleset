@@ -1,0 +1,37 @@
+title: System Service Enumeration (AN2076)
+id: 97c0c97b-441f-4030-8a5e-c926ae784485
+status: experimental
+description: Detects the execution of sc.exe or net.exe to enumerate system services. Covers renamed binaries via OriginalFileName to resist trivial binary-rename evasion.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\sc.exe'
+            - '\net.exe'
+            - '\net1.exe'
+    selection_ofn:
+        OriginalFileName:
+            - 'sc.exe'
+            - 'net.exe'
+            - 'net1.exe'
+    selection_cli:
+        CommandLine|contains:
+            - ' query'
+    condition: (selection_images or selection_ofn) and selection_cli
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - IT administrators querying service status during troubleshooting.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1007
+    - analytic.an2076
+    - detection.det0933

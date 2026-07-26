@@ -1,0 +1,27 @@
+title: Exposure File Access (AN2069-Sensitive-Files)
+id: faa63e82-465b-4733-9a03-65cadc0aae3a
+status: experimental
+description: Detects successful retrieval of highly sensitive configuration or repository files (e.g., .git/config, .env), typically discovered via Google Dorking or directory brute-forcing.
+author: Krishna Gupta
+date: 2026-07-02
+logsource:
+    category: webserver
+    product: windows
+detection:
+    selection:
+        http_request_path|re:
+            - '.*\/\.git\/config$'
+            - '.*\/\.git\/HEAD$'
+            - '.*\/composer\.json$'
+            - '.*\/package\.json$'
+            - '.*\/\.env\.[a-z]+$'        # .env.production, .env.local
+            - '.*\/web\.config$'
+            - '.*\/crossdomain\.xml$'
+            - '.*\/clientaccesspolicy\.xml$'
+        http_status:
+            - 200                          # They FOUND something
+    condition: selection
+level: high
+tags:
+    - attack.reconnaissance
+    - attack.t1594

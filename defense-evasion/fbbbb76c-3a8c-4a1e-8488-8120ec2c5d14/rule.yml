@@ -1,0 +1,37 @@
+title: Downgrade Attack - PowerShell v2 Execution (AN0995)
+id: a45712cf-f0e6-4adb-94f5-adacbddf879f
+status: experimental
+description: Detects the execution of PowerShell explicitly requesting version 2 or legacy binaries, bypassing modern security logging.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_ps:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_args:
+        CommandLine|contains|all:
+            - '-version'
+            - '2'
+    condition: selection_ps and selection_args
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legacy enterprise scripts that explicitly require PowerShell v2 for compatibility.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1689
+    - analytic.an0995
+    - detection.det0350

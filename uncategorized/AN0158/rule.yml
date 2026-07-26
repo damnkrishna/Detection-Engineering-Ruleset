@@ -1,0 +1,76 @@
+title: Scripting Host Connection to Dead Drop Web Service (AN0158-A)
+id: 81df8484-8401-4ec0-a076-cbc11d37bbc1
+status: experimental
+description: Detects scripting hosts or system command-line interpreters initiating network connections to known dead drop resolver domains (e.g., github.com, pastebin.com, reddit.com).
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\cmd.exe'
+    selection_domains:
+        DestinationHostname|contains:
+            - 'github.com'
+            - 'raw.githubusercontent.com'
+            - 'pastebin.com'
+            - 'reddit.com'
+            - 'twitter.com'
+            - 'instagram.com'
+    condition: selection_process and selection_domains
+fields:
+    - Image
+    - CommandLine
+    - User
+    - DestinationHostname
+    - DestinationIp
+    - DestinationPort
+    - Initiated
+    - SourceIp
+falsepositives:
+    - Legitimate administrative tasks or developers downloading code files and packages.
+level: medium
+tags:
+    - attack.command-and-control
+    - attack.t1102.001
+    - analytic.an0158
+    - detection.det0058
+---
+title: Dead Drop Web Service via PowerShell Script Block (AN0158-B)
+id: aac5a9a1-6770-47c0-8ab3-7d9084f25172
+status: experimental
+description: Detects PowerShell script blocks referencing dead drop resolver domains (e.g., github.com, pastebin.com, reddit.com) to resolve C2 endpoints.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'github.com'
+            - 'raw.githubusercontent.com'
+            - 'pastebin.com'
+            - 'reddit.com'
+            - 'twitter.com'
+            - 'instagram.com'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Administrative scripts updating local config or software from GitHub.
+level: medium
+tags:
+    - attack.command-and-control
+    - attack.t1102.001
+    - analytic.an0158
+    - detection.det0058

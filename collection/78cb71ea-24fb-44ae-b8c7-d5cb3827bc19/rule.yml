@@ -1,0 +1,34 @@
+title: Suspicious Database Client Network Connection (AN0677-B)
+id: 553a9316-988d-4552-8e07-9ac02535f508
+status: experimental
+description: Detects network connections initiated by database client tools, suggesting unauthorized data compilation or remote connection during collection.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_db_clients:
+        - Image|endswith:
+            - '\sqlcmd.exe'
+            - '\bcp.exe'
+            - '\osql.exe'
+            - '\isql.exe'
+            - '\mysql.exe'
+            - '\mysqldump.exe'
+    condition: selection_db_clients
+fields:
+    - Image
+    - User
+    - SourceIp
+    - SourcePort
+    - DestinationIp
+    - DestinationPort
+falsepositives:
+    - Legitimate connections made by administrators or developer scripts to databases.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1213.006
+    - analytic.an0677
+    - detection.det0242

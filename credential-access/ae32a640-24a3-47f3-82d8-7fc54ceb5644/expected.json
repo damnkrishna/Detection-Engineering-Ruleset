@@ -1,0 +1,23 @@
+{
+  "rule_id": "ae32a640-24a3-47f3-82d8-7fc54ceb5644",
+  "rule_name": "AS-REP Roasting Tool Execution via PowerShell Script Block (AN0316-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "id": "APPLOCKER_BYPASS_EXEC",
+  "description": "AppLocker or WDAC bypass via signed binary proxy (T1218) followed by malicious execution \u2014 whitelisting evasion chain",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.5,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "proxy_bypass",
+      "techniques": [
+        "T1218"
+      ],
+      "signatureContains": [
+        "InstallUtil.exe",
+        "regsvcs.exe",
+        "regasm.exe",
+        "MSBuild.exe",
+        "csc.exe",
+        "vbc.exe",
+        "jsc.exe",
+        "odbcconf.exe",
+        "pcalua.exe",
+        "dnscmd.exe",
+        "applocker bypass",
+        "WDAC bypass",
+        "trusted binary proxy"
+      ],
+      "optional": false
+    },
+    {
+      "label": "malicious_exec",
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0002",
+            "TA0003",
+            "TA0011"
+          ]
+        }
+      ],
+      "optional": false,
+      "maxGapSeconds": 600
+    }
+  ]
+}

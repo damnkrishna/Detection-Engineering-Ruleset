@@ -1,0 +1,53 @@
+title: Collection - Data Access and Copy from Removable Media (AN1410)
+id: 48d9856b-876b-4794-a14a-09cdc056484e
+status: experimental
+description: Detects command-line copy utilities, compression engines, or scripting environments targeting files stored on removable media drive letters, indicating unauthorized data collection.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_utilities:
+        - Image|endswith:
+            - '\xcopy.exe'
+            - '\robocopy.exe'
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\7z.exe'
+            - '\tar.exe'
+        - OriginalFileName:
+            - 'xcopy.exe'
+            - 'robocopy.exe'
+            - 'cmd.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - '7z.exe'
+            - 'tar.exe'
+    selection_removable_drives:
+        CommandLine|contains:
+            - ' D:\'
+            - ' E:\'
+            - ' F:\'
+            - ' G:\'
+            - ' H:\'
+    condition: selection_utilities and selection_removable_drives
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - administrators or users copying personal files or running local script backups from their authorized external drives.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1025
+    - analytic.an1410
+    - detection.det0511

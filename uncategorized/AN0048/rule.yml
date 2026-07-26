@@ -1,0 +1,137 @@
+title: Security Software Discovery via Service and WMI Queries (AN0048-A)
+id: d4146a00-75af-4219-8eb5-20e7c1d8c579
+status: experimental
+description: Detects adversarial enumeration of installed security products (antivirus, EDR, firewall) using sc.exe query, wmic product, netsh advfirewall, or PowerShell WMI queries.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_sc:
+        - Image|endswith: '\sc.exe'
+        - OriginalFileName: 'sc.exe'
+    selection_sc_args:
+        CommandLine|contains: ' query'
+    selection_netsh:
+        - Image|endswith: '\netsh.exe'
+        - OriginalFileName: 'netsh.exe'
+    selection_netsh_args:
+        CommandLine|contains: 'advfirewall'
+    selection_wmic:
+        - Image|endswith: '\wmic.exe'
+        - OriginalFileName: 'wmic.exe'
+    selection_wmic_args:
+        CommandLine|contains:
+            - ' product '
+            - 'AntiVirusProduct'
+            - 'FirewallProduct'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_args:
+        CommandLine|contains:
+            - 'AntiVirusProduct'
+            - 'FirewallProduct'
+            - 'Get-MpComputerStatus'
+            - 'SecurityCenter2'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: ((selection_sc and selection_sc_args) or (selection_netsh and selection_netsh_args) or (selection_wmic and selection_wmic_args) or (selection_powershell and selection_powershell_args)) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - IT administrators running service inventories, vulnerability scanners, or endpoint health check scripts enumerating installed security products.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1518.001
+    - analytic.an0048
+    - detection.det0016
+---
+title: Security Software Discovery via PowerShell Script Block (AN0048-B)
+id: d30e4837-1e4f-40bd-89c6-5f7ec40ad3fb
+status: experimental
+description: Detects PowerShell script blocks querying security software namespaces (SecurityCenter2, Get-MpComputerStatus) to identify installed security tools.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'SecurityCenter2'
+            - 'Get-MpComputerStatus'
+            - 'AntiVirusProduct'
+            - 'FirewallProduct'
+            - 'AntiSpywareProduct'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - IT administrators or endpoint security agents running diagnostic/audit PowerShell scripts.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1518.001
+    - analytic.an0048
+    - detection.det0016
+---
+title: Security Software Registry Key Modifications (AN0048-C)
+id: e48a8ada-0488-41e8-ae23-1e72943f2d49
+status: experimental
+description: Detects registry value modifications or additions targeting known antivirus or Defender registry paths.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 13
+detection:
+    selection_path:
+        TargetObject|contains:
+            - 'HKLM\SOFTWARE\Microsoft\Windows Defender'
+            - 'HKLM\SOFTWARE\Microsoft\Windows Advanced Threat Protection'
+            - 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender'
+            - 'HKLM\SOFTWARE\McAfee\'
+            - 'HKLM\SOFTWARE\Symantec\'
+            - 'HKLM\SOFTWARE\TrendMicro\'
+            - 'HKLM\SOFTWARE\CrowdStrike\'
+    filter_legitimate:
+        Image|endswith:
+            - '\MsMpEng.exe'
+            - '\NisSrv.exe'
+            - '\SenseIR.exe'
+            - '\SenseCncProxy.exe'
+            - '\wininit.exe'
+            - '\services.exe'
+    condition: selection_path and not filter_legitimate
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - Authorized software installations or security agent updates.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1518.001
+    - analytic.an0048
+    - detection.det0016

@@ -1,0 +1,38 @@
+title: Local Administrator Network Connection (AN1137-B)
+id: 5412a0cf-18e4-4d3a-9330-f69e1e03f0f3
+status: experimental
+description: Detects outbound network connections over remote management ports (SMB, RDP, WinRM) associated with local admin lateral movement.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_ports:
+        DestinationPort:
+            - 445   # SMB
+            - 3389  # RDP
+            - 5985  # WinRM HTTP
+            - 5986  # WinRM HTTPS
+    selection_process:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    condition: selection_ports and selection_process
+fields:
+    - Image
+    - SourceIp
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Authorized remote administration by IT administrators using automation scripts.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1078.003
+    - analytic.an1137
+    - detection.det0360

@@ -1,0 +1,38 @@
+title: Cryptographic DLL Loaded by Non-Cryptographic Process (AN0400-A)
+id: 41951dff-ecc8-45e6-92bf-4a0a68159f33
+status: experimental
+description: Detects standard system applications that typically perform no cryptographic operations loading Windows cryptographic DLLs (e.g., bcryptprimitives.dll, cryptsp.dll), which may indicate encrypted C2 beaconing.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: image_load
+    product: windows
+    # Relies on Sysmon Event ID 7
+detection:
+    selection_process:
+        Image|endswith:
+            - '\calc.exe'
+            - '\notepad.exe'
+            - '\mspaint.exe'
+            - '\write.exe'
+            - '\wordpad.exe'
+    selection_dll:
+        ImageLoaded|endswith:
+            - '\bcrypt.dll'
+            - '\bcryptprimitives.dll'
+            - '\cryptsp.dll'
+            - '\ncrypt.dll'
+    condition: selection_process and selection_dll
+fields:
+    - Image
+    - ImageLoaded
+    - Signed
+    - SignatureStatus
+falsepositives:
+    - Extremely rare. Standard system applications like calc or notepad have no native reason to load cryptographic libraries.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1573.001
+    - analytic.an0400
+    - detection.det0143

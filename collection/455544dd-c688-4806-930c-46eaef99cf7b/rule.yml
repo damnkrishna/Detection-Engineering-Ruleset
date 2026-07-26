@@ -1,0 +1,49 @@
+title: Collection - Email Inbox Forwarding Rule Creation (AN1589)
+id: bae6fa5a-5bd8-4824-9f47-3c2ad040ee62
+status: experimental
+description: Detects PowerShell cmdlets (New-InboxRule, Set-InboxRule, Set-Mailbox) executed with parameters configured to forward or redirect emails, suggesting external data redirection.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_cmdlets:
+        CommandLine|contains:
+            - 'New-InboxRule'
+            - 'Set-InboxRule'
+            - 'New-TransportRule'
+            - 'Set-TransportRule'
+            - 'Set-Mailbox'
+    selection_forward_flags:
+        CommandLine|contains:
+            - 'ForwardTo'
+            - 'ForwardAsAttachmentTo'
+            - 'RedirectTo'
+            - 'DeliverToMailboxAndForward'
+    condition: selection_powershell and selection_cmdlets and selection_forward_flags
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - administrators configuring legitimate corporate mail routing rules or user out-of-office forwarding.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1114.003
+    - analytic.an1589
+    - detection.det0576

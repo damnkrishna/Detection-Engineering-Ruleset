@@ -1,0 +1,36 @@
+title: Outbound Network Connection from Non-Cryptographic Process (AN0400-B)
+id: f26d747b-0745-4b61-a5f6-43e9cbc71bff
+status: experimental
+description: Detects outbound network connections initiated by standard Windows system applications (like calc.exe, notepad.exe) that do not natively perform network communications, indicating potential active C2 beaconing.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_process:
+        Image|endswith:
+            - '\calc.exe'
+            - '\notepad.exe'
+            - '\mspaint.exe'
+            - '\write.exe'
+            - '\wordpad.exe'
+    condition: selection_process
+fields:
+    - Image
+    - CommandLine
+    - User
+    - DestinationHostname
+    - DestinationIp
+    - DestinationPort
+    - Initiated
+    - SourceIp
+falsepositives:
+    - Extremely rare. Standard system applications like calc or notepad do not make network connections.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1573.001
+    - analytic.an0400
+    - detection.det0143

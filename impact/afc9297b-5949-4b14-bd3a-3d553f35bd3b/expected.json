@@ -1,0 +1,23 @@
+{
+  "rule_id": "afc9297b-5949-4b14-bd3a-3d553f35bd3b",
+  "rule_name": "Potential Endpoint Service Exhaustion Flood Tool Execution via Network Connection (AN0489-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,28 @@
+title: Domain Trust or Policy Modification via Script Block (AN0755-B)
+id: c8b1dfb3-d6ff-4488-b443-0d9ffc3b71e5
+status: experimental
+description: Detects executing PowerShell script blocks containing Active Directory trust modification cmdlets, indicating direct configuration tampering.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection:
+        ScriptBlockText|contains:
+            - 'Add-ADDomainTrust'
+            - 'Remove-ADDomainTrust'
+            - 'Set-ADDomainTrust'
+    condition: selection
+fields:
+    - ScriptBlockText
+    - User
+falsepositives:
+    - Authorized administration script automation.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.privilege-escalation
+    - attack.t1484
+    - analytic.an0755
+    - detection.det0270

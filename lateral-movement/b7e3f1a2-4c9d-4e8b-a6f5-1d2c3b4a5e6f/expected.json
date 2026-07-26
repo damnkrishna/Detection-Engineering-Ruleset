@@ -1,0 +1,23 @@
+{
+  "rule_id": "b7e3f1a2-4c9d-4e8b-a6f5-1d2c3b4a5e6f",
+  "rule_name": "Suspicious VNC Server Binary Execution (AN0504-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,49 @@
+title: Privileged Account or Group Membership Manipulation (AN2114)
+id: d6487529-c76b-43d7-aaba-6430a6871623
+status: experimental
+description: "Detects the addition of users to administrative or privileged groups (Domain Admins, Enterprise Admins, Schema Admins, Local Administrators) or critical modifications to account properties (such as enabling Password Not Required or altering logon permissions) in Windows Security logs."
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    service: security
+    product: windows
+detection:
+    selection_group_adds:
+        EventID:
+            - 4728
+            - 4732
+            - 4756
+        # Target privileged group names
+        TargetUserName:
+            - 'Administrators'
+            - 'Domain Admins'
+            - 'Enterprise Admins'
+            - 'Schema Admins'
+            - 'Account Operators'
+            - 'Backup Operators'
+    selection_account_changes:
+        EventID: 4738
+        # Look for suspicious flag changes like setting password not required or preauth bypass
+        UserAccountControl|contains:
+            - 'Password Not Required'
+            - "Don't Require Preauth"
+            - 'Trusted For Delegation'
+            - 'Trusted To Authenticate For Delegation'
+    filter_machine_accounts:
+        # Exclude standard computer account self-updates
+        SubjectUserName|endswith: '$'
+    condition: (selection_group_adds or selection_account_changes) and not filter_machine_accounts
+fields:
+    - EventID
+    - TargetUserName
+    - SubjectUserName
+    - MemberName
+    - UserAccountControl
+falsepositives:
+    - Standard identity management workflows or IT administrators creating, modifying, or promoting accounts during onboarding or maintenance.
+level: high
+tags:
+    - attack.persistence
+    - attack.t1098
+    - analytic.an2114
+    - detection.det0971

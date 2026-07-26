@@ -1,0 +1,33 @@
+title: LSASS Suspicious Image Load (AN0757-B)
+id: 55c8d404-b1c7-415f-98af-aa9b803d884b
+status: experimental
+description: Detects non-standard DLLs loaded into the LSASS process space on Domain Controllers.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection_target:
+        Image|endswith: '\lsass.exe'
+    selection_load:
+        ImageLoaded: '*'
+    filter_legitimate_paths:
+        ImageLoaded|startswith:
+            - 'C:\Windows\System32\'
+            - 'C:\Windows\SysWOW64\'
+            - 'C:\Program Files\'
+            - 'C:\Program Files (x86)\'
+    condition: selection_target and selection_load and not filter_legitimate_paths
+fields:
+    - Image
+    - ImageLoaded
+    - User
+falsepositives:
+    - Custom multi-factor authentication provider DLLs or smart-card reader DLLs registered in System32.
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1556.001
+    - analytic.an0757
+    - detection.det0271

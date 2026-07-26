@@ -1,0 +1,40 @@
+title: Anomalous HTTP Error Rate from Single Source (AN2069-Error-Spike)
+id: d83a5fa8-1ec0-4480-8b74-bb35876317fa
+status: experimental
+description: >
+  Detects a single source IP generating a high volume of HTTP 4xx or 5xx 
+  error responses in a short window, indicating directory brute-forcing 
+  (404s) or API parameter fuzzing (400/500 errors). Covers the fuzzing 
+  gap that AN2069 misses when tools target non-hardcoded paths or generate 
+  non-403 error codes. Note: SIEM-side aggregation required — 
+  count(http_status) by src_ip where http_status >= 400 > 50 in 1m.
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: webserver
+    product: windows
+detection:
+    selection_errors:
+        http_status|gte: 400
+    filter_crawler:
+        user_agent|contains:
+            - 'Googlebot'
+            - 'Bingbot'
+    filter_auth_user:
+        http_auth_user: '-'
+    condition: selection_errors and not filter_crawler and filter_auth_user
+fields:
+    - src_ip
+    - http_request_path
+    - http_status
+    - user_agent
+falsepositives:
+    - Legitimate applications with high error rates due to misconfiguration or 
+      buggy mobile clients. Requires SIEM aggregation threshold before alerting.
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1594
+    - attack.t1595.003
+    - analytic.an2069
+    - detection.det0926

@@ -1,0 +1,23 @@
+{
+  "rule_id": "4abae01c-cce6-4014-b64d-4ba200c8a728",
+  "rule_name": "File Wiping or Volume Shadow Copy Deletion via PowerShell Script Block (AN0411-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

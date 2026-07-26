@@ -1,0 +1,43 @@
+title: Local Outlook Email Archive CLI Search (AN0130-B)
+id: 027c1211-895b-45c8-b32e-da59d3594a52
+status: experimental
+description: Detects command-line tool execution attempting to locate, list, or copy local Outlook PST or OST data files.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_process:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\findstr.exe'
+            - '\robocopy.exe'
+            - '\xcopy.exe'
+        - OriginalFileName:
+            - 'cmd.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'findstr.exe'
+            - 'robocopy.exe'
+            - 'xcopy.exe'
+    selection_args:
+        CommandLine|contains:
+            - '.pst'
+            - '.ost'
+    condition: selection_process and selection_args
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Administrative backup tasks or file migration scripts targeting user profile mail archives.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1114.001
+    - analytic.an0130
+    - detection.det0047

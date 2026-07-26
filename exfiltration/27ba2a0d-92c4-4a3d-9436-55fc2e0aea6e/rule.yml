@@ -1,0 +1,54 @@
+title: Exfiltration - Outbound Unencrypted Connection by Scripting Host (AN0423)
+id: e98bf5a3-17b2-4340-bd3f-bc21400db1b1
+status: experimental
+description: Detects command interpreters or scripting utilities (PowerShell, cscript, wscript) initiating network connections over unencrypted ports (80, 21, 25) to external IP addresses.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\cmd.exe'
+    selection_ports:
+        DestinationPort:
+            - 21 # FTP
+            - 25 # SMTP
+            - 80 # HTTP
+    filter_internal:
+        DestinationIp|startswith:
+            - '10.'
+            - '192.168.'
+            - '172.16.'
+            - '172.17.'
+            - '172.18.'
+            - '172.19.'
+            - '172.2'
+            - '172.3'
+            - '127.'
+            - '169.254.'
+    condition: selection_process and selection_ports and not filter_internal
+fields:
+    - Image
+    - CommandLine
+    - User
+    - LogonId
+    - Initiated
+    - SourceIp
+    - DestinationIp
+    - DestinationPort
+falsepositives:
+    - Administrative scripts executing HTTP queries to download public updates or syncing time via NTP.
+    - Automated system backup tools transferring statistics to internal monitoring servers.
+level: high
+tags:
+    - attack.exfiltration
+    - attack.t1048.003
+    - analytic.an0423
+    - detection.det0149

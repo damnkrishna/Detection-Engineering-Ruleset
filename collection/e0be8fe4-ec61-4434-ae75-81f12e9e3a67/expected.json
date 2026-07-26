@@ -1,0 +1,23 @@
+{
+  "rule_id": "e0be8fe4-ec61-4434-ae75-81f12e9e3a67",
+  "rule_name": "Collection - Local Email Database Access and Collection (AN1309)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,43 @@
+title: Logon Process Memory Access (AN0389-A)
+id: 4b39dbcd-f5e6-4820-b4a2-c8ba1c116e42
+status: experimental
+description: Detects process access to logonui.exe or lsass.exe indicating credential harvesting or hooking.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_access
+    product: windows
+detection:
+    selection_targets:
+        TargetImage|endswith:
+            - '\logonui.exe'
+            - '\lsass.exe'
+    selection_access:
+        # Require exact match on high access masks that allow VM write/modify operations
+        GrantedAccess:
+            - '0x1F3FFF'
+            - '0x1F0FFF'
+            - '0x1010'
+            - '0x1410'
+            - '0x1438'
+    filter_system:
+        SourceImage|endswith:
+            - '\services.exe'
+            - '\wininit.exe'
+            - '\csrss.exe'
+            - '\winlogon.exe'
+            - '\MsMpEng.exe'
+    condition: selection_targets and selection_access and not filter_system
+fields:
+    - SourceImage
+    - TargetImage
+    - GrantedAccess
+    - User
+falsepositives:
+    - Normal administrative diagnostic and troubleshooting sessions.
+level: high
+tags:
+    - attack.collection
+    - attack.t1056.004
+    - analytic.an0389
+    - detection.det0139

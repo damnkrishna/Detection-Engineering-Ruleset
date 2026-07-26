@@ -1,0 +1,26 @@
+title: 'AN1548 - Software Extensions: IDE Extensions'
+id: 83d7bd94-452e-489c-9c68-06881b05f611
+status: experimental
+description: 'Detects the execution of command-line tools to forcefully install IDE extensions, a technique potentially used for developer environment compromise.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_image:
+    Image|endswith:
+      - '\code.exe'
+      - '\code-insiders.exe'
+  selection_cmd:
+    CommandLine|contains: '--install-extension'
+  condition: selection_image and selection_cmd
+fields:
+  - EventID
+  - Image
+  - CommandLine
+  - ParentImage
+level: medium
+tags:
+  - attack.persistence
+  - attack.t1176.002
+  - analytic.an1548

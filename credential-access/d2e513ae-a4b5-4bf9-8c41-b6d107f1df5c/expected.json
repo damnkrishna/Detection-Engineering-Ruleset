@@ -1,0 +1,23 @@
+{
+  "rule_id": "d2e513ae-a4b5-4bf9-8c41-b6d107f1df5c",
+  "rule_name": "Suspicious SAM Registry Hive Export via File Event (AN0235-C)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

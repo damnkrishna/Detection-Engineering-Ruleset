@@ -1,0 +1,2 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"C:\\Windows\\System32 powershell","hostname":"OPS-WKS-348","agent_ip":"10.42.139.159","severity_id":3,"event_uid":"golden|WEB_SHELL_DEPLOY|1|563201","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:00:01.000Z","signature_name":"ET MALWARE Observed Suspicious Outbound Connection POST","hostname":"OPS-WKS-348","agent_ip":"10.42.139.159","severity_id":3,"event_uid":"golden|WEB_SHELL_DEPLOY|0|563200","proto":"tcp","src_port":"50412","dst_port":"443"}

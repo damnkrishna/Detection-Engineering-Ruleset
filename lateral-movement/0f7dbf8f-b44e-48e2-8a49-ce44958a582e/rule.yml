@@ -1,0 +1,26 @@
+title: WinRM Remote Command Execution in Script Block (AN1313-B)
+id: bde39d24-513b-4d53-ab46-d283c9b93064
+status: experimental
+description: Detects PowerShell script block execution containing keywords or patterns indicating remote command invocation via WinRM (e.g. wsmprovhost, Enter-PSSession, Invoke-Command).
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'wsmprovhost'
+            - 'Enter-PSSession'
+            - 'Invoke-Command'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate remote administration by IT support.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1021.006
+    - analytic.an1313
+    - detection.det0477

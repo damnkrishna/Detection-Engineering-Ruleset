@@ -1,0 +1,109 @@
+title: Verclsid LOLBin Abuse for COM Object Execution (AN0118-A)
+id: 59534fdd-8afd-4447-9295-f743fb37c7d6
+status: experimental
+description: Detects abuse of verclsid.exe (a signed Windows Shell binary) to execute arbitrary COM objects via CLSID arguments, which may load malicious scriptlets or DLLs.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection:
+        - Image|endswith: '\verclsid.exe'
+        - OriginalFileName: 'verclsid.exe'
+    selection_args:
+        CommandLine|contains:
+            - ' /S '
+            - ' /C '
+            - '{{'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection and selection_args and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate Windows shell or COM infrastructure operations triggered by Windows Explorer during COM object verification.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1218.012
+    - analytic.an0118
+    - detection.det0042
+---
+title: Verclsid Network Connection (AN0118-B)
+id: 8a143194-0ec1-4cca-88e7-5f565eaadebd
+status: experimental
+description: Detects outbound network connections initiated by verclsid.exe, indicating remote scriptlet or COM payload download.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_process:
+        Image|endswith: '\verclsid.exe'
+    condition: selection_process
+fields:
+    - Image
+    - SourceIp
+    - DestinationIp
+    - DestinationPort
+    - User
+    - Initiated
+falsepositives:
+    - None known. verclsid.exe should not generate network connections in normal operations.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1218.012
+    - analytic.an0118
+    - detection.det0042
+---
+title: Verclsid Custom CLSID Registry Modification (AN0118-C)
+id: 3e4e29d9-b1b9-4b10-85c9-b471b780875d
+status: experimental
+description: Detects registry value writes under the user-writable Class ID registry paths (HKCU\SOFTWARE\Classes\CLSID\), which is a common persistence and defense evasion method used to proxy code execution.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: registry_set
+    product: windows
+    # Relies on Sysmon Event ID 12/13
+detection:
+    selection_path:
+        TargetObject|contains:
+            - 'HKCU\SOFTWARE\Classes\CLSID\'
+            - '\Software\Classes\CLSID\'
+    selection_cmd:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+    condition: selection_path and selection_cmd
+fields:
+    - Image
+    - TargetObject
+    - EventType
+    - User
+falsepositives:
+    - Legitimate software installers creating user-level COM registrations during setup.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1218.012
+    - analytic.an0118
+    - detection.det0042

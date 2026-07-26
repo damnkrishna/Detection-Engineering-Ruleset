@@ -1,0 +1,80 @@
+title: WiFi or Secondary Network Interface Configuration via CLI (AN0212)
+id: 8870386f-1084-4230-9065-17acdd987a2f
+status: experimental
+description: Detects command-line execution of netsh.exe or PowerShell network cmdlets being used to configure, enable, or connect to wireless (WLAN) or secondary network interfaces, which can be used to bypass corporate network boundaries for exfiltration.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_netsh:
+        - Image|endswith: '\netsh.exe'
+        - OriginalFileName: 'netsh.exe'
+    selection_netsh_args:
+        CommandLine|contains:
+            - ' wlan '
+            - ' wlan'
+            - 'wlan '
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_noun:
+        CommandLine|contains:
+            - 'NetAdapter'
+            - 'NetRoute'
+    selection_powershell_verb:
+        CommandLine|contains:
+            - 'Set-'
+            - 'Enable-'
+            - 'New-'
+    condition: (selection_netsh and selection_netsh_args) or (selection_powershell and (selection_powershell_noun and selection_powershell_verb))
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - IT administrators or users troubleshooting mobile workstation wireless connections or configuring VPN routing.
+level: medium
+tags:
+    - attack.exfiltration
+    - attack.t1011
+    - analytic.an0212
+    - detection.det0077
+---
+title: Bluetooth Device Connection or Configuration (AN0212-B)
+id: 4dd6d1c7-844d-4c54-9632-3d393f829649
+status: experimental
+description: Detects registry modifications under the Bluetooth port driver keys (BTHPORT), indicating connection or configuration of alternative Bluetooth communication channels for exfiltration.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_bth:
+        TargetObject|contains:
+            - '\System\CurrentControlSet\Services\BTHPORT\'
+    condition: selection_bth
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Legitimate pairing of Bluetooth mice, keyboards, or administrative devices.
+level: low
+tags:
+    - attack.exfiltration
+    - attack.t1011
+    - analytic.an0212
+    - detection.det0077

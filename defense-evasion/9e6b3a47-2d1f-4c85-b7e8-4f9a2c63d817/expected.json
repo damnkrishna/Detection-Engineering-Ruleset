@@ -1,0 +1,23 @@
+{
+  "rule_id": "9e6b3a47-2d1f-4c85-b7e8-4f9a2c63d817",
+  "rule_name": "Microsoft-Signed Script Proxy Execution (AN2101)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

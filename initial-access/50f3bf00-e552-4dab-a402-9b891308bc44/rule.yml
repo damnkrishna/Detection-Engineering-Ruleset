@@ -1,0 +1,59 @@
+title: Supply Chain Tampering - Suspicious Process Spawned by Development Tool via CLI (AN0021-A)
+id: 66545ca0-44e4-4a9f-8d79-0c413cc86794
+status: experimental
+description: Detects package managers or development builds (like npm, pip, nuget, maven, gradle, python, node) spawning suspicious command interpreters, script engines, or network download utilities.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\node.exe'
+            - '\npm.cmd'
+            - '\pip.exe'
+            - '\python.exe'
+            - '\python3.exe'
+            - '\nuget.exe'
+            - '\mvn.cmd'
+            - '\gradle.bat'
+            - '\msbuild.exe'
+    selection_child:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\curl.exe'
+            - '\certutil.exe'
+            - '\bitsadmin.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'mshta.exe'
+            - 'curl.exe'
+            - 'certutil.exe'
+            - 'bitsadmin.exe'
+    condition: selection_parent and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate post-install build scripts run by developers (e.g., compiling native C++ bindings for Node modules).
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1195.001
+    - analytic.an0021
+    - detection.det0009

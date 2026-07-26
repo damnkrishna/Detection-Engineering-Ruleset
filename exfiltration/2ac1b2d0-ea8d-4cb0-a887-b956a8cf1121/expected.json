@@ -1,0 +1,23 @@
+{
+  "rule_id": "2ac1b2d0-ea8d-4cb0-a887-b956a8cf1121",
+  "rule_name": "Bluetooth Device Connection or Configuration (AN0212-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

@@ -1,0 +1,62 @@
+title: DLL Side-Loading Image Load (AN0577)
+id: a390f25c-6736-40cd-9f31-b0410f65d3f9
+status: experimental
+description: Detects legitimate Windows system utilities loading libraries from temporary or user-writable paths, indicating potential DLL side-loading.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: image_load
+    product: windows
+detection:
+    selection_system_binaries:
+        - Image|endswith:
+            - '\calc.exe'
+            - '\notepad.exe'
+            - '\svchost.exe'
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\regsvr32.exe'
+            - '\rundll32.exe'
+            - '\odbcconf.exe'
+            - '\gpupdate.exe'
+            - '\taskhost.exe'
+            - '\wsmprovhost.exe'
+        - OriginalFileName:
+            - 'calc.exe'
+            - 'NOTEPAD.EXE'
+            - 'svchost.exe'
+            - 'cmd.exe'
+            - 'PowerShell.EXE'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'regsvr32.exe'
+            - 'RUNDLL32.EXE'
+            - 'odbcconf.exe'
+            - 'gpupdate.exe'
+            - 'taskhost.exe'
+            - 'wsmprovhost.exe'
+    selection_suspicious_paths:
+        ImageLoaded|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+            - '\AppData\Roaming\'
+            - '\ProgramData\'
+    condition: selection_system_binaries and selection_suspicious_paths
+fields:
+    - Image
+    - ImageLoaded
+    - Signed
+    - SignatureStatus
+falsepositives:
+    - Legacy applications running local copies of system utilities loading local modules.
+level: high
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1574.001
+    - analytic.an0577
+    - detection.det0201

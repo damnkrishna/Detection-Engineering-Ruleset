@@ -1,0 +1,53 @@
+title: Supply Chain Compromise - Installer Executing Anomalous Shell (AN1480-A)
+id: 09461c6d-8d6d-4331-948e-4086c951fc45
+status: experimental
+description: Detects software installers or newly installed application binaries spawning command interpreters, script execution engines, or background shell commands.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_installer:
+        ParentImage|contains:
+            - '\Temp\'
+            - '\AppData\Local\'
+            - '\msiexec.exe'
+            - '\setup.exe'
+            - '\install.exe'
+    selection_child:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\curl.exe'
+            - '\certutil.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'mshta.exe'
+            - 'curl.exe'
+            - 'certutil.exe'
+    condition: selection_installer and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate software setup wrappers unpacking and running setup scripts.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1195
+    - analytic.an1480
+    - detection.det0537

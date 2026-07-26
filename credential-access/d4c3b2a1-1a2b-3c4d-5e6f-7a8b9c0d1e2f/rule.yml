@@ -1,0 +1,50 @@
+title: Golden Ticket Forging Tool Execution via CLI (AN0405-A)
+id: 16c3583d-41ba-43b1-b4e2-c7411c828655
+status: experimental
+description: Detects command-line parameters and process executions associated with the forging or injection of Kerberos Golden Tickets using tools like Mimikatz or Rubeus.
+author: Krishna Gupta
+date: 2026-06-12
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_mimikatz:
+        CommandLine|contains: 'kerberos::golden'
+    selection_rubeus:
+        CommandLine|contains|all:
+            - 'golden'
+            - '/krbtgt:'
+    selection_rubeus_ptt:
+        CommandLine|contains|all:
+            - 'golden'
+            - '/ptt'
+    selection_tools_image:
+        Image|endswith:
+            - '\mimikatz.exe'
+            - '\rubeus.exe'
+    selection_tools_original:
+        OriginalFileName:
+            - 'mimikatz.exe'
+            - 'Rubeus.exe'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_mimikatz or selection_rubeus or selection_rubeus_ptt or selection_tools_image or selection_tools_original) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Authorized red team engagements or adversary emulation exercises.
+level: critical
+tags:
+    - attack.credential-access
+    - attack.t1558.001
+    - analytic.an0405
+    - detection.det0144

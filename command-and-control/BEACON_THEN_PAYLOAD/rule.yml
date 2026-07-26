@@ -1,0 +1,63 @@
+{
+  "id": "BEACON_THEN_PAYLOAD",
+  "description": "C2 beaconing \u2192 tool download \u2192 execution (full compromise chain)",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 3.5,
+  "windowMinutes": 60,
+  "sensorFilter": [
+    "NIDS",
+    "HIDS"
+  ],
+  "stages": [
+    {
+      "label": "beacon",
+      "tactics": [
+        "TA0011"
+      ],
+      "signatureContains": [
+        "beacon",
+        "periodic",
+        "heartbeat",
+        "check-in",
+        "C2",
+        "cobalt strike",
+        "empire",
+        "metasploit",
+        "suspicious GET",
+        "beaconing"
+      ],
+      "optional": false
+    },
+    {
+      "label": "download",
+      "techniques": [
+        "T1105"
+      ],
+      "signatureContains": [
+        "certutil -urlcache",
+        "bitsadmin",
+        "wget",
+        "curl",
+        "Invoke-WebRequest",
+        "DownloadFile",
+        "tool download",
+        "payload download",
+        "ingress"
+      ],
+      "optional": false
+    },
+    {
+      "label": "execution",
+      "optional": false,
+      "conditions": [
+        {
+          "field": "tactic",
+          "op": "IN",
+          "values": [
+            "TA0002"
+          ]
+        }
+      ]
+    }
+  ]
+}

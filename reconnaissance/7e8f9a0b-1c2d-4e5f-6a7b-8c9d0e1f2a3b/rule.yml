@@ -1,0 +1,27 @@
+title: Reconnaissance via robots.txt and Sitemap Access (AN2069-Recon-Files)
+id: 35d8020e-5a3d-4a1f-a9ed-dc531c93fac7
+status: experimental
+description: "Detects manual or automated reconnaissance of sitemaps and security files by non-crawler agents. Note: Requires frequency context (e.g., 5+ hits in 30s) or combination with other recon alerts to be actionable."
+author: Krishna Gupta
+date: 2026-07-02
+logsource:
+    category: webserver
+    product: windows
+detection:
+    selection:
+        http_request_path|contains:
+            - '/robots.txt'
+            - '/sitemap.xml'
+            - '/sitemap_index.xml'
+            - '/.well-known/security.txt'
+            - '/humans.txt'
+    filter_crawlers:
+        user_agent|contains:
+            - 'Googlebot'
+            - 'Bingbot'
+            - 'Slurp'
+    condition: selection and not filter_crawlers
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1594

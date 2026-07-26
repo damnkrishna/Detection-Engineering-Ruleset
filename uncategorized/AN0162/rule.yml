@@ -1,0 +1,80 @@
+title: Database or Log File Modification by Non-Database Process via File Event (AN0162-A)
+id: d83d05f6-66bb-4550-8c4b-f87dfc735ee1
+status: experimental
+description: Detects command-line interpreters or scripting hosts modifying or creating database files (e.g., .db, .sqlite, .mdf) or system log files (.evtx), which can indicate unauthorized data manipulation or log tempering.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+    selection_files:
+        TargetFilename|endswith:
+            - '.db'
+            - '.sqlite'
+            - '.sqlite3'
+            - '.mdf'
+            - '.ldf'
+            - '.mdb'
+            - '.accdb'
+            - '.evtx'
+    condition: selection_process and selection_files
+fields:
+    - Image
+    - TargetFilename
+falsepositives:
+    - Legitimate administration scripts managing local SQLite databases or backing up event log files (.evtx).
+level: medium
+tags:
+    - attack.impact
+    - attack.t1565
+    - analytic.an0162
+    - detection.det0162
+---
+title: Database or Log File Modification by Non-Database Process via CLI (AN0162-B)
+id: 909471cf-ea56-4c51-ba81-546fb57a78b0
+status: experimental
+description: Detects command-line commands attempting to manipulate databases or clear Windows event logs using utilities like wevtutil or database engines.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_tools:
+        - Image|endswith:
+            - '\wevtutil.exe'
+            - '\sqlite3.exe'
+        - OriginalFileName:
+            - 'wevtutil.exe'
+            - 'sqlite3.exe'
+    selection_commands:
+        CommandLine|contains:
+            - ' cl '
+            - 'clear-eventlog'
+            - 'clear-log'
+            - 'update '
+            - 'delete '
+    condition: selection_tools or selection_commands
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Legitimate event log rotations or database maintenance scripts.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1565
+    - analytic.an0162
+    - detection.det0162

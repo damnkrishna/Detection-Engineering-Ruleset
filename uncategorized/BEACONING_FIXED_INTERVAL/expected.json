@@ -1,0 +1,23 @@
+{
+  "rule_id": "BEACONING_FIXED_INTERVAL",
+  "rule_name": "Single host making 5+ outbound C2-tactic connections in 60 minutes — frequency-based beacon detection with no signature dependency; catches custom implants, encrypted C2, novel frameworks (T1071, T1095, T1573)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-zeek",
+  "event_source": "zeek",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 5
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 5
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 4
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 5
+  }
+}

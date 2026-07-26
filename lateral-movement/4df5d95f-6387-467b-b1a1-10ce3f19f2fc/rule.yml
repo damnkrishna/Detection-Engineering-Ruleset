@@ -1,0 +1,28 @@
+title: File Copy to Administrative Shares (AN0516-B)
+id: b766e1b5-3edb-4a8e-b648-cf65468e031c
+status: experimental
+description: Detects file creation events on administrative shares (C$, ADMIN$), which can indicate lateral tool transfer.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_shares:
+        TargetFilename|contains:
+            - '\C$\'
+            - '\Admin$\'
+            - '\ADMIN$\'
+    condition: selection_shares
+fields:
+    - Image
+    - TargetFilename
+    - User
+falsepositives:
+    - Administrative scripts or patch management tools deploying files.
+level: medium
+tags:
+    - attack.lateral-movement
+    - attack.t1570
+    - analytic.an0516
+    - detection.det0183

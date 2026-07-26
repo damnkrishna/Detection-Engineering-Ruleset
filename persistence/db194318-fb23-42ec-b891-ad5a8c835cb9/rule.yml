@@ -1,0 +1,30 @@
+title: Custom Print Processor Registry Modification (AN0074-B)
+id: 16418797-a16c-4ce1-8611-7c767a48db0b
+status: experimental
+description: Detects direct registry writes registering custom print processors under the spooler environments path.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry:
+        TargetObject|contains:
+            - '\Control\Print\Environments\'
+        TargetObject|contains:
+            - '\Print Processors\'
+    condition: selection_registry
+fields:
+    - TargetObject
+    - Image
+    - User
+    - Details
+falsepositives:
+    - Installation of approved print processor drivers or spooler setup activities.
+level: high
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1547.012
+    - analytic.an0074
+    - detection.det0029

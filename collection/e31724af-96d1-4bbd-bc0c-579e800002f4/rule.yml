@@ -1,0 +1,48 @@
+title: AiTM Interception Tool Execution (AN0823-A)
+id: 29297d5f-ad9f-4c8b-9d5d-189bce4cf5d8
+status: experimental
+description: Detects command-line execution of tools like Bettercap, Ettercap, or mitmproxy.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\bettercap.exe'
+            - '\ettercap.exe'
+            - '\mitmproxy.exe'
+            - '\mitmdump.exe'
+            - '\burpsuite.exe'
+        OriginalFileName:
+            - 'bettercap.exe'
+            - 'ettercap.exe'
+            - 'mitmproxy.exe'
+            - 'mitmdump.exe'
+            - 'burpsuite.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'bettercap'
+            - 'ettercap'
+            - 'mitmproxy'
+            - 'arp.spoof'
+            - 'dns.spoof'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_cli) and not filter_installers
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Authorized network diagnostics or application security penetration testing.
+level: high
+tags:
+    - attack.collection
+    - attack.t1557
+    - analytic.an0823
+    - detection.det0296

@@ -1,0 +1,42 @@
+title: Input Sniffing Process Execution (AN0282-A)
+id: 98682863-8f9f-4da3-bc6b-1f2f748b1e7e
+status: experimental
+description: Detects process execution of tools like SniffPass or custom password capture binaries.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\sniffpass.exe'
+            - '\pipedup.exe'
+            - '\winpst.exe'
+        OriginalFileName:
+            - 'sniffpass.exe'
+            - 'pipedup.exe'
+            - 'winpst.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'sniffpass'
+            - 'credsniff'
+            - 'inputcapture'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_cli) and not filter_installers
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Legitimate penetration testing activities or authorized system troubleshooting utilities.
+level: high
+tags:
+    - attack.collection
+    - attack.t1056
+    - analytic.an0282
+    - detection.det0102

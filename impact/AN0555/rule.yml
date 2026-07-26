@@ -1,0 +1,38 @@
+title: Stored Office Document Modification by Scripting Host via File Event (AN0555-A)
+id: 0a966edc-70e5-458f-85fb-2a2e78e0de82
+status: experimental
+description: Detects command-line interpreters or scripting hosts creating or modifying business-critical office documents (e.g. .docx, .xlsx, .pdf), which can indicate unauthorized stored data manipulation.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_process:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\cmd.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+    selection_files:
+        TargetFilename|endswith:
+            - '.docx'
+            - '.xlsx'
+            - '.pptx'
+            - '.pdf'
+            - '.odt'
+            - '.ods'
+    condition: selection_process and selection_files
+fields:
+    - Image
+    - TargetFilename
+falsepositives:
+    - Legitimate enterprise automation scripts performing automated report compilation, PDF generation, or document migration.
+level: medium
+tags:
+    - attack.impact
+    - attack.t1565.001
+    - analytic.an0555
+    - detection.det0555

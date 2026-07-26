@@ -1,0 +1,25 @@
+title: 'AN1116 - Generic Office Application Startup'
+id: 96053f85-65d0-4b5a-9c6a-4fd66b94ecf5
+status: experimental
+description: 'Detects registry modifications adding new Trusted Locations for Microsoft Office, allowing malicious macros to execute without warnings.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: registry_set
+detection:
+  selection:
+    TargetObject|contains: '\Software\Microsoft\Office\'
+    TargetObject|contains: '\Security\Trusted Locations\'
+  selection_event:
+    EventType: 'SetValue'
+  condition: selection and selection_event
+fields:
+  - EventID
+  - TargetObject
+  - Image
+  - Details
+level: high
+tags:
+  - attack.persistence
+  - attack.t1137
+  - analytic.an1116

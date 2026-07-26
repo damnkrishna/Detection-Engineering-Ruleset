@@ -1,0 +1,34 @@
+title: Weak Permission Directory Executable File Write (AN0108-B)
+id: d9e57ed4-e07f-40e1-89f3-60ac77fc7a61
+status: experimental
+description: Detects the creation of executable files (.exe, .dll) in temporary installer directories, which could indicate pre-staging for execution flow hijacking.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_paths:
+        TargetFilename|contains:
+            - '\AppData\Local\Temp\'
+            - '\Users\Public\'
+            - '\Windows\Temp\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.exe'
+            - '.dll'
+    condition: selection_paths and selection_extensions
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Legitimate installers unpacking binaries to temporary directories.
+level: medium
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1574.005
+    - analytic.an0108
+    - detection.det0038

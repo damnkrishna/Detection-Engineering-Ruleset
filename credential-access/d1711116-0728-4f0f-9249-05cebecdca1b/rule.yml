@@ -1,0 +1,37 @@
+title: Suspicious SAM Registry Hive Modification via Registry Set (AN0235-B)
+id: b67bcc0c-0fbb-47d6-8fbf-67eab4566e6b
+status: experimental
+description: Detects registry value additions or modifications targeting SAM, SYSTEM, or SECURITY registry hives, indicating potential credential dumping or manipulation.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_target:
+        TargetObject|contains:
+            - 'HKLM\SAM'
+            - 'HKLM\SYSTEM'
+            - 'HKLM\SECURITY'
+            - 'HKEY_LOCAL_MACHINE\SAM'
+            - 'HKEY_LOCAL_MACHINE\SYSTEM'
+            - 'HKEY_LOCAL_MACHINE\SECURITY'
+    filter_system:
+        Image|endswith:
+            - '\services.exe'
+            - '\wininit.exe'
+            - '\lsass.exe'
+            - '\svchost.exe'
+    condition: selection_target and not filter_system
+fields:
+    - Image
+    - TargetObject
+    - User
+falsepositives:
+    - Legitimate system updates or domain join operations.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1003.002
+    - analytic.an0235
+    - detection.det0085

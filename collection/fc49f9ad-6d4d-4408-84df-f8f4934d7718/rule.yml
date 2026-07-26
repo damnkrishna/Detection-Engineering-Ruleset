@@ -1,0 +1,30 @@
+title: Native ARP Table Static Modification (AN1091-B)
+id: 40cb6157-3f51-4b8c-b854-306ef635638c
+status: experimental
+description: Detects static modification of the local ARP cache table via native command-line parameters.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_image:
+        Image|endswith: '\arp.exe'
+        OriginalFileName: 'arp.exe'
+    selection_args:
+        CommandLine|contains:
+            - ' -s '
+            - ' /s '
+    condition: selection_image and selection_args
+fields:
+    - Image
+    - CommandLine
+    - User
+falsepositives:
+    - Administrators configuring static mappings for legacy networking equipment or high-availability load balancers.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1557.002
+    - analytic.an1091
+    - detection.det0387

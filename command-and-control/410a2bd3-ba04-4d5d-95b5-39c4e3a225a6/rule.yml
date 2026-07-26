@@ -1,0 +1,31 @@
+title: Bidirectional C2 via PowerShell Script Block (AN0100-B)
+id: 9e6ed395-80c9-44ed-9074-7446e25fc156
+status: experimental
+description: Detects PowerShell script blocks invoking web request methods targeting common web service API domains (Telegram, Slack, Dropbox, Discord, Box) used for Command and Control.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'api.telegram.org'
+            - 'api.slack.com'
+            - 'slack.com'
+            - 'dropboxapi.com'
+            - 'discordapp.com'
+            - 'discord.com'
+            - 'api.box.com'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative or developer integration scripts communicating with authorized SaaS platforms.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1102.002
+    - analytic.an0100
+    - detection.det0035

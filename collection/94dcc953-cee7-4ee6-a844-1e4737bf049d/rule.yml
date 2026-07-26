@@ -1,0 +1,42 @@
+title: Collection - Browser Process Access and Session Hijacking (AN1398)
+id: 6c68a218-59bc-4e6e-92c9-0a06de15dfe9
+status: experimental
+description: Detects command interpreters, scripting hosts, or common LOLBins opening access handles to web browser processes, which may indicate memory cookie harvesting or process injection.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_access
+    product: windows
+    # Relies on Sysmon Event ID 10
+detection:
+    selection_target_browsers:
+        TargetImage|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\firefox.exe'
+            - '\brave.exe'
+            - '\iexplore.exe'
+    selection_source_injectors:
+        SourceImage|endswith:
+            - '\powershell.exe'
+            - '\cmd.exe'
+            - '\rundll32.exe'
+            - '\regasm.exe'
+            - '\regsvcs.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\installutil.exe'
+            - '\msbuild.exe'
+    condition: selection_target_browsers and selection_source_injectors
+fields:
+    - SourceImage
+    - TargetImage
+falsepositives:
+    - Legitimate third-party password managers or security agents injecting extensions or hooks into browsers.
+    - Official software updates or browser management utilities.
+level: high
+tags:
+    - attack.collection
+    - attack.t1185
+    - analytic.an1398
+    - detection.det0507

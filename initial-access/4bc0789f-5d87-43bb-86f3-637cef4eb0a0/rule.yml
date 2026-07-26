@@ -1,0 +1,63 @@
+title: Drive-by Compromise - Suspicious Child Process Spawned by Browser (AN0498-A)
+id: 726dc159-8903-4cc7-9d88-7ad9c4b81d28
+status: experimental
+description: Detects suspicious processes (e.g., cmd.exe, powershell.exe, wscript.exe, rundll32.exe, mshta.exe) spawned directly by web browser processes, which indicates browser exploitation or user opening dangerous downloaded files.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\firefox.exe'
+            - '\brave.exe'
+            - '\opera.exe'
+            - '\iexplore.exe'
+            - '\safari.exe'
+    selection_child:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\certutil.exe'
+            - '\bitsadmin.exe'
+            - '\curl.exe'
+            - '\scrcons.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'mshta.exe'
+            - 'rundll32.exe'
+            - 'regsvr32.exe'
+            - 'certutil.exe'
+            - 'bitsadmin.exe'
+            - 'curl.exe'
+    condition: selection_parent and selection_child
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate web applications running on localhost (e.g., local development servers, admin dashboards) that spawn shell windows.
+    - Automated browser-based test tools (e.g. Selenium, Puppeteer) spawning command prompts to run testing scripts.
+level: high
+tags:
+    - attack.initial-access
+    - attack.t1189
+    - analytic.an0498
+    - detection.det0176

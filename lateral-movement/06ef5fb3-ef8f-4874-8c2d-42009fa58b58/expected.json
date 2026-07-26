@@ -1,0 +1,23 @@
+{
+  "rule_id": "06ef5fb3-ef8f-4874-8c2d-42009fa58b58",
+  "rule_name": "Windows Service Service Account PowerShell Execution (AN0327-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

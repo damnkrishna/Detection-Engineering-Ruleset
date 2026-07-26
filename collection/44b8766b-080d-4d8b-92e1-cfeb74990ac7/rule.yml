@@ -1,0 +1,47 @@
+title: Scripting Process Invoked as Proxy Listener (AN0823-B)
+id: 9d60618e-61c2-4c69-96d3-f0c6838c027a
+status: experimental
+description: Detects Python, PowerShell, or Go binaries launched with flags that configure a local proxy listener (e.g. --listen-port, -p 8080, --mode reverse), indicating a potential local AiTM interceptor being stood up.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_interpreters:
+        Image|endswith:
+            - '\python.exe'
+            - '\python3.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\go.exe'
+    selection_proxy_flags:
+        CommandLine|contains:
+            - '--listen-port'
+            - '--mode reverse'
+            - '--mode transparent'
+            - '-p 8080'
+            - '-p 8443'
+            - '-p 9090'
+            - 'http.server'
+            - 'mitmproxy'
+            - 'mitmdump'
+            - 'mitmweb'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_interpreters and selection_proxy_flags and not filter_installers
+fields:
+    - Image
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Developers running local debug proxy servers (e.g. mitmproxy for API testing) or running simple HTTP servers for local file serving.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1557
+    - analytic.an0823
+    - detection.det0296

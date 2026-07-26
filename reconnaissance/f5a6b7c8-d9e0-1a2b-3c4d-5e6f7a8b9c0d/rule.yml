@@ -1,0 +1,30 @@
+title: WMI Command Line System Information Gathering (AN2067-WMIC)
+id: 4e817c31-1a40-4b8a-83c2-f610bc6784b2
+status: experimental
+description: Detects the execution of wmic.exe targeting classes that describe system specs (OS, BIOS, CPU, ComputerSystem).
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_wmic:
+        Image|endswith: '\wmic.exe'
+        OriginalFileName: 'wmic.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'os'
+            - 'bios'
+            - 'computersystem'
+            - 'cpu'
+    selection_action:
+        CommandLine|contains:
+            - 'get'
+            - 'list'
+    condition: selection_wmic and selection_args and selection_action
+falsepositives:
+    - Third-party inventory management tools or automated domain setup scripts.
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1592

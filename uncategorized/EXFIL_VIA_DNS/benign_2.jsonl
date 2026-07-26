@@ -1,0 +1,3 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","tactic":"TA0009","hostname":"FIN-WKS-050","agent_ip":"10.42.141.185","severity_id":3,"event_uid":"golden|EXFIL_VIA_DNS|0|483000","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:16:00.000Z","signature_name":"C:\\Windows\\System32 dns tunnel","hostname":"FIN-WKS-050","agent_ip":"10.42.141.185","severity_id":3,"event_uid":"golden|EXFIL_VIA_DNS|1|483001","proto":"tcp","src_port":"50412","dst_port":"443"}
+{"timestamp":"2026-03-02T09:16:01.000Z","signature_name":"C:\\Windows\\System32 dns tunnel","hostname":"FIN-WKS-050","agent_ip":"10.42.141.185","severity_id":3,"event_uid":"golden|EXFIL_VIA_DNS|1|483002","proto":"tcp","src_port":"50412","dst_port":"443"}

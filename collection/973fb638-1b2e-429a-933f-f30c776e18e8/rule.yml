@@ -1,0 +1,44 @@
+title: ARP Spoofing Tool Execution (AN1091-A)
+id: 0df6767e-2e53-4dca-b9d6-0021e17d65c5
+status: experimental
+description: Detects command-line execution of tools designed to send malicious ARP replies or configure ARP cache redirection.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\arpspoof.exe'
+            - '\dsniff.exe'
+            - '\cain.exe'
+            - '\ettercap.exe'
+        OriginalFileName:
+            - 'arpspoof.exe'
+            - 'dsniff.exe'
+            - 'cain.exe'
+            - 'ettercap.exe'
+    selection_cli:
+        CommandLine|contains:
+            - 'arpspoof'
+            - 'arp.spoof'
+            - 'arp.mitm'
+    filter_installers:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: (selection_images or selection_cli) and not filter_installers
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Network administrator diagnostics or authorized vulnerability scans.
+level: high
+tags:
+    - attack.collection
+    - attack.t1557.002
+    - analytic.an1091
+    - detection.det0387

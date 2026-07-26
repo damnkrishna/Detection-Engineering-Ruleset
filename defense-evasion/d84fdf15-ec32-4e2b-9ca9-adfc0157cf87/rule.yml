@@ -1,0 +1,29 @@
+title: Verclsid Network Connection (AN0118-B)
+id: 8a143194-0ec1-4cca-88e7-5f565eaadebd
+status: experimental
+description: Detects outbound network connections initiated by verclsid.exe, indicating remote scriptlet or COM payload download.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_process:
+        Image|endswith: '\verclsid.exe'
+    condition: selection_process
+fields:
+    - Image
+    - SourceIp
+    - DestinationIp
+    - DestinationPort
+    - User
+    - Initiated
+falsepositives:
+    - None known. verclsid.exe should not generate network connections in normal operations.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1218.012
+    - analytic.an0118
+    - detection.det0042

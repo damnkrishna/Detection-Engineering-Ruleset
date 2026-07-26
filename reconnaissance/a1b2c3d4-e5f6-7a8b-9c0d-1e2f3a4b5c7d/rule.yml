@@ -1,0 +1,35 @@
+title: Connection to Unlisted Public GenAI Services (AN2075-Unlisted-GenAI)
+id: 796b987d-460c-4818-bfef-3f014dc0f16a
+status: experimental
+description: Detects outbound POST requests to unlisted/generic domains containing AI-specific keyword strings.
+logsource:
+    category: web_proxy
+    product: proxy
+detection:
+    selection_ai_keywords:
+        destination_domain|contains:
+            - 'chat'
+            - 'ai-'
+            - '-gpt'
+    selection_method:
+        http_method: 'POST'
+    filter_known_ai:
+        destination_domain|contains:
+            - 'openai.com'
+            - 'chatgpt.com'
+            - 'claude.ai'
+            - 'gemini.google.com'
+            - 'cohere.com'
+            - 'poe.com'
+    condition: selection_ai_keywords and selection_method and not filter_known_ai
+fields:
+    - src_ip
+    - destination_domain
+    - user
+    - http_method
+falsepositives:
+    - Legitimate internal portals or external vendors with "ai" or "chat" in their domain names.
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1682

@@ -1,0 +1,23 @@
+{
+  "rule_id": "1c4d8e29-5f7a-4b83-9c16-d2e3f5a87b31",
+  "rule_name": "Indirect Command Execution via Trusted Windows Utilities (AN2100)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

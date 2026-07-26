@@ -1,0 +1,23 @@
+{
+  "rule_id": "d47d228b-7ef5-41fc-9a4a-a5fff86b09f6",
+  "rule_name": "Spearphishing Attachment - Dangerous File Written by Mail Client (AN0655-A)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

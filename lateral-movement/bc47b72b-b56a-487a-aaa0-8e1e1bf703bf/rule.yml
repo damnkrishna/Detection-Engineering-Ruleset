@@ -1,0 +1,50 @@
+title: Lateral Movement - Windows Service Spawning Suspicious Shell (AN0327)
+id: 14dbf460-ff3f-42c2-bd2a-2745f94287e3
+status: experimental
+description: Detects core Windows services (lsass.exe, spoolsv.exe) spawning command interpreters or script hosts, indicating potential exploitation (e.g., PrintNightmare, remote code execution).
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\spoolsv.exe' # Print Spooler
+            - '\lsass.exe' # LSASS
+    selection_child:
+        - Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+        - OriginalFileName:
+            - 'Cmd.Exe'
+            - 'PowerShell.EXE'
+            - 'wscript.exe'
+            - 'cscript.exe'
+            - 'mshta.exe'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_parent and selection_child and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative troubleshooting or vendor driver installation scripts that directly communicate with system services.
+level: critical
+tags:
+    - attack.lateral-movement
+    - attack.t1210
+    - analytic.an0327
+    - detection.det0118

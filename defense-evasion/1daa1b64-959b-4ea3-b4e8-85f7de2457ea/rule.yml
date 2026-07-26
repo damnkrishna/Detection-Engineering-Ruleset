@@ -1,0 +1,33 @@
+title: Registry Modification of System Security Configurations (AN0781-B)
+id: c8fe1b38-1c7b-4357-aaba-b68e2c0d40fb
+status: experimental
+description: Detects direct registry value modifications targeting critical system registry keys used for persistence or defense evasion.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains:
+            - 'CurrentVersion\Winlogon\Notify'
+            - 'CurrentVersion\Winlogon'
+            - 'CurrentVersion\Run'
+            - 'CurrentVersion\RunOnce'
+            - 'Session Manager\SafeDllSearchMode'
+            - 'SafeDllSearchMode'
+    condition: selection
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Authorized software installations setting startup actions.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.persistence
+    - attack.t1112
+    - analytic.an0781
+    - detection.det0280

@@ -1,0 +1,37 @@
+title: Remote Thread Creation in Transaction Application Processes (AN1097-B)
+id: 34b6c14e-5b48-4c9e-b7ee-23c45263a6a1
+status: experimental
+description: Detects Sysmon Event ID 8 capturing remote thread creations inside POS or database processes.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: create_remote_thread
+    product: windows
+detection:
+    selection_target:
+        TargetImage|endswith:
+            - '\pos.exe'
+            - '\retail.exe'
+            - '\sap.exe'
+            - '\sqlserver.exe'
+            - '\postgres.exe'
+    filter_sys:
+        SourceImage|endswith:
+            - '\system32\svchost.exe'
+            - '\system32\csrss.exe'
+            - '\system32\lsass.exe'
+            - '\system32\winlogon.exe'
+            - '\MsMpEng.exe'
+    condition: selection_target and not filter_sys
+fields:
+    - SourceImage
+    - TargetImage
+    - User
+falsepositives:
+    - System level updates or development debuggers attached during runtime patching.
+level: critical
+tags:
+    - attack.impact
+    - attack.t1565.003
+    - analytic.an1097
+    - detection.det0391

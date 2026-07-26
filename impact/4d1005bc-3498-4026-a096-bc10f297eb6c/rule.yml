@@ -1,0 +1,54 @@
+title: Backup Catalog and Shadow Copy Deletion (AN0933-A)
+id: 925f4987-bed9-4dd5-be4b-c43eee5079a0
+status: experimental
+description: Detects command-line execution of vssadmin, wbadmin, bcdedit, wmic, diskshadow, or REAgentC attempting to delete shadow copies or catalog files.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\vssadmin.exe'
+            - '\wbadmin.exe'
+            - '\bcdedit.exe'
+            - '\wmic.exe'
+            - '\diskshadow.exe'
+            - '\reagentc.exe'
+        OriginalFileName:
+            - 'vssadmin.exe'
+            - 'wbadmin.exe'
+            - 'bcdedit.exe'
+            - 'wmic.exe'
+            - 'diskshadow.exe'
+            - 'reagentc.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'delete shadows'
+            - 'delete catalog'
+            - 'delete systemstatebackup'
+            - 'shadowcopy delete'
+            - 'recoveryenabled no'
+            - 'ignoreallfailures'
+            - '/disable'
+    filter_legitimate:
+        # Exclude legitimate backup managers by parent image across any user context to avoid AND logic gaps
+        ParentImage|endswith:
+            - '\svchost.exe'
+            - '\backup.exe'
+            - '\veeam.exe'
+    condition: selection_images and selection_args and not filter_legitimate
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Standard automated backup scripts or disaster recovery routines running under system privileges.
+level: critical
+tags:
+    - attack.impact
+    - attack.t1490
+    - analytic.an0933
+    - detection.det0329

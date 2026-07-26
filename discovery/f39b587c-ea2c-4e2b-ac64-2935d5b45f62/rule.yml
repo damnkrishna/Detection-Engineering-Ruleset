@@ -1,0 +1,29 @@
+title: Security Software Discovery via PowerShell Script Block (AN0048-B)
+id: d30e4837-1e4f-40bd-89c6-5f7ec40ad3fb
+status: experimental
+description: Detects PowerShell script blocks querying security software namespaces (SecurityCenter2, Get-MpComputerStatus) to identify installed security tools.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'SecurityCenter2'
+            - 'Get-MpComputerStatus'
+            - 'AntiVirusProduct'
+            - 'FirewallProduct'
+            - 'AntiSpywareProduct'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - IT administrators or endpoint security agents running diagnostic/audit PowerShell scripts.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1518.001
+    - analytic.an0048
+    - detection.det0016

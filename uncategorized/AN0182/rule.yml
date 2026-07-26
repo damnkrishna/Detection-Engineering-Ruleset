@@ -1,0 +1,129 @@
+title: PowerShell Silent Error Suppression for Evasion (AN0182-A)
+id: d11c7e85-9b25-41be-a73d-7185b940268b
+status: experimental
+description: Detects PowerShell execution with error action preference set to SilentlyContinue or Ignore in script block logs, used by adversaries to suppress error output and execute commands without alerting users or detection tools.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_silence:
+        ScriptBlockText|contains:
+            - '-ErrorAction SilentlyContinue'
+            - '-EA SilentlyContinue'
+            - '$ErrorActionPreference = ''SilentlyContinue'''
+            - '$ErrorActionPreference = "SilentlyContinue"'
+            - '-ErrorAction Ignore'
+            - '$ErrorActionPreference = ''Ignore'''
+            - 'SilentlyContinue'
+    selection_combined_with_execution:
+        ScriptBlockText|contains:
+            - 'Invoke-Expression'
+            - 'IEX'
+            - 'DownloadString'
+            - 'WebClient'
+            - 'Start-Process'
+            - 'Invoke-Command'
+    condition: selection_silence and selection_combined_with_execution
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative automation scripts that use SilentlyContinue to gracefully handle expected failures.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1564.011
+    - analytic.an0182
+    - detection.det0067
+---
+title: PowerShell Error Suppression Command-Line Option (AN0182-B)
+id: 4e0035aa-a241-46a8-9f34-9470a022b76e
+status: experimental
+description: Detects powershell.exe execution where the command-line parameters specify silencing or ignoring error actions, which is common in adversarial scripting trying to avoid user alerts.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_flags:
+        CommandLine|contains:
+            - '-ErrorAction SilentlyContinue'
+            - '-EA SilentlyContinue'
+            - '-ErrorAction Ignore'
+            - '-EA Ignore'
+    condition: selection_powershell and selection_flags
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - User
+falsepositives:
+    - Administrative automation tasks running PowerShell commands with error ignoring options.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1564.011
+    - analytic.an0182
+    - detection.det0067
+---
+title: Cmd Error Stream Suppression (AN0182-C)
+id: c47ea961-9e65-4ac0-b84c-9ebf11e99442
+status: experimental
+description: Detects command prompt (cmd.exe) processes redirecting stderr to null (2>nul or >nul 2>&1) combined with network download or scripting commands, which indicates attempts to execute tools silently.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_cmd:
+        - Image|endswith: '\cmd.exe'
+        - OriginalFileName: 'Cmd.Exe'
+    selection_redirection:
+        CommandLine|contains:
+            - '2>nul'
+            - '>nul 2>&1'
+            - '2>&1 >nul'
+    selection_execution:
+        CommandLine|contains:
+            - 'powershell'
+            - 'pwsh'
+            - 'curl'
+            - 'wget'
+            - 'certutil'
+            - 'bitsadmin'
+            - 'reg '
+            - 'sc '
+            - 'wscript'
+            - 'cscript'
+            - 'mshta'
+            - 'rundll32'
+    condition: selection_cmd and selection_redirection and selection_execution
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Automated system backup or installation scripts using standard error output redirection.
+level: medium
+tags:
+    - attack.defense-evasion
+    - attack.t1564.011
+    - analytic.an0182
+    - detection.det0067

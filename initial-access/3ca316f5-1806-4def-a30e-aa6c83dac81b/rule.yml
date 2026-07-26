@@ -1,0 +1,36 @@
+title: Removable Media - Suspicious Script Block executing from Removable Drive (AN0841-B)
+id: 16524c45-7b40-4789-8332-29b2a25d8c0e
+status: experimental
+description: Detects PowerShell script block logs executing commands or loading modules from non-system drive letters, which may indicate replication from removable USB devices.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_drives:
+        ScriptBlockText|contains:
+            - 'D:\'
+            - 'E:\'
+            - 'F:\'
+            - 'G:\'
+            - 'H:\'
+            - 'I:\'
+    selection_cmd:
+        ScriptBlockText|contains:
+            - 'Invoke-Expression'
+            - 'iex'
+            - 'Import-Module'
+            - 'ipmo'
+            - '. '
+    condition: selection_drives and selection_cmd
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Developer scripting or system admin automation from secondary internal storage drives.
+level: high
+tags:
+    - attack.initial-access
+    - attack.t1091
+    - analytic.an0841
+    - detection.det0301

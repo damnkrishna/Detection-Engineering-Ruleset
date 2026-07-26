@@ -1,0 +1,23 @@
+{
+  "rule_id": "CR0095_T1563_T1078",
+  "rule_name": "Administrative RDP Session Hijacking via tscon.exe",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-zeek",
+  "event_source": "zeek",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

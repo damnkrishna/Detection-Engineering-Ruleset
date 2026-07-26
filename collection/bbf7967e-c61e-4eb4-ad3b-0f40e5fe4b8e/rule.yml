@@ -1,0 +1,50 @@
+title: Web Server Root Folder File Creation (AN1321)
+id: dc28f38d-7b89-4b88-9108-15cf41f2af92
+status: experimental
+description: Detects the creation of web page files in standard web root paths, which may indicate deployment of credential harvesting portals or web shells.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_web_roots:
+        TargetFilename|contains:
+            - '\inetpub\wwwroot\'
+            - '\apache\htdocs\'
+            - '\nginx\html\'
+            - '\tomcat\webapps\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.php'
+            - '.aspx'
+            - '.asp'
+            - '.jsp'
+            - '.html'
+            - '.htm'
+    filter_installers:
+        Image|endswith:
+            - '\trustedinstaller.exe'
+            - '\msiexec.exe'
+            - '\tiworker.exe'
+    filter_deployment:
+        User:
+            - 'NT AUTHORITY\SYSTEM'
+            - 'NT AUTHORITY\NETWORK SERVICE'
+        Image|endswith:
+            - '\w3wp.exe'
+            - '\msdeploy.exe'
+            - '\deployagent.exe'
+    condition: selection_web_roots and selection_extensions and not (filter_installers or filter_deployment)
+fields:
+    - TargetFilename
+    - Image
+    - User
+falsepositives:
+    - Standard deployment of web applications, portal content updates, or authorized web server administration.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1056.003
+    - analytic.an1321
+    - detection.det0480

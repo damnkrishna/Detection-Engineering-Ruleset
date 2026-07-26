@@ -1,0 +1,53 @@
+title: Outbound Network Connection via Non-Standard Port (AN0633-A)
+id: 9f74c1fd-b318-40ee-ac8a-ed2e7388d7e6
+status: experimental
+description: Detects outbound network connections initiated by system processes or office applications on atypical/non-standard port ranges, which can indicate C2 encapsulation or protocol tunneling.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_process:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\mshta.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\winword.exe'
+            - '\excel.exe'
+    selection_ports:
+        DestinationPort:
+            - 4444
+            - 4445
+            - 5555
+            - 8000
+            - 8080
+            - 8443
+            - 8888
+            - 9001
+            - 9999
+    condition: selection_process and selection_ports
+fields:
+    - Image
+    - CommandLine
+    - User
+    - DestinationHostname
+    - DestinationIp
+    - DestinationPort
+    - Initiated
+    - SourceIp
+    - SourcePort
+falsepositives:
+    - Internal developer services, staging environments, or management servers (e.g. Jenkins, Tomcat, VMware console) running on custom ports.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1571
+    - analytic.an0633
+    - detection.det0227

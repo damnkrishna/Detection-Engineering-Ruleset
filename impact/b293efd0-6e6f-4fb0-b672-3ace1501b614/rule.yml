@@ -1,0 +1,35 @@
+title: Outbound Mail Connection Burst (AN1008-B)
+id: 14caace3-dc3f-4226-adae-4f8a2e297398
+status: experimental
+description: Detects outbound network connections to SMTP ports (25, 465, 587) from non-standard email applications. This rule should be aggregated in the SIEM layer to count burst patterns.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection_ports:
+        DestinationPort:
+            - 25
+            - 465
+            - 587
+    filter_clients:
+        Image|endswith:
+            - '\outlook.exe'
+            - '\thunderbird.exe'
+            - '\msedge.exe'
+            - '\chrome.exe'
+    condition: selection_ports and not filter_clients
+fields:
+    - Image
+    - DestinationIp
+    - DestinationPort
+    - User
+falsepositives:
+    - Developer machines testing local mail routing setup or diagnostic testing.
+level: low
+tags:
+    - attack.impact
+    - attack.t1667
+    - analytic.an1008
+    - detection.det0355

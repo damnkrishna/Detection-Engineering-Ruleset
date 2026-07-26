@@ -1,0 +1,83 @@
+title: Password Policy Discovery via CLI (AN0455-A)
+id: 5a70d96f-5372-42b7-900f-60b5a8f9f334
+status: experimental
+description: Detects adversarial execution of commands querying local or domain password policy settings such as net accounts, secedit /export, or PowerShell AD cmdlets for password policy discovery.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_net:
+        - Image|endswith: '\net.exe'
+        - OriginalFileName: 'net.exe'
+    selection_net_args:
+        CommandLine|contains: ' accounts'
+    selection_secedit:
+        - Image|endswith: '\secedit.exe'
+        - OriginalFileName: 'secedit.exe'
+    selection_secedit_args:
+        CommandLine|contains: '/export'
+    selection_powershell:
+        - Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_powershell_args:
+        CommandLine|contains:
+            - 'Get-ADDefaultDomainPasswordPolicy'
+            - 'Get-ADFineGrainedPasswordPolicy'
+            - 'PasswordPolicy'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: ((selection_net and selection_net_args) or (selection_secedit and selection_secedit_args) or (selection_powershell and selection_powershell_args)) and not filter_installer
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Security compliance scripts or audit tools that query password policies as part of regular CIS benchmark assessments.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1201
+    - analytic.an0455
+    - detection.det0161
+---
+title: Password Policy Discovery via PowerShell Script Block (AN0455-B)
+id: 05130155-ae35-40c5-abd7-5b1ff032fc64
+status: experimental
+description: Detects PowerShell script blocks querying Active Directory fine-grained or default domain password policy settings.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: ps_script
+    product: windows
+    # Relies on PowerShell Script Block Logging (Event ID 4104)
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Get-ADDefaultDomainPasswordPolicy'
+            - 'Get-ADFineGrainedPasswordPolicy'
+            - 'PasswordPolicy'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate AD auditing or policy administration scripts.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1201
+    - analytic.an0455
+    - detection.det0161

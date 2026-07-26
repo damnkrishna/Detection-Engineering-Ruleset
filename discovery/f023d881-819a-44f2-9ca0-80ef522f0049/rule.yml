@@ -1,0 +1,39 @@
+title: Local and Domain Account Enumeration (AN2085)
+id: 2f40d4bf-82bd-4bec-a790-6a0aa2435944
+status: experimental
+description: Detects command-line execution of net user, net accounts, or dsquery user to enumerate accounts. Covers renamed binaries via OriginalFileName to resist trivial binary-rename evasion.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\net.exe'
+            - '\net1.exe'
+            - '\dsquery.exe'
+    selection_ofn:
+        OriginalFileName:
+            - 'net.exe'
+            - 'net1.exe'
+            - 'dsquery.exe'
+    selection_cli:
+        CommandLine|contains:
+            - ' user '
+            - ' users '
+            - ' accounts '
+    condition: (selection_images or selection_ofn) and selection_cli
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Identity and access management (IAM) tools performing daily account synchronizations.
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1087
+    - analytic.an2085
+    - detection.det0942

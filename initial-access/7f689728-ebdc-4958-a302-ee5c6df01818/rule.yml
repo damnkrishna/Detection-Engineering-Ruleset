@@ -1,0 +1,37 @@
+title: Spearphishing Link - Script Block executing Email Link Parser (AN0298-B)
+id: f6c1825b-8d25-44e8-8cee-98c436bd406b
+status: experimental
+description: Detects PowerShell script block logs executing commands associated with parsing emails, extracting links, or downloading contents from links (using Invoke-WebRequest or Net.WebClient).
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_cmd:
+        ScriptBlockText|contains:
+            - 'Invoke-WebRequest'
+            - 'iwr '
+            - 'Invoke-RestMethod'
+            - 'irm '
+            - 'Net.WebClient'
+            - 'DownloadFile'
+            - 'DownloadString'
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'outlook'
+            - 'mail'
+            - 'link'
+            - 'url'
+            - 'click'
+    condition: selection_cmd and selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate automation scripts retrieving information from web servers using URL-related parameters.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1566.002
+    - analytic.an0298
+    - detection.det0107

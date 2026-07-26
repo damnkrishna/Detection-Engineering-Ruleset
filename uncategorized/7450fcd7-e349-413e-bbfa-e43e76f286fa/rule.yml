@@ -1,0 +1,43 @@
+title: Reversible Encryption Enabled on User Account (AN1621-A)
+id: 675d929b-2455-4dc5-bbbe-36e88e200587
+status: experimental
+description: Detects Windows Security Event ID 4738 indicating the "Store password using reversible encryption" option was enabled on an account.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_event:
+        EventID: 4738
+    selection_uac_flags:
+        # Check standard combined UserAccountControl values that have the reversible encryption bit (128 / 0x80) enabled
+        UserAccountControl:
+            - '640'
+            - '672'
+            - '66176'
+            - '66208'
+            - '2176'
+            - '4224'
+            - '8320'
+            - '0x280'
+            - '0x2A0'
+            - '0x10280'
+            - '0x102A0'
+            - '0x880'
+            - '0x1080'
+            - '0x2080'
+    condition: selection_event and selection_uac_flags
+fields:
+    - TargetUserName
+    - SubjectUserName
+    - UserAccountControl
+    - SubjectDomainName
+falsepositives:
+    - Administrative configuration for legacy protocols (like IIS Digest Authentication) that require reversible encryption.
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1556.005
+    - analytic.an1621
+    - detection.det0589

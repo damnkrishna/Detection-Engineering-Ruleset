@@ -1,0 +1,38 @@
+title: Archiver Spawning Scripting Hosts or Command Shells (AN1314-B)
+id: cefa1648-531e-4de5-9786-5967372b8344
+status: experimental
+description: Detects command shells or scripting engines launched directly by archive managers.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parents:
+        ParentImage|endswith:
+            - '\winrar.exe'
+            - '\7zfm.exe'
+            - '\7zg.exe'
+            - '\winzip64.exe'
+    selection_images:
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\mshta.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+    condition: selection_parents and selection_images
+fields:
+    - Image
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Users launching administrative scripts from extracted zip archives during manual setup tasks.
+level: high
+tags:
+    - attack.execution
+    - attack.t1204
+    - analytic.an1314
+    - detection.det0478

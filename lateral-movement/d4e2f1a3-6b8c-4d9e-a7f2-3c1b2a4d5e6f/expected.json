@@ -1,0 +1,23 @@
+{
+  "rule_id": "d4e2f1a3-6b8c-4d9e-a7f2-3c1b2a4d5e6f",
+  "rule_name": "RDP Session Hijacking via tscon.exe (AN0216)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

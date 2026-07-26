@@ -1,0 +1,24 @@
+title: 'AN0595 - Server Software Component: Terminal Services DLL'
+id: d192ac64-fd83-46d0-956d-f9cb8197e8ac
+status: experimental
+description: 'Detects registry modifications targeting Terminal Services DLL configurations, which adversaries may abuse to load malicious modules during RDP sessions.'
+author: Krishna Gupta
+logsource:
+  product: windows
+  category: registry_set
+detection:
+  selection_registry:
+    TargetObject|contains: 'System\CurrentControlSet\Control\Terminal Server\Wds\rdpwd'
+  selection_event:
+    EventType: 'SetValue'
+  condition: selection_registry and selection_event
+fields:
+  - EventID
+  - TargetObject
+  - Image
+  - Details
+level: high
+tags:
+  - attack.persistence
+  - attack.t1505.005
+  - analytic.an0595

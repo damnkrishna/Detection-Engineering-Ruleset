@@ -1,0 +1,49 @@
+title: Multi-Stage C2 Channel Process spawning with Network Connection (AN0637-A)
+id: adca2bbb-2fa7-4651-a00c-f63fd4a5f977
+status: experimental
+description: Detects process creation patterns typical of multi-stage C2 channels, where a scripting host (stage 1) spawns an unexpected child process (stage 2) that immediately initiates outbound network connections.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: network_connection
+    product: windows
+    # Relies on Sysmon Event ID 3
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+            - '\wscript.exe'
+            - '\cscript.exe'
+            - '\mshta.exe'
+            - '\hh.exe'
+    selection_child_network:
+        # The child process itself initiates network activity
+        Image|endswith:
+            - '\cmd.exe'
+            - '\rundll32.exe'
+            - '\regsvr32.exe'
+            - '\schtasks.exe'
+            - '\certutil.exe'
+            - '\installutil.exe'
+            - '\cvtres.exe'
+    condition: selection_parent and selection_child_network
+fields:
+    - Image
+    - ParentImage
+    - CommandLine
+    - User
+    - DestinationHostname
+    - DestinationIp
+    - DestinationPort
+    - Initiated
+    - SourceIp
+    - SourcePort
+falsepositives:
+    - Administrative orchestration scripts (e.g. software deployment, patch installation) that execute helper binaries to perform network checks.
+level: high
+tags:
+    - attack.command-and-control
+    - attack.t1104
+    - analytic.an0637
+    - detection.det0228

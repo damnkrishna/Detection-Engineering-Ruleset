@@ -1,0 +1,33 @@
+title: Custom Security Support Provider or LSA Package Registration (AN2115)
+id: fbe4b8da-bfe1-4dda-8def-99a46fea7e40
+status: experimental
+description: "Detects modifications to registry values under HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa (Security Packages, Authentication Packages) or SecurityProviders, which can be abused by adversaries to register custom Security Support Providers (SSPs) to intercept plaintext passwords and MFA credentials."
+author: Krishna Gupta
+date: 2026-07-01
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry_paths:
+        TargetObject|contains:
+            - '\System\CurrentControlSet\Control\Lsa\Security Packages'
+            - '\System\CurrentControlSet\Control\Lsa\Authentication Packages'
+            - '\System\CurrentControlSet\Control\SecurityProviders\SecurityProviders'
+    filter_installer:
+        ParentImage|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+    condition: selection_registry_paths and not filter_installer
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Standard enterprise software (like backup tools or custom endpoint security agents) registering their own security support packages during system installation.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1111
+    - analytic.an2115
+    - detection.det0972

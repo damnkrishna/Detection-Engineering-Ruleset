@@ -1,0 +1,42 @@
+title: Collection - Anomaly Compression Library Load (AN0747)
+id: 631b7ade-97d5-4a47-a85f-59b70fb6b388
+status: experimental
+description: Detects unsigned or non-standard executables loading common compression and archiving libraries (zlib, 7z.dll, unrar, Ionic.Zip), indicating potential custom data archiving prior to exfiltration.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: image_load
+    product: windows
+    # Relies on Sysmon Event ID 7
+detection:
+    selection_dll:
+        ImageLoaded|endswith:
+            - '\zlib1.dll'
+            - '\zlib.dll'
+            - '\7z.dll'
+            - '\unrar.dll'
+            - '\libzip.dll'
+            - '\Ionic.Zip.dll'
+    filter_system:
+ # Exclude standard system and installer paths
+        Image|endswith:
+            - '\System32\msiexec.exe'
+            - '\Program Files\7-Zip\7zG.exe'
+            - '\Program Files\7-Zip\7z.exe'
+            - '\Program Files\WinRAR\WinRAR.exe'
+            - '\Program Files\Microsoft Office\root\Office16\* '
+    condition: selection_dll and not filter_system
+fields:
+    - Image
+    - ImageLoaded
+    - Signed
+    - SignatureStatus
+falsepositives:
+    - Legitimate software installers compiling or extracting update packages during standard setup.
+    - Custom business applications running standard file compression commands.
+level: medium
+tags:
+    - attack.collection
+    - attack.t1560.002
+    - analytic.an0747
+    - detection.det0268

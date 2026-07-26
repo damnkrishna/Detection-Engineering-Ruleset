@@ -1,0 +1,23 @@
+{
+  "rule_id": "5e2e6baa-d6d5-4ea9-b545-3afcbca8667a",
+  "rule_name": "Lateral Movement - WinRM Host Spawning Command Shell (AN1313)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

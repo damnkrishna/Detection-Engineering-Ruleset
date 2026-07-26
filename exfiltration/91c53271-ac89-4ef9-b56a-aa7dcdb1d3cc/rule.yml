@@ -1,0 +1,35 @@
+title: Exfiltration - Bluetooth File Transfer Wizard Execution (AN1531)
+id: 0502b993-f2d8-4c10-882a-e51cf0a12755
+status: experimental
+description: Detects execution of the native Windows Bluetooth File Transfer Wizard (fsquirt.exe), which can be abused by insiders or threat actors to copy data to nearby mobile devices or laptops.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_process_image:
+        Image|endswith:
+            - '\fsquirt.exe'
+    selection_process_original:
+        OriginalFileName:
+            - 'fsquirt.exe'
+    condition: selection_process_image or selection_process_original
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate user transferring business files to an authorized corporate mobile device over Bluetooth.
+level: high
+tags:
+    - attack.exfiltration
+    - attack.t1011.001
+    - analytic.an1531
+    - detection.det0554

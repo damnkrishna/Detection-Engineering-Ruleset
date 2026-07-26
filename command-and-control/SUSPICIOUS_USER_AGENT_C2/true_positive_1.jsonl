@@ -1,0 +1,1 @@
+{"timestamp":"2026-03-02T09:00:00.000Z","signature_name":"ET MALWARE Observed Suspicious Outbound Connection r00ts3c","hostname":"HR-WKS-326","agent_ip":"10.42.17.187","severity_id":3,"event_uid":"golden|SUSPICIOUS_USER_AGENT_C2|0|285900","proto":"tcp","src_port":"50412","dst_port":"443","src_ip":"10.42.17.187","dst_ip":"198.51.100.36"}

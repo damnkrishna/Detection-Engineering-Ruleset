@@ -1,0 +1,23 @@
+{
+  "rule_id": "8c8dfa43-6d03-4b08-8f55-1f9e1db285b0",
+  "rule_name": "Suspicious Python Interpreter Execution (AN0172)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

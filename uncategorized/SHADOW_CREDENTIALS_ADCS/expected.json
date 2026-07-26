@@ -1,0 +1,23 @@
+{
+  "rule_id": "SHADOW_CREDENTIALS_ADCS",
+  "rule_name": "ADCS certificate-based attack — enumeration or ESC exploitation, cert request, certificate-based auth for lateral movement or persistence (T1649)",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-hids",
+  "event_source": "wazuh",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 2
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 2
+  }
+}

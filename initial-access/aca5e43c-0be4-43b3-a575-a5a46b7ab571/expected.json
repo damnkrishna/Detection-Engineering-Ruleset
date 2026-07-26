@@ -1,0 +1,23 @@
+{
+  "rule_id": "aca5e43c-0be4-43b3-a575-a5a46b7ab571",
+  "rule_name": "Trusted Relationship Abuse - Anomalous Third-Party Administrative Logon (AN1344)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

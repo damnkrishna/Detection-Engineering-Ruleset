@@ -1,0 +1,28 @@
+title: Suspicious SPN Enumeration and Kerberoasting Activity via PowerShell Script Block (AN0444-B)
+id: dd567c68-078b-4505-a837-866827065b71
+status: experimental
+description: Detects PowerShell script block logs containing keywords related to SPN enumeration or Kerberoasting attacks.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_keywords:
+        ScriptBlockText|contains:
+            - 'Invoke-Kerberoast'
+            - 'Request-SPNTicket'
+            - 'kerberoast'
+            - 'System.IdentityModel.Tokens.KerberosRequestorSecurityToken'
+            - 'setspn'
+    condition: selection_keywords
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative AD audit scripts.
+level: high
+tags:
+    - attack.credential-access
+    - attack.t1558.003
+    - analytic.an0444
+    - detection.det0157

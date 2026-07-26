@@ -1,0 +1,23 @@
+{
+  "rule_id": "f8775091-a408-4549-baa5-780cd79d3c06",
+  "rule_name": "Volume Shadow Copy Deletion via Native Utilities (AN0602-C)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

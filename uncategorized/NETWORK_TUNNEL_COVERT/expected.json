@@ -1,0 +1,23 @@
+{
+  "rule_id": "NETWORK_TUNNEL_COVERT",
+  "rule_name": "Covert channel: protocol tunneling (DNS/ICMP/HTTP) or port forwarding tool — C2 traffic hiding inside legitimate protocols (T1572, T1090)",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-nids",
+  "event_source": "suricata",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 3
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 3
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 3
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 3
+  }
+}

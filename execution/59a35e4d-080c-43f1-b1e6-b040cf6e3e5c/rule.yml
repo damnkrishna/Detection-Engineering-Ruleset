@@ -1,0 +1,47 @@
+title: Suspicious Windows Command Shell Execution (AN0578)
+id: 5fd1db09-297d-4e45-807a-0c80de188be7
+status: experimental
+description: Detects interactive or scripted abuse of cmd.exe, focusing on anomalous parent processes, suspicious command-line flags, or chained execution.
+author: Krishna Gupta
+date: 2026-06-09
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_cmd:
+        Image|endswith: '\cmd.exe'
+    selection_parent:
+        ParentImage|endswith:
+            - '\winword.exe'
+            - '\excel.exe'
+            - '\powerpnt.exe'
+            - '\mshta.exe'
+            - '\wmiprvse.exe'
+            - '\spoolsv.exe'
+            - '\lsass.exe'
+    selection_flags:
+        CommandLine|contains:
+            - ' /c '
+            - ' /k '
+            - '^' # Obfuscation using caret
+            - '&' # Command chaining
+    condition: selection_cmd and (selection_parent or selection_flags)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Logon scripts executing via wmiprvse.exe.
+    - Legacy applications heavily chaining commands with ampersands.
+level: high
+tags:
+    - attack.execution
+    - attack.t1059.003
+    - analytic.an0578
+    - detection.det0202

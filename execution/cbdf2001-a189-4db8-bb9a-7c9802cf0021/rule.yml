@@ -1,0 +1,44 @@
+title: Unusual PowerShell Parent Process (AN1252-B)
+id: 1d8ef564-2da6-4aea-a81b-639d6ec2547a
+status: experimental
+description: Detects PowerShell spawned by non-standard parent applications.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_images:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_orig:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+            - 'pwsh.exe'
+    selection_parents:
+        ParentImage|endswith:
+            - '\w3wp.exe'
+            - '\nginx.exe'
+            - '\tomcat.exe'
+            - '\winword.exe'
+            - '\excel.exe'
+            - '\powerpnt.exe'
+            - '\sqlserver.exe'
+            - '\postgres.exe'
+            - '\mysqld.exe'
+    condition: (selection_images or selection_orig) and selection_parents
+fields:
+    - Image
+    - ParentImage
+    - CommandLine
+    - User
+falsepositives:
+    - Authorized database plugins or web applications executing system tasks.
+level: critical
+tags:
+    - attack.execution
+    - attack.t1059.001
+    - analytic.an1252
+    - detection.det0455

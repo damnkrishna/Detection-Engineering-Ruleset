@@ -1,0 +1,42 @@
+title: Software Supply Chain - Installer Writing Suspicious File (AN0862-B)
+id: 7b9ed0fb-4566-4abf-9aa9-a59a1a2f08ab
+status: experimental
+description: Detects software installers or updater processes writing scripts, shortcuts, or executables into system folders or startup paths.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection_parent:
+        Image|endswith:
+            - '\msiexec.exe'
+            - '\setup.exe'
+            - '\install.exe'
+            - '\update.exe'
+            - '\updater.exe'
+    selection_paths:
+        TargetFilename|contains:
+            - '\Start Menu\Programs\Startup\'
+            - '\Windows\System32\'
+            - '\Windows\SysWOW64\'
+    selection_extensions:
+        TargetFilename|endswith:
+            - '.bat'
+            - '.ps1'
+            - '.lnk'
+            - '.vbs'
+            - '.exe'
+    condition: selection_parent and selection_paths and selection_extensions
+fields:
+    - Image
+    - TargetFilename
+    - User
+falsepositives:
+    - Legitimate installer writing binaries or start shortcuts during authorized application setup.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1195.002
+    - analytic.an0862
+    - detection.det0309

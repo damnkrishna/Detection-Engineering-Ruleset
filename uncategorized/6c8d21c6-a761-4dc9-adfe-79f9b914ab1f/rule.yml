@@ -1,0 +1,31 @@
+title: LSA Password Filter DLL Registration (AN1303-A)
+id: ce765c7a-572f-471b-9f7d-8617856abe7f
+status: experimental
+description: Detects registry modifications to the Notification Packages key used to load password filters in LSASS.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_lsa:
+        TargetObject|endswith: 'SYSTEM\CurrentControlSet\Control\Lsa\Notification Packages'
+    filter_clean_baselines:
+        # Match only exact standard baseline lists
+        Details:
+            - 'scecli rassfm kdcsvc'
+            - 'scecli rassfm'
+            - 'scecli'
+    condition: selection_lsa and not filter_clean_baselines
+fields:
+    - TargetObject
+    - Details
+    - User
+falsepositives:
+    - Installation of legitimate enterprise password enforcement agents (e.g., AD self-service reset tools).
+level: high
+tags:
+    - attack.defense-impairment
+    - attack.t1556.002
+    - analytic.an1303
+    - detection.det0472

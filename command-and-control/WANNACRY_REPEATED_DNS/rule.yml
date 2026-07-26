@@ -1,0 +1,30 @@
+{
+  "id": "WANNACRY_REPEATED_DNS",
+  "description": "Repeated WannaCry kill-switch DNS lookups \u2014 active ransomware infection confirmed",
+  "correlationKey": "entityIp",
+  "scoreMultiplier": 5.0,
+  "windowMinutes": 30,
+  "sensorFilter": [
+    "NIDS"
+  ],
+  "stages": [
+    {
+      "label": "wc_dns",
+      "tactics": [
+        "TA0011"
+      ],
+      "techniques": [
+        "T1071.004"
+      ],
+      "signatureContains": [
+        "wannacry",
+        "iuqerfsodp9",
+        "Possible WannaCry",
+        "Observed WannaCry",
+        "wncry"
+      ],
+      "optional": false,
+      "minOccurrences": 2
+    }
+  ]
+}

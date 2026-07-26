@@ -1,0 +1,38 @@
+title: Recursive Directory Enumeration (AN2084)
+id: f9545eb5-e7a0-45fe-8f15-8dfb2c1bfcb5
+status: experimental
+description: Detects command-line operations performing recursive directory listings or searching for files across the entire file system. Covers renamed binaries via OriginalFileName to resist trivial binary-rename evasion.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_cmd:
+        Image|endswith:
+            - '\cmd.exe'
+    selection_cmd_ofn:
+        OriginalFileName: 'Cmd.Exe'
+    selection_cmd_args:
+        CommandLine|contains:
+            - 'dir /s'
+            - 'tree /F'
+    selection_tree:
+        Image|endswith:
+            - '\tree.com'
+    selection_tree_ofn:
+        OriginalFileName: 'TREE.COM'
+    condition: ((selection_cmd or selection_cmd_ofn) and selection_cmd_args) or selection_tree or selection_tree_ofn
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - User
+falsepositives:
+    - Developers searching for lost source files or administrators documenting folder structures.
+level: low
+tags:
+    - attack.discovery
+    - attack.t1083
+    - analytic.an2084
+    - detection.det0941

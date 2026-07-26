@@ -1,0 +1,23 @@
+{
+  "rule_id": "ZEEK_LARGE_TRANSFER_HIDS_COLLECTION",
+  "rule_name": "Cross-sensor: HIDS detects file collection activity + Zeek detects large outbound flow from same host — data exfiltration confirmed by two independent sources",
+  "rule_type": "SEQUENCE",
+  "replay_topic": "replay-events-hids",
+  "event_source": "wazuh",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 2
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 2
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 2
+  }
+}

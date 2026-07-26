@@ -1,0 +1,27 @@
+title: Internal Spearphishing via PowerShell Script (AN0147-B)
+id: 2b93c3d4-e32e-406f-b028-f4ed9639ea36
+status: experimental
+description: Detects PowerShell script block execution invoking SMTP client objects or mail message cmdlets to send emails, suggesting programmatic internal spearphishing.
+author: Krishna Gupta
+date: 2026-06-16
+logsource:
+    category: ps_script
+    product: windows
+detection:
+    selection_cmdlet:
+        ScriptBlockText|contains:
+            - 'Send-MailMessage'
+            - 'Net.Mail.SmtpClient'
+            - 'Net.Mail.MailMessage'
+    condition: selection_cmdlet
+fields:
+    - ScriptBlockText
+falsepositives:
+    - Legitimate administrative script block automation sending notifications.
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1534
+    - attack.t1566.002
+    - analytic.an0147
+    - detection.det0054

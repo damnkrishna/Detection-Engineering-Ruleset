@@ -1,0 +1,23 @@
+{
+  "rule_id": "9a17f58c-f886-4e86-8d69-dd311b18497e",
+  "rule_name": "Drive-by Compromise - PowerShell Script Block executing from Web Browser Parent (AN0498-B)",
+  "rule_type": "THRESHOLD",
+  "replay_topic": "replay-events-sysmon",
+  "event_source": "sysmon",
+  "true_positive_1": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "true_positive_2": {
+      "expected_alerts": 1,
+      "events": 1
+  },
+  "benign_1": {
+      "expected_alerts": 0,
+      "events": 1
+  },
+  "benign_2": {
+      "expected_alerts": 0,
+      "events": 1
+  }
+}

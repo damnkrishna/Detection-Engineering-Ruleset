@@ -1,0 +1,36 @@
+title: Accessibility Features Registry Debugger Configuration (AN0094-B)
+id: 9fb5ef9f-a06f-4c81-8ffa-988215111b0e
+status: experimental
+description: Detects registry value writes configuring a Debugger value for accessibility binaries under the Image File Execution Options path.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection_registry_path:
+        TargetObject|contains:
+            - '\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\sethc.exe'
+            - '\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\utilman.exe'
+            - '\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\osk.exe'
+            - '\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\magnify.exe'
+            - '\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\narrator.exe'
+            - '\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\displayswitch.exe'
+            - '\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\AtBroker.exe'
+    selection_registry_value:
+        TargetObject|endswith: '\Debugger'
+    condition: selection_registry_path and selection_registry_value
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Troubleshooting scenarios performed by developers or support, but highly anomalous on production.
+level: critical
+tags:
+    - attack.persistence
+    - attack.privilege-escalation
+    - attack.t1546.008
+    - analytic.an0094
+    - detection.det0042

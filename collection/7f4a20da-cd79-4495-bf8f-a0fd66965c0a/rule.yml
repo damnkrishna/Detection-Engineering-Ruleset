@@ -1,0 +1,43 @@
+title: Collection - Remote Email Collection via Exchange API Query (AN0131)
+id: e270ed9f-40a9-40c0-a8e7-950c8f8ab153
+status: experimental
+description: Detects command-line parameters or PowerShell script blocks indicating remote email collection via Exchange Web Services (EWS) or Exchange Management cmdlets, indicating potential data theft.
+author: Krishna Gupta
+date: 2026-06-08
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1 / PowerShell Event 4104
+detection:
+    selection_cmd:
+        CommandLine|contains:
+            - 'Microsoft.Exchange.WebServices.Data'
+            - 'Export-Mailbox'
+            - 'Search-Mailbox'
+            - 'Get-MailboxFolderStatistics'
+            - 'ExchangeService'
+    selection_powershell:
+        EventID: 4104
+        ScriptBlockText|contains:
+            - 'Microsoft.Exchange.WebServices.Data.ExchangeService'
+            - 'Get-Mailbox'
+            - 'Export-Mailbox'
+            - 'Search-Mailbox'
+    condition: selection_cmd or selection_powershell
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Exchange administrators running routine mailbox cleanups or compliance exports.
+level: high
+tags:
+    - attack.collection
+    - attack.t1114.002
+    - analytic.an0131
+    - detection.det0048

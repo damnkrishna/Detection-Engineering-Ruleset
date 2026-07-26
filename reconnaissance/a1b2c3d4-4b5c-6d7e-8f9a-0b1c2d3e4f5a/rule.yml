@@ -1,0 +1,28 @@
+title: Registry System Information Query (AN2067-Registry)
+id: 34ce162a-c836-4ce2-b78f-5e00a601fc25
+status: experimental
+description: Detects command-line execution of reg.exe querying key system information registry paths.
+author: Krishna Gupta
+date: 2026-06-30
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_reg:
+        Image|endswith: '\reg.exe'
+        OriginalFileName: 'reg.exe'
+    selection_args:
+        CommandLine|contains:
+            - 'query'
+    selection_keys:
+        CommandLine|contains:
+            - 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
+            - 'HKLM\SYSTEM\CurrentControlSet\Control\ComputerName'
+            - 'HKLM\Hardware\Description\System\CentralProcessor'
+    condition: selection_reg and selection_args and selection_keys
+falsepositives:
+    - Legitimate diagnostic scripts.
+level: low
+tags:
+    - attack.reconnaissance
+    - attack.t1592

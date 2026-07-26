@@ -1,0 +1,92 @@
+title: Disabling or Tampering with Windows Event Logging (AN0535)
+id: 20ee9259-7a0e-44a0-b6e6-d27119e99fb0
+status: experimental
+description: Detects command-line operations that attempt to disable, clear, or modify Windows Event Log services, logging channels, or system audit policies.
+author: Krishna Gupta
+date: 2026-06-07
+logsource:
+    category: process_creation
+    product: windows
+    # Relies on Sysmon Event ID 1
+detection:
+    selection_wevtutil:
+        - Image|endswith: '\wevtutil.exe'
+        - OriginalFileName: 'wevtutil.exe'
+    selection_wevtutil_args:
+        CommandLine|contains:
+            - ' cl '      # Clear log
+            - ' clear-log '
+            - '/e:false'  # Disable log
+            - '/enabled:false'
+    selection_auditpol:
+        - Image|endswith: '\auditpol.exe'
+        - OriginalFileName: 'Auditpol.exe'
+    selection_auditpol_args:
+        CommandLine|contains:
+            - '/clear'
+            - '/remove'
+            - '/success:disable'
+            - '/failure:disable'
+    selection_service_control:
+        - Image|endswith:
+            - '\sc.exe'
+            - '\net.exe'
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        - OriginalFileName:
+            - 'sc.exe'
+            - 'net.exe'
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    selection_service_args:
+        CommandLine|contains|all:
+            - 'eventlog'
+        CommandLine|contains:
+            - 'stop'
+            - 'disable'
+    condition: (selection_wevtutil and selection_wevtutil_args) or (selection_auditpol and selection_auditpol_args) or (selection_service_control and selection_service_args)
+fields:
+    - Image
+    - OriginalFileName
+    - CommandLine
+    - ParentImage
+    - ParentCommandLine
+    - CurrentDirectory
+    - User
+    - LogonId
+falsepositives:
+    - Legitimate administrative maintenance, diagnostic troubleshooting, or script-based log rotation configured by enterprise engineers.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1685.001
+    - analytic.an0535
+    - detection.det0187
+---
+title: Windows Event Logging Service Registry Modification (AN0535-B)
+id: ca95c7f9-a9a6-49d1-803e-bde7431dbc1c
+status: experimental
+description: Detects registry modifications under Windows EventLog configurations, indicating attempts to disable or redirect logging.
+author: Krishna Gupta
+date: 2026-06-17
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains:
+            - '\System\CurrentControlSet\Services\EventLog\'
+    condition: selection
+fields:
+    - TargetObject
+    - Details
+    - Image
+    - User
+falsepositives:
+    - Administrative configuration of custom event log paths or settings.
+level: high
+tags:
+    - attack.defense-evasion
+    - attack.t1685.001
+    - analytic.an0535
+    - detection.det0187
